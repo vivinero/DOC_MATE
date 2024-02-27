@@ -31,7 +31,7 @@ const adminAuthenticate =async (req, res, next)=>{
                 message: "Account doesn't exist",
             })
         }
-        if(ad.blacklist.includes(token)){
+        if(admin.blacklist.includes(token)){
             return res.status(400).json({
                 message : "Authorization failed: Please login again",
             })
@@ -51,7 +51,7 @@ const adminAuthenticate =async (req, res, next)=>{
             
         }
         return res.status(500).json({
-            message: "Error authenticating" + err.message
+            message: "Error authenticating:" + " " + err.message
         })
         
     }

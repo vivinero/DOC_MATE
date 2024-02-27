@@ -1,101 +1,168 @@
 // controllers/appointmentController.js
 
 const appointmentModel = require('../models/appModel');
+const adminModel = require('../models/adminModel')
 const nodemailer = require('nodemailer');
 const userModel = require("../models/userModel")
+const requestModel = require("../models/requestModel")
 const cron = require('cron');
 const sendEmail = require("../email")
 const notificationModel = require("../models/notificationModel")
-const { validateDateTime } = require("../middleware/validator")
+const { validateDateTime } = require("../middleware/validator");
+const sendMail = require('../middleware/email');
+const viewApp = require('../createAppMail')
+const { notify } = require('../router.js/patientAppRoute');
 
 
+const requestPatientAppointment = async(req,res)=>{
+  try {
+    
+    const userId = req.user.userId
+    const user = await userModel.findById(userId)
+    
+    const hospitalId = req.params.id
+    // find the hospital
+    const hospital = await adminModel.findById(hospitalId)
+    if (!hospital) {
+      return res.status(400).json({message:"hospital unavailable"})
+    }
+    // get the apointment details
+    const {patientName, lastVisit, lastDiagnosis, presentSymptoms} = req.body
 
+    const request = await requestModel.create({
+      patientName,
+      lastVisit,
+      lastDiagnosis,
+      presentSymptoms,
+      user:user._id
+    })
+
+
+    if(!request){
+      return res.status(403).json({
+        message: "Cannot request an appointment"
+      })
+    }
+
+    hospital.appointment.push(request._id)
+    // user._id = request.user 
+
+    await hospital.save()
+    await user.save()
+
+    // Send email to the patient with appointment details
+    const subject = "Patient's Appointment Request";
+    const link = `${req.protocol}://${req.get("host")}/viewApp/${user.id}`;
+    const html = viewApp(link, hospital.hospitalName); // Assuming you have access to patient's first name
+    await sendMail({
+        email: hospital.email,
+        subject: subject,
+        html: html
+    });
+
+    // push request to notification
+    if(request){
+    const message = `${patientName} requested an appointment. Click to view`
+    const notify = new notificationModel({
+      user:hospital._id,
+      message
+    })
+  }
+
+  res.status(200).json({
+    message: "You have successfully requested an appointment"
+  })
+    
+  } catch (error) {
+    res.status(500).json({message:error.message})
+  }
+}
 // Create an instance of AdminNotification
 //const adminNotification = new AdminNotification();
 
 // Logic for handling appointment requests
-const handleAppointmentRequest = async (req, res) => {
-  const { error } = validateDateTime (req.body);
-        if (error) {
-            res.status(500).json({
-                message: error.details[0].message
-            })
-            return;
-        } else {
-  try {
-    const userId = req.params.userId;
-    const user = await userModel.findById(userId);
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found"
-      });
-    }
+// const handleAppointmentRequest = async (req, res) => {
+//   const { error } = validateDateTime (req.body);
+//         if (error) {
+//             res.status(500).json({
+//                 message: error.details[0].message
+//             })
+//             return;
+//         } else {
+//   try {
+//     const userId = req.params.userId;
+//     const user = await userModel.findById(userId);
+//     if (!user) {
+//       return res.status(404).json({
+//         message: "User not found"
+//       });
+//     }
 
-    // Extract appointment details from request body
-    const data = {
-      fullName: req.body.fullName.toLowerCase(),
-      date: req.body.date,
-      patientEmail: req.body.patientEmail.toLowerCase(),
-      //specialist: req.body.specialist.toLowerCase(),
-    };
-    const databaseName = user.firstName + " " + user.lastName;
-    if (data.fullName !== databaseName) {
-      return res.status(400).json({
-        message: "User not in the database"
-      });
-    }
+//     // Extract appointment details from request body
+//     const data = {
+//       fullName: req.body.fullName.toLowerCase(),
+//       date: req.body.date,
+//       patientEmail: req.body.patientEmail.toLowerCase(),
+//       //specialist: req.body.specialist.toLowerCase(),
+//     };
+//     const databaseName = user.firstName + " " + user.lastName;
+//     if (data.fullName !== databaseName) {
+//       return res.status(400).json({
+//         message: "User not in the database"
+//       });
+//     }
 
-    // Check if the appointment date is in the future
-    const currentDate = new Date();
-    const appointmentDate = new Date(data.date);
-    if (appointmentDate < currentDate) {
-      return res.status(400).json({
-        message: "Appointment date must be in the future"
-      });
-    }
+//     // Check if the appointment date is in the future
+//     const currentDate = new Date();
+//     const appointmentDate = new Date(data.date);
+//     if (appointmentDate < currentDate) {
+//       return res.status(400).json({
+//         message: "Appointment date must be in the future"
+//       });
+//     }
 
 
-    // Create instance of AppointmentModel and store the request
-    const appointmentRequest = new appointmentModel({
-      fullName: data.fullName,
-        patientEmail: data.patientEmail,
-         date: data.date });
-    // const isNewAppointment = (appointmentRequest) => {
-    //   //Implement logic to check if it's a new appointment
-    //   const currentDate = new Date();
+//     // Create instance of AppointmentModel and store the request
+//     const appointmentRequest = new appointmentModel({
+//       fullName: data.fullName,
+//         patientEmail: data.patientEmail,
+//          date: data.date });
+//     // const isNewAppointment = (appointmentRequest) => {
+//     //   //Implement logic to check if it's a new appointment
+//     //   const currentDate = new Date();
 
-    //   //convert the dateRequested string to a Date object
-    //   const dateRequested = new Date(appointmentRequest.date);
-    //   // For example, you could check if the dateRequested is in the future
-    //   return dateRequested > currentDate; // Placeholder logic, replace with your implementation
-    // }
-    appointmentRequest.createdAppId = appointmentRequest._id
+//     //   //convert the dateRequested string to a Date object
+//     //   const dateRequested = new Date(appointmentRequest.date);
+//     //   // For example, you could check if the dateRequested is in the future
+//     //   return dateRequested > currentDate; // Placeholder logic, replace with your implementation
+//     // }
+//     appointmentRequest.createdAppId = appointmentRequest._id
 
-    await appointmentRequest.save();
+//     await appointmentRequest.save();
 
-    const adminNotification = await notificationModel.create({ fullName: data.fullName, patientEmail: data.patientEmail, date: data.date });
-    if (!adminNotification) {
-      return res.status(404).json({
-        message: "Notification not sent"
+//     const adminNotification = await notificationModel.create({ fullName: data.fullName, patientEmail: data.patientEmail, date: data.date });
+//     if (!adminNotification) {
+//       return res.status(404).json({
+//         message: "Notification not sent"
 
-      })
-    }
+//       })
+//     }
 
-    // // Check if it's a new appointment
-    // if (isNewAppointment(appointmentRequest)) {
-    //   //       // Notify admin
-    //   notifyAdmin(appointmentRequest);
-    // }
+//     // // Check if it's a new appointment
+//     // if (isNewAppointment(appointmentRequest)) {
+//     //   //       // Notify admin
+//     //   notifyAdmin(appointmentRequest);
+//     // }
 
-    // Notify admin
-    //notifyAdmin(appointmentRequest);
+//     // Notify admin
+//     //notifyAdmin(appointmentRequest);
 
-    return res.status(201).json({ message: 'Appointment request sent successfully', appointment: appointmentRequest });
-  } catch (error) {
-    return res.status(500).json({ error: "Internal server error " + error.message });
-  }
-};
-}
+//     return res.status(201).json({ message: 'Appointment request sent successfully', appointment: appointmentRequest });
+//   } catch (error) {
+//     return res.status(500).json({ error: "Internal server error " + error.message });
+//   }
+// };
+// }
 
 // // Function to notify admin
 // const notifyAdmin = (appointmentRequest) => {
@@ -174,60 +241,60 @@ const deleteRequest = async (req, res) => {
 
 
 
-const requestAppointment = async (req, res) => {
+// const requestAppointment = async (req, res) => {
   
-  try {
-    const userId = req.params.userId
-    const user = await userModel.findById(userId)
-    if (!user) {
-      return res.status(404).json({
-        message: "User not found"
-      })
-    }
+//   try {
+//     const userId = req.params.userId
+//     const user = await userModel.findById(userId)
+//     if (!user) {
+//       return res.status(404).json({
+//         message: "User not found"
+//       })
+//     }
 
-    // Extract appointment details from request body
-    const { patientName, date, patientEmail } = req.body;
-    const databaseName = user.firstName + " " + user.lastName
-    if (patientName !== databaseName) {
-      return res.status(400).json({
-        message: "User not in the database"
-      })
-    }
+//     // Extract appointment details from request body
+//     const { patientName, date, patientEmail } = req.body;
+//     const databaseName = user.firstName + " " + user.lastName
+//     if (patientName !== databaseName) {
+//       return res.status(400).json({
+//         message: "User not in the database"
+//       })
+//     }
 
-    const bookedDate = await appointmentModel.findOne({ date })
-    if (bookedDate) {
-      return res.status(400).json({
-        message: "Date have been booked already try another date"
-      })
-    }
+//     const bookedDate = await appointmentModel.findOne({ date })
+//     if (bookedDate) {
+//       return res.status(400).json({
+//         message: "Date have been booked already try another date"
+//       })
+//     }
 
-    // Create new appointment
-    const appointment = new appointmentModel({
-      patientName,
-      patientEmail,
-      date
+//     // Create new appointment
+//     const appointment = new appointmentModel({
+//       patientName,
+//       patientEmail,
+//       date
 
-    });
-        // Check if the appointment date is in the future
-        const currentDate = new Date();
-        const appointmentDate = new Date(date);
-        if (appointmentDate < currentDate) {
-          return res.status(400).json({
-            message: "Appointment date must be in the future"
-          });
-        }
+//     });
+//         // Check if the appointment date is in the future
+//         const currentDate = new Date();
+//         const appointmentDate = new Date(date);
+//         if (appointmentDate < currentDate) {
+//           return res.status(400).json({
+//             message: "Appointment date must be in the future"
+//           });
+//         }
 
-    // Save appointment to database
-    await appointment.save();
-    user.appointment.push(appointment)
-    await user.save()
-    // totalRequests++;
+//     // Save appointment to database
+//     await appointment.save();
+//     user.appointment.push(appointment)
+//     await user.save()
+//     // totalRequests++;
 
-    return res.status(201).json({ message: 'Appointment request sent successfully', appointment });
-  } catch (error) {
-    return res.status(500).json({ error: "Internal server error " + error.message });
-  }
-};
+//     return res.status(201).json({ message: 'Appointment request sent successfully', appointment });
+//   } catch (error) {
+//     return res.status(500).json({ error: "Internal server error " + error.message });
+//   }
+// };
 
 
 const cancelAppointment = async (req, res) => {
@@ -418,14 +485,15 @@ const sendAppointmentReminders = async (appointmentId) => {
 
 
 module.exports = {
-  requestAppointment,
+  // requestAppointment,
   sendAppointmentReminders,
   cancelAppointment,
-  rescheduleAppointment,
-  handleAppointmentRequest,
+  // rescheduleAppointment,
+  // handleAppointmentRequest,
   getAllRequest,
   viewOneAppointRequest,
-  deleteRequest
+  deleteRequest,
+  requestPatientAppointment,
   // scheduleAppointmentReminders
 
 }

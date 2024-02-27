@@ -13,11 +13,7 @@ const Appointments = new mongoose.Schema({
         enum: ['pending', 'confirmed', 'rechedule'],
         default: 'pending'
     },
-    reschedule: [{
-        Day: String,
-        Time: String,
-        DocName: String,
-    }],
+
     patient: [{
         type: mongoose.SchemaTypes.ObjectId,
         ref: "patient"

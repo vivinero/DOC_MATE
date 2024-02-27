@@ -34,8 +34,9 @@ const signUp = async (req, res) => {
             const email = req.body.email.trim();
             const password = req.body.password.trim();
             const phoneNumber = req.body.phoneNumber.trim();
-            const gender = req.body.gender.trim();
             const confirmPassword = req.body.confirmPassword.trim();
+            const gender = req.body.gender.trim();
+
 
             const checkPatient = await patientModel.findOne({ email: email.toLowerCase() })
             if (checkPatient) {
@@ -55,7 +56,6 @@ const signUp = async (req, res) => {
                 })
             }
 
-
             //Create a user
             const patient = new patientModel({
                 firstName,
@@ -69,6 +69,7 @@ const signUp = async (req, res) => {
             )
 
             const token = jwt.sign({ userId: patient._id, firstName: patient.firstName, lastName: patient.lastName, email: patient.email }, process.env.jwtSecret, { expiresIn: "300s" })
+            patient.token = token;
 
 
             const link = `${ req.protocol }://${req.get("host")}/verify/${patient.id}/${token}`
@@ -100,6 +101,8 @@ const signUp = async (req, res) => {
 
     }
 }
+
+
 
 //Function to verify a new user with a link
 const verify = async (req, res) => {
@@ -274,7 +277,9 @@ const resetpassword = async (req, res) => {
 const uploadProfilePicture = async (req, res) => {
     try {
         const userId = req.user.userId
+
         const user = await patientModel.findById(userId)
+        
         const allowedMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
 
         // Check if the uploaded file's MIME type is allowed

@@ -29,18 +29,18 @@ const register = async (req, res) => {
                 })
             }
 
+            //Encrypt the user's password
+            const salt = bcrypt.genSaltSync(10);
+            const hashedPassword = bcrypt.hashSync(password, salt);
+
             if (password !== confirmPassword) {
                 return res.status(404).json({
                     message: "Please enter the correct password"
                 })
             }
 
-            //Encrypt the user's password
-            const salt = bcrypt.genSaltSync(10);
-            const hashedPassword = bcrypt.hashSync(password, salt);
-            
             //Create a user
-            const user = new adminModel({
+            const admin = new adminModel({
                 hospitalName,
                 email,
                 password: hashedPassword,
@@ -48,26 +48,22 @@ const register = async (req, res) => {
                 hospitalAddress
             })
 
-            const token = jwt.sign({
-                userId: user._id, 
-                hospitalName: user.hospitalName, 
-                hospitalAddress: user.hospitalAddress, 
-                email: user.email,
-                phoneNumber: user.phoneNumber
-            }, process.env.jwtSecret, { expiresIn: "5mins" })
 
+            const token = jwt.sign({ userId: admin._id, firstName: admin.firstName, lastName: admin.lastName, email: admin.email }, process.env.jwtSecret, { expiresIn: "300s" })
+            admin.token = token;
 
-            const link = `${ req.protocol }://${req.get("host")}/verify/${user.id}/${token}`
+            const link = `${ req.protocol }://${req.get("host")}/verify/${admin.id}/${token}`
+
             sendEmail({
-                email: user.email,
+                email: admin.email,
                 subject: 'KINDLY VERIFY YOUR ACCOUNT',
-                html: generateDynamicEmail(link, user.hospitalName)
+                html: generateDynamicEmail(link, admin.hospitalName)
             })
-            await user.save();
+            await admin.save();
 
             return res.status(201).json({
                 message: "Your profile has been created! A link has been sent to your email to verify your email address",
-                data: user
+                data: admin
             })
             
     } catch (error) {
@@ -83,17 +79,17 @@ const register = async (req, res) => {
 const verifyAdmin = async (req, res) => {
     try {
         const id = req.params.id;
-          const token = req.params.token;
-        const user = await adminModel.findById(id);
+        //   const token = req.params.token;
+        const admin = await adminModel.findById(id);
 
         // Verify the token
-        jwt.verify(token, process.env.jwtSecret);
+        jwt.verify(admin.token, process.env.jwtSecret);
 
 
         // Update the user if verification is successful
-        const updatedUser = await adminModel.findByIdAndUpdate(id, { isVerified: true }, { new: true });
+        const updatedAdmin = await adminModel.findByIdAndUpdate(id, { isVerified: true }, { new: true });
 
-        if (updatedUser.isVerified === true) {
+        if (updatedAdmin.isVerified === true) {
             return res.status(200).send("<h1>You have been successfully verified. Kindly visit the login page.</h1>");
         }
         //handle your redirection here
@@ -103,16 +99,17 @@ const verifyAdmin = async (req, res) => {
         if (error instanceof jwt.JsonWebTokenError) {
             // Handle token expiration
             const id = req.params.id;
-            const updatedUser = await adminModel.findById(id);
+            const updatedAdmin = await adminModel.findById(id);
             //const { firstName, lastName, email } = updatedUser;
-            const newtoken = jwt.sign({ email: updatedUser.email, firstName: updatedUser.firstName, lastName: updatedUser.lastName }, process.env.jwtSecret, { expiresIn: "300s" });
-            updatedUser.token = newtoken;
-            updatedUser.save();
+            const newtoken = jwt.sign({ email: updatedAdmin.email, firstName: updatedAdmin.firstName, lastName: updatedAdmin.lastName }, process.env.jwtSecret, { expiresIn: "300s" });
+            updatedAdmin.token = newtoken;
+            
+            updatedAdmin.save();
 
             const link = `${req.protocol}://${req.get('host')}/verify/${id}`;
             sendEmail({
-                email: updatedUser.email,
-                html: generateDynamicEmail(link, updatedUser.firstName, updatedUser.lastName),
+                email: updatedAdmin.email,
+                html: generateDynamicEmail(link, updatedAdmin.firstName, updatedAdmin.lastName),
                 subject: "RE-VERIFY YOUR ACCOUNT"
             });
             return res.status(401).send("<h1>This link is expired. Kindly check your email for another email to verify.</h1>");
@@ -124,6 +121,7 @@ const verifyAdmin = async (req, res) => {
         };
     }
 }
+
 
 
 const loginAdmin = async (req, res) => {
@@ -152,6 +150,7 @@ const loginAdmin = async (req, res) => {
             })
 
         }
+        
 
         const token = jwt.sign({
             userId: admin._id,

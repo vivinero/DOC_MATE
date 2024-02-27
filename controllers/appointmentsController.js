@@ -6,7 +6,7 @@ const adminModel = require("../models/adminModel");
 const sendMail = require("../middleware/email");
 const generateDynamicEmail = require("../createAppMail");
 const userModel = require("../models/userModel.js")
-
+const requestModel = require("../models/requestModel.js")
 const Appointment = require("../models/adminAppointment.js");
 const { validateCreateAppointment, validateConfirmAppointment, validateRescheduleAppointment } = require('../middleware/createAppVal'); // Import the validation functions
 const { validateRescheduleOptions } = require('../middleware/createAppVal.js');
@@ -89,10 +89,10 @@ exports.createAppointment = async (req, res) => {
         const { doctorName, fee, date, time  } = req.body;
 
         // Fetch patient details from the database
-        const patient = await userModel.findById(id);
-        if (!patient) {
+        const requestedApp = await requestModel.findById(id);
+        if (!requestedApp) {
             return res.status(404).json({ 
-                message: `Patient with this ID: ${id} was not found`
+                message: `Patient request ID: ${id} was not found`
             });
         }
 
@@ -102,16 +102,16 @@ exports.createAppointment = async (req, res) => {
         // Send email to the patient with appointment details
         const subject = "Your Appointment Details";
         const link = `${req.protocol}://${req.get("host")}/viewApp/${createApp.id}`;
-        const html = viewApp(link, patient.firstName); // Assuming you have access to patient's first name
+        const html = viewApp(link, requestedApp.firstName); // Assuming you have access to patient's first name
         await sendMail({
-            email: patient.email,
+            email: requestedApp.email,
             subject: subject,
             html: html
         });
 
         // Success message
         res.status(200).json({
-            message: `Dear ${patient.firstName}, your appointment has been created successfully. Check your email for details.`,
+            message: `, your appointment has been created successfully. Check your email for details.`,
             appointment: createApp
         });
     } catch (error) {
@@ -127,6 +127,7 @@ exports.confirmAppointment = async (req, res) => {
     try {
         // const userId = req.user.userId
         const id = req.params.id
+        
         const patient = await userModel.findById(id)
         if (!patient) {
             return res.status(400).json({

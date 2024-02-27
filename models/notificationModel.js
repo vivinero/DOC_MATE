@@ -1,18 +1,16 @@
 const mongoose = require("mongoose")
 const notificationSchema = new mongoose.Schema({
-    fullName: {
-        type: String,
-        required: true
-    },
 
-    date: {
+    admin:{
+        type: mongoose.SchemaTypes.ObjectId,
+        ref: "Hospital"
+    },
+    
+
+    msg: {
         type: String,
         required: true
     },
-    appointments: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'appointments'
-    }]
 
 
 }, {timestamps: true})

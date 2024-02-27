@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
 
-const {handleAppointmentRequest,  rescheduleAppointment}= require("../controllers/appointment")
+const { requestPatientAppointment}= require("../controllers/appointment")
+const {authenticate} = require('../middleware/authentication')
 
-router.post("/request",handleAppointmentRequest );
-router.put("/reschedule", rescheduleAppointment)
+router.post("/request/:id", authenticate, requestPatientAppointment );
 
 module.exports= router

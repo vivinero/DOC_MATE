@@ -1,4 +1,33 @@
 const notificationModel = require("../models/notificationModel")
+const adminModel = require("../models/adminModel")
+
+//get one
+exports.getOne = async (req, res) => {
+     try {
+        const userId = req.user.userId
+        const id = req.params.id
+        const admin = await adminModel.findById(userId)
+        if (!admin) {
+            return res.status(404).json({
+                message: "unable to find hospital"
+            })
+        }
+        const notify = await notificationModel.findById(id)
+        if (!notify) {
+            return res.status(404).json({
+                message: "unable to find notification"
+            })
+        }
+        res.status(200).json({
+            message: "Successfully gotten one"
+        })
+
+     } catch (error) {
+        res.status(500).json({
+            message: error.message
+        });
+     }
+}
 
 
 exports.getAllNotification = async (req, res) => {
