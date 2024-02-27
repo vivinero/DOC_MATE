@@ -2,9 +2,14 @@
 const mongoose = require('mongoose');
 
 const appointmentSchema = new mongoose.Schema({
-  patientName: { type: String, required: true },
-  patientEmail: { type: String, required: true },
-  date: { type: Date, required: true },
+  date: { 
+    type: Date, 
+    required: true
+  },
+  doctorName: { 
+    type: Date, 
+    required: true
+  },
   // specialist: {
   //   type: String,
   //   required: true,
@@ -27,15 +32,6 @@ const appointmentSchema = new mongoose.Schema({
 
 
 }, { timestamps: true });
-// appointmentSchema.pre('save', function(next) {
-//   // Convert the name to lowercase before saving
-//   if (this.isModified('patientName', 'patientEmail', 'specialist')) {
-//     this.patientName = this.patientName.toLowerCase();
-//     this.patientEmail = this.patientEmail.toLowerCase();
-//     this.specialist = this.specialist.toLowerCase();
-//   }
-//   next();
-// });
 
 
 const Appointment = mongoose.model('Appointment', appointmentSchema);

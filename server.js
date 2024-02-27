@@ -1,4 +1,4 @@
-const { sendAppointmentReminders } = require('./controllers/appointment');
+// const { sendAppointmentReminders } = require('./controllers/appointment');
 const appointmentModel = require("./models/appModel")
 
 const express = require('express');

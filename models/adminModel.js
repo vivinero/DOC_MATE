@@ -18,10 +18,6 @@ const hospitalSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    isAdmin: {
-        type: String,
-        required: true
-    },
     // confirmPassword: {
     //     type: String,
     // },
@@ -64,7 +60,7 @@ const hospitalSchema = new mongoose.Schema({
 
 hospitalSchema.pre('save', function(next) {
     // Convert the name to lowercase before saving
-    if (this.isModified('hospialName', 'hospitalAddress', 'email')) {
+    if (this.isModified('hospitalName', 'hospitalAddress', 'email')) {
       this.hospialName = this.hospialName.toLowerCase();
       this.hospitalAddress= this.hospitalAddress.toLowerCase();
       this.email = this.email.toLowerCase();

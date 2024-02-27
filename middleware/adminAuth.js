@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const adminModel = require('../models/adminModel')
 require('dotenv').config();
 
-const authenticate =async (req, res, next)=>{
+const adminAuthenticate =async (req, res, next)=>{
     try{
         const hasAuthorization = req.headers.authorization;
 
@@ -31,14 +31,14 @@ const authenticate =async (req, res, next)=>{
                 message: "Account doesn't exist",
             })
         }
-        if(user.blacklist.includes(token)){
+        if(admin.blacklist.includes(token)){
             return res.status(400).json({
                 message : "Authorization failed: Please login again",
             })
         
 
         }
-        //pass the payload into the request user
+        //pass the payload into the request admin
         req.user = decodeToken
         next();
         
@@ -58,4 +58,4 @@ const authenticate =async (req, res, next)=>{
 
 }
 
-module.exports = {authenticate, admin}
+module.exports = {adminAuthenticate}

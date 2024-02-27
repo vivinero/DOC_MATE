@@ -1,17 +1,80 @@
-const appointmentsModel = require("../models/appointmentsModel")
+const appointmentsModel = require("../models/adminAppointment.js")
 // const sendEmail = require("../creatAppMail")
 const getUserDetailsById = require("../utils/patientID")
 const viewApp = require("../createAppMail");
 const adminModel = require("../models/adminModel");
 const sendMail = require("../middleware/email");
 const generateDynamicEmail = require("../createAppMail");
+const userModel = require("../models/userModel.js")
 
-const Appointment = require("../models/appointmentsModel");
-const { validateCreateAppointment, validateRescheduleAppointment } = require('../middleware/createAppVal'); // Import the validation functions
+const Appointment = require("../models/adminAppointment.js");
+const { validateCreateAppointment, validateConfirmAppointment, validateRescheduleAppointment } = require('../middleware/createAppVal'); // Import the validation functions
 const { id } = require("@hapi/joi/lib/base");
+
+// exports.createAppointment = async (req, res) => {
+//     try {
+//         // Validate the request body for creating an appointment
+//         const { error: createError } = validateCreateAppointment(req.body);
+//         if (createError) {
+//             return res.status(400).json({ 
+//                 message: createError.details[0].message
+//             });
+//         }
+
+//         // Check if admin exists in the database
+//         const { patientName, date, time } = req.body;
+
+//         // Define reschedule options
+//         const rescheduleOptions = [
+//             { day: 'Tuesday', time: '2pm', doctor: 'Henry' },
+//             { day: 'Thursday', time: '2pm', doctor: 'Michael' },
+//             { day: 'Friday', time: '2pm', doctor: 'Godwin'}
+//         ];
+
+//         // Create the appointment
+//         const createApp = await appointmentsModel.create({ patientName, patientId, date, time});
+
+//         // Get patient details
+//         const patientname = await userModel.findOne();
+//         if (!patient) {
+//             return res.status(404).json({ 
+//                 message: `Patient with this ID: ${patientId} was not found`
+//             });
+//         }
+
+//         // Send email to the patient with appointment details
+//         const subject = "PLEASE VIEW APPOINTMENT";
+//         const link = `${req.protocol}://${req.get("host")}/viewApp/${createApp.id}`;
+//         const html = viewApp(link, patientDetails.firstName);
+//         await sendMail({
+//             email: patientDetails.email,
+//             subject: subject,
+//             html: html
+//         });
+
+//         // Success message
+//         res.status(200).json({
+//             message: `Dear ${createApp.patientName}, your appointment has been created successfully. Check your email for details.`,
+//             appointment: createApp
+//         });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ 
+//             message: error.message
+//         });
+//     }
+// };
 
 exports.createAppointment = async (req, res) => {
     try {
+        const userId = req.user.userId
+        const id = req.params.id
+
+        if(!userId){
+            return res.status(403).json({
+                message: `Hospital not found`
+            })
+        }
         // Validate the request body for creating an appointment
         const { error: createError } = validateCreateAppointment(req.body);
         if (createError) {
@@ -20,40 +83,33 @@ exports.createAppointment = async (req, res) => {
             });
         }
 
-        // Check if admin exists in the database
-        const { patientName, date, time } = req.body;
+        // Extract necessary details from the request body
+        const { doctorName, fee, date, time  } = req.body;
 
-        // Define reschedule options
-        const rescheduleOptions = [
-            { day: 'Tuesday', time: '2pm', doctor: 'Henry' },
-            { day: 'Thursday', time: '2pm', doctor: 'Michael' },
-            { day: 'Friday', time: '2pm', doctor: 'Godwin'}
-        ];
-
-        // Create the appointment
-        const createApp = await appointmentsModel.create({ patientName, patientId, date, time});
-
-        // Get patient details
-        const patientname = await userModel.findOne();
+        // Fetch patient details from the database
+        const patient = await userModel.findById(id);
         if (!patient) {
             return res.status(404).json({ 
-                message: `Patient with this ID: ${patientId} was not found`
+                message: `Patient with this ID: ${id} was not found`
             });
         }
 
+        // Create the appointment
+        const createApp = await appointmentsModel.create({doctorName, fee, date, time });
+
         // Send email to the patient with appointment details
-        const subject = "PLEASE VIEW APPOINTMENT";
+        const subject = "Your Appointment Details";
         const link = `${req.protocol}://${req.get("host")}/viewApp/${createApp.id}`;
-        const html = viewApp(link, patientDetails.firstName);
+        const html = viewApp(link, patient.firstName); // Assuming you have access to patient's first name
         await sendMail({
-            email: patientDetails.email,
+            email: patient.email,
             subject: subject,
             html: html
         });
 
         // Success message
         res.status(200).json({
-            message: `Dear ${createApp.patientName}, your appointment has been created successfully. Check your email for details.`,
+            message: `Dear ${patient.firstName}, your appointment has been created successfully. Check your email for details.`,
             appointment: createApp
         });
     } catch (error) {
@@ -65,32 +121,37 @@ exports.createAppointment = async (req, res) => {
 };
 
 
-
 exports.confirmAppointment = async (req, res) => {
     try {
-        const {id} = req.params
+        const userId = req.user.userId
+        const id = req.params.id
+        if (!userId) {
+            return res.status(404).json({
+                message: "Unable to find hospital"
+            })
+        }
+
+         // Validate the request body for confirm an appointment
+         const { error: createError } = validateConfirmAppointment(req.body);
+         if (createError) {
+             return res.status(400).json({ 
+                 message: createError.details[0].message
+             });
+         }
+
         const appointment = await appointmentsModel.findById(id)
 
-        console.log(id)
-        
         // await appointment.save()
         if (!appointment) {
             return res.status(404).json({
                 message: "Unable to find appointment"
             })
         }
-        // if (appointment) {
-        //     return res.status(404).json({
-        //         message: "This appointment has already been confirmed"
-        //     })
-        // }
-        // console.log(appointmentId)
-        const patientDetails = await getUserDetailsById(appointment.patientId)
-
-        //mapping mongoose id
-        appointment.appointmentId = appointment._id
-        await appointment.save()
-
+        if (appointment.userId !== userId) {
+            return res.status(403).json({ 
+                message: `Unauthorized to confirm this appointment`
+            });
+        }
 
         appointment.status = "confirmed"
         await appointment.save()

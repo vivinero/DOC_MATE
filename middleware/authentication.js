@@ -75,16 +75,16 @@ const authenticate =async (req, res, next)=>{
 //     });
 // }
 
-const admin = (req, res, next) => {
-    authenticate(req, res, async () => {
-        if (req.user.admin) {
-            next()
-        } else {
-            return res.status(401).json({
-                message: "Unauthorized access", 
-            })
-        }
+// const admin = (req, res, next) => {
+//     authenticate(req, res, async () => {
+//         if (req.user.admin) {
+//             next()
+//         } else {
+//             return res.status(401).json({
+//                 message: "Unauthorized access", 
+//             })
+//         }
 
-    })
-}
-module.exports = {authenticate, admin}
+//     })
+// }
+module.exports = {authenticate}

@@ -3,11 +3,18 @@ const Joi = require('@hapi/joi');
 // Validator for creating a new appointment
 const validateCreateAppointment = (data) => {
     const schema = Joi.object({
-        adminId: Joi.string().required(),
-        patientName: Joi.string().required(),
-        patientId: Joi.string().required(),
+        doctorName: Joi.string().required(),
+        fee: Joi.string().required(),
         date: Joi.date().required(),
         time: Joi.string().required(),
+    });
+    return schema.validate(data);
+};
+// Validator for confirming appointment
+
+const validateConfirmAppointment = (data) => {
+    const schema = Joi.object({
+        appointmentId: Joi.string().required()
     });
     return schema.validate(data);
 };
@@ -20,4 +27,4 @@ const validateRescheduleAppointment = (data) => {
     return schema.validate(data);
 };
 
-module.exports = { validateCreateAppointment, validateRescheduleAppointment };
+module.exports = { validateCreateAppointment, validateConfirmAppointment, validateRescheduleAppointment };

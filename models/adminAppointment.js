@@ -1,9 +1,5 @@
 const mongoose = require("mongoose")
 const Appointments = new mongoose.Schema({
-    patientName: {
-        type: String,
-        required: true
-    },
     date: {
         type: String,
         required: true
@@ -11,9 +7,6 @@ const Appointments = new mongoose.Schema({
     time: {
         type: String,
         required: true
-    },
-    adminId: {
-        type: String,
     },
     status: {
         type: String,
