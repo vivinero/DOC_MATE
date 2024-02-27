@@ -10,6 +10,13 @@ const appointmentSchema = new mongoose.Schema({
     type: Date, 
     required: true
   },
+
+  patientName: {
+    type: String,
+    required: true
+  },
+
+
   // specialist: {
   //   type: String,
   //   required: true,
@@ -17,18 +24,13 @@ const appointmentSchema = new mongoose.Schema({
   // },
   status: { 
     type: String, 
-    enum: ['pending', "confirmed", "cancelled"] 
+    enum: ['pending', "confirmed", "reschedule"] 
   },
 
   reschedule: { 
     type: String,
-     enum: ['attended', "Unattended", "Unassigned", "Assigned"] },
-
-     createdAppId:{
-      type: String,
-
-     },
-     confirmAppId:{ type: String,}
+    //  enum: ['attended', "Unattended", "Unassigned", "Assigned"] 
+    },
 
 
 }, { timestamps: true });

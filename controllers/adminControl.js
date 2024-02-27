@@ -20,8 +20,9 @@ const register = async (req, res) => {
             // Get the required field from the request object body
 
             const { hospitalName, hospitalAddress, email, phoneNumber, password, confirmPassword } = req.body
+            console.log(req.body)
 
-            const checkUser = await adminModel.findOne({ email: email.toLowerCase() })
+            const checkUser = await adminModel.findOne({ email })
             if (checkUser) {
                 return res.status(400).json({
                     message: "Hospital already exists"
@@ -68,6 +69,7 @@ const register = async (req, res) => {
                 message: "Your profile has been created! A link has been sent to your email to verify your email address",
                 data: user
             })
+            
     } catch (error) {
         res.status(500).json({
             message: error.message

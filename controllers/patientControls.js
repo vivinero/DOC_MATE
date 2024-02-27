@@ -55,6 +55,7 @@ const signUp = async (req, res) => {
                 })
             }
 
+
             //Create a user
             const patient = new patientModel({
                 firstName,
@@ -68,7 +69,6 @@ const signUp = async (req, res) => {
             )
 
             const token = jwt.sign({ userId: patient._id, firstName: patient.firstName, lastName: patient.lastName, email: patient.email }, process.env.jwtSecret, { expiresIn: "300s" })
-
 
 
             const link = `${ req.protocol }://${req.get("host")}/verify/${patient.id}/${token}`
@@ -92,8 +92,6 @@ const signUp = async (req, res) => {
                 message: "Your profile has been created! A link has been sent to your email to verify your email address",
                 data: patient
             })
-
-
         }
     } catch (error) {
         return res.status(500).json({
@@ -102,8 +100,6 @@ const signUp = async (req, res) => {
 
     }
 }
-
-
 
 //Function to verify a new user with a link
 const verify = async (req, res) => {

@@ -58,16 +58,6 @@ const hospitalSchema = new mongoose.Schema({
       },
 }, {timestamps: true})
 
-hospitalSchema.pre('save', function(next) {
-    // Convert the name to lowercase before saving
-    if (this.isModified('hospitalName', 'hospitalAddress', 'email')) {
-      this.hospialName = this.hospialName.toLowerCase();
-      this.hospitalAddress= this.hospitalAddress.toLowerCase();
-      this.email = this.email.toLowerCase();
-    }
-    next();
-  });
-
 const hospitalModel = mongoose.model("Hospital", hospitalSchema)
 
 module.exports = hospitalModel

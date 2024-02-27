@@ -15,7 +15,7 @@ router.put("/uploadimage", authenticate, uploadProfilePicture);
 router.delete("/deleteimage", authenticate, deleteProfilePicture);
 router.get("all-hospitals", authenticate, getAllHospitals)
 
-router.get("/verify/:id/:token",verify);
+router.get("/verify/:id",verify);
 router.post("/login", login);
 router.post("/forgot", authenticate, forgotpassWord);
 router.put("/reset/:id", authenticate, resetpassword);

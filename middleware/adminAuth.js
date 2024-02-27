@@ -31,14 +31,14 @@ const adminAuthenticate =async (req, res, next)=>{
                 message: "Account doesn't exist",
             })
         }
-        if(admin.blacklist.includes(token)){
+        if(ad.blacklist.includes(token)){
             return res.status(400).json({
                 message : "Authorization failed: Please login again",
             })
         
 
         }
-        //pass the payload into the request admin
+        //pass the payload into the request ad
         req.user = decodeToken
         next();
         

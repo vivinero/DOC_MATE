@@ -9,6 +9,8 @@ const userModel = require("../models/userModel.js")
 
 const Appointment = require("../models/adminAppointment.js");
 const { validateCreateAppointment, validateConfirmAppointment, validateRescheduleAppointment } = require('../middleware/createAppVal'); // Import the validation functions
+const { validateRescheduleOptions } = require('../middleware/createAppVal.js');
+
 const { id } = require("@hapi/joi/lib/base");
 
 // exports.createAppointment = async (req, res) => {
@@ -123,14 +125,19 @@ exports.createAppointment = async (req, res) => {
 
 exports.confirmAppointment = async (req, res) => {
     try {
-        const userId = req.user.userId
+        // const userId = req.user.userId
         const id = req.params.id
-        if (!userId) {
-            return res.status(404).json({
-                message: "Unable to find hospital"
+        const patient = await userModel.findById(id)
+        if (!patient) {
+            return res.status(400).json({
+                message: "Unable to find patient"
             })
         }
-
+        // if (!userId) {
+        //     return res.status(404).json({
+        //         message: "Unable to find hospital"
+        //     })
+        // }
          // Validate the request body for confirm an appointment
          const { error: createError } = validateConfirmAppointment(req.body);
          if (createError) {
@@ -147,11 +154,11 @@ exports.confirmAppointment = async (req, res) => {
                 message: "Unable to find appointment"
             })
         }
-        if (appointment.userId !== userId) {
-            return res.status(403).json({ 
-                message: `Unauthorized to confirm this appointment`
-            });
-        }
+        // if (appointment.userId !== userId) {
+        //     return res.status(403).json({ 
+        //         message: `Unauthorized to confirm this appointment`
+        //     });
+        // }
 
         appointment.status = "confirmed"
         await appointment.save()
@@ -161,7 +168,7 @@ exports.confirmAppointment = async (req, res) => {
         const link = `${req.protocol}://${req.get("host")}/confirmApp/${appointment.id}`
         const html = viewApp(link, appointment.firstName);
         await sendMail({
-            email: patientDetails.email,
+            email: appointment.email,
             subject: subject,
             html: html
         });
@@ -169,7 +176,7 @@ exports.confirmAppointment = async (req, res) => {
         await appointment.save();
 
         res.status(200).json({
-            message: `Patient with this ${appointment.patientName}, has been confirmed successfully`,
+            message: `Patient appointment has been confirmed successfully`,
             appointment
         })
     } catch (error) {
@@ -181,59 +188,194 @@ exports.confirmAppointment = async (req, res) => {
 
 
 // Reschedule Appointment
+// exports.rescheduleAppointment = async (req, res) => {
+//     try {
+//         // Validate the request body for rescheduling an appointment
+//         const { error } = validateRescheduleAppointment(req.body);
+//         if (error) {
+//             return res.status(400).json({
+//                  message: error.details[0].message
+//                 });
+//         }
+
+//         // Check if the user is authenticated and authorized as a hospital
+//         if (!req.user || !req.user.isHospital) {
+//             return res.status(401).json({ message: "Unauthorized access" });
+//         }
+
+//         // Retrieve appointment ID from request parameters
+//         const { id } = req.params;
+
+//         // Find the appointment in the database
+//         const appointment = await Appointment.findById(id);
+//         if (!appointment) {
+//             return res.status(404).json({ 
+//                 message: "Appointment not found"
+//             });
+//         }
+
+//         // Check if the appointment belongs to the hospital making the request
+//         if (appointment.hospital.toString() !== req.user._id.toString()) {
+//             return res.status(403).json({ 
+//                 message: "Forbidden: You can only reschedule your own appointments"
+//             });
+//         }
+
+//         // Update the appointment with new details
+//         appointment.date = req.body.date;
+//         appointment.time = req.body.time;
+//         appointment.specialist = req.body.specialist;
+
+//         // Save the updated appointment
+//         await appointment.save();
+
+//         // Send response
+//         res.status(200).json({ 
+//             message: "Appointment rescheduled successfully",
+//             appointment 
+//         });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({ 
+//             message: "Internal server error"
+//          });
+//     }
+// };
+
+
+// exports.rescheduleAppointment = async (req, res) => {
+//     try {
+//         const appointmentId = req.params.id;
+
+//         // Validate the request body for rescheduling options
+//         const { error: optionsError } = validateRescheduleOptions(req.body);
+//         if (optionsError) {
+//             return res.status(400).json({ 
+//                 message: optionsError.details[0].message
+//             });
+//         }
+
+//         const { option } = req.body;
+
+//         // Find the appointment by ID
+//         const appointment = await appointmentsModel.findById(appointmentId);
+
+//         if (!appointment) {
+//             return res.status(404).json({
+//                 message: "Appointment not found"
+//             });
+//         }
+
+//         // Depending on the option selected, update the appointment date and time
+//         let newDate;
+//         let newTime;
+
+//         switch (option) {
+//             case 1:
+//                 newDate = appointment.date;
+//                 newTime = '9:00 AM';
+//                 break;
+//             case 2:
+//                 newDate = appointment.date;
+//                 newTime = '11:00 AM';
+//                 break;
+//             case 3:
+//                 newDate = appointment.date;
+//                 newTime = '1:00 PM';
+//                 break;
+//             default:
+//                 return res.status(400).json({
+//                     message: "Invalid reschedule option"
+//                 });
+//         }
+
+//         // Update the appointment with the new date, time, and status
+//         appointment.date = newDate;
+//         appointment.time = newTime;
+//         appointment.status = 'reschedule'; // Assigning the default status
+//         await appointment.save();
+
+//         res.status(200).json({
+//             message: `Appointment rescheduled successfully`,
+//             appointment
+//         });
+//     } catch (error) {
+//         res.status(500).json({
+//             message: error.message
+//         });
+//     }
+// };
+
 exports.rescheduleAppointment = async (req, res) => {
     try {
-        // Validate the request body for rescheduling an appointment
-        const { error } = validateRescheduleAppointment(req.body);
-        if (error) {
-            return res.status(400).json({
-                 message: error.details[0].message
-                });
+        const appointmentId = req.params.id;
+
+        // Validate the request body for rescheduling options
+        const { error: optionsError } = validateRescheduleOptions(req.body);
+        if (optionsError) {
+            return res.status(400).json({ 
+                message: optionsError.details[0].message
+            });
         }
 
-        // Check if the user is authenticated and authorized as a hospital
-        if (!req.user || !req.user.isHospital) {
-            return res.status(401).json({ message: "Unauthorized access" });
-        }
+        const { option } = req.body;
 
-        // Retrieve appointment ID from request parameters
-        const { id } = req.params;
+        // Find the appointment by ID
+        const appointment = await appointmentsModel.findById(appointmentId);
 
-        // Find the appointment in the database
-        const appointment = await Appointment.findById(id);
         if (!appointment) {
-            return res.status(404).json({ 
+            return res.status(404).json({
                 message: "Appointment not found"
             });
         }
 
-        // Check if the appointment belongs to the hospital making the request
-        if (appointment.hospital.toString() !== req.user._id.toString()) {
-            return res.status(403).json({ 
-                message: "Forbidden: You can only reschedule your own appointments"
-            });
+        // Depending on the option selected, update the appointment date and time
+        let newDate;
+        let newTime;
+
+        switch (option) {
+            case 1:
+                newDate = appointment.date;
+                newTime = '9:00 AM';
+                break;
+            case 2:
+                newDate = appointment.date;
+                newTime = '11:00 AM';
+                break;
+            case 3:
+                newDate = appointment.date;
+                newTime = '1:00 PM';
+                break;
+            default:
+                return res.status(400).json({
+                    message: "Invalid reschedule option"
+                });
         }
 
-        // Update the appointment with new details
-        appointment.date = req.body.date;
-        appointment.time = req.body.time;
-        appointment.specialist = req.body.specialist;
+        // Fetch doctor's name associated with the appointment
+        const doctorName = appointment.doctorName;
 
-        // Save the updated appointment
+        // Update the appointment with the new date, time, and status
+        appointment.date = newDate;
+        appointment.time = newTime;
+        appointment.status = 'confirmed'; // Assigning the default status
         await appointment.save();
 
-        // Send response
-        res.status(200).json({ 
-            message: "Appointment rescheduled successfully",
-            appointment 
+        res.status(200).json({
+            message: `Appointment rescheduled successfully`,
+            appointment: {
+                ...appointment.toObject(),
+                doctorName: doctorName
+            }
         });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ 
-            message: "Internal server error"
-         });
+        res.status(500).json({
+            message: error.message
+        });
     }
 };
+
+
 
 
 exports.getAllApp = async (req, res) => {
@@ -330,7 +472,7 @@ exports.getAllConfirmedAppointments = async (req, res) => {
 
 exports.getAllRescheduleAppointments = async (req, res) => {
     try {
-        const rescheduleApp = await appointmentsModel.find({ status: "rescheduled" })
+        const rescheduleApp = await appointmentsModel.find({ status: "reschedule" })
         console.log(rescheduleApp)
 
         if (!rescheduleApp) {
