@@ -166,19 +166,43 @@ const validateMessage = (data) => {
 }
 
 
-const validateDateTime = (data) => {
+const validateAppointmentRequest = (data) => {
     const schema = joi.object({
-        patientName: joi.string().min(3).max(30).regex(/^[a-zA-Z]+(?: [a-zA-Z]+)?$/).required().messages({
-            'string.empty': "First name field can't be left empty",
-            'string.min': "Minimum of 3 characters for the first name field",
-            'any.required': "Please first name is required",
-            "string.pattern.base": "Please input a valid name"
+        fullName: joi.string().regex(/^[a-zA-Z]+(?: [a-zA-Z]+)?$/).required().messages({
+            'string.empty': "Full name field can't be left empty",
+            'any.required': "Please full name is required",
+            "string.pattern.base": "Please input a valid first name and last name"
         }),
-    patientEmail: joi.string().max(40).trim().email( {tlds: {allow: false} } ).messages({
-        'string.empty': "Email field can't be left empty",
-        'any.required': "Please Email is required"
-    }),
-    
+        patientEmail: joi.string().max(40).trim().email({ tlds: { allow: false } }).messages({
+            'string.empty': "Email field can't be left empty",
+            'any.required': "Please Email is required"
+        }),
+        lastVisitation: joi.date().allow(null).optional().max('now').messages({
+            'date.max': 'Last visitation date cannot be in the future'
+        }),
+        presentSymptoms: joi.string().trim().messages({
+            'string.empty': "Prsent symptoms field can't be left empty",
+            'any.required': "Please symptoms is required"
+        }),
+        lastDiagnosis: joi.string().trim().optional().messages({
+            'string.empty': "Last diagnosis field can't be left empty",
+            'any.required': "Please diagnosis is required"
+        }),
+        // presentSymptoms: joi.string().min(3).max(30).regex(/^[a-zA-Z0-9\s]+(?: [a-zA-Z0-9\s]+)?$/).pattern(/^\S+$/).required().messages({
+        //     'string.empty': "Symptoms field can't be left empty",
+        //     'string.min': "Minimum of 3 characters for the hospital name field",
+        //     'any.required': "Please input your current symptoms",
+        //     "string.pattern.base": "Present symptoms must not be empty or contain only whitespace characters",
+        //     //'string.empty': 'Present symptoms must not be empty or contain only whitespace characters'
+
+        // }),
+        // lastDiagnosis: joi.string().min(3).max(30).regex(/^[a-zA-Z0-9\s]+(?: [a-zA-Z0-9\s]+)?$/).optional().messages({
+        //     'string.empty': "Hospital name field can't be left empty",
+        //     'string.min': "Minimum of 3 characters for the hospital name field",
+        //     'any.required': "Please hospital name is required",
+        //     "string.pattern.base": "Please input a valid address"
+        // }),
+
         date: joi.date().iso().required().messages({
             'any.required': 'Date is required',
             'date.base': 'Invalid date format',
@@ -197,52 +221,21 @@ const validateDateTime = (data) => {
 };
 
 
+// const Joi = require('joi');
 
-const Joi = require('joi');
+// // Define schema for date input validation
+// const dateSchema = Joi.date().iso().min('now').required().messages({
+//   'any.required': 'Date is required',
+//   'date.base': 'Invalid date format',
+//   'date.min': 'Date must be in the future',
+// });
 
-// Define schema for date input validation
-const dateSchema = Joi.date().iso().min('now').required().messages({
-  'any.required': 'Date is required',
-  'date.base': 'Invalid date format',
-  'date.min': 'Date must be in the future',
-});
+// // Define schema for time input validation
+// const timeSchema = Joi.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/).required().messages({
+//   'any.required': 'Time is required',
+//   'string.pattern.base': 'Invalid time format (HH:MM)',
+// });
 
-// Define schema for time input validation
-const timeSchema = Joi.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/).required().messages({
-  'any.required': 'Time is required',
-  'string.pattern.base': 'Invalid time format (HH:MM)',
-});
-
-// Example usage
-//const validateDateTime = (date, time) => {
-    // function validateDateTime(dateString) {
-    //     // Regular expression for YYYY-MM-DD format
-    //     const dateFormat = /^\d{4}-\d{2}-\d{2}$/;
-    
-    //     // Test if the input string matches the expected format
-    //     return dateFormat.test(dateString);
-    // }
-    
-    // // Example usage
-    // const dateInput = "2023-12-31";
-    // if (validateDateTime(dateInput)) {
-    //     console.log("Date is in valid format");
-    // } else {
-    //     console.log("Date is not in valid format");
-    // }
-    
-//   const dateResult = dateSchema.validate(date);
-//   const timeResult = timeSchema.validate(time);
-
-//   if (dateResult.error) {
-//     return dateResult.error.message;
-//   }
-//   if (timeResult.error) {
-//     return timeResult.error.message;
-//   }
-
-//   return 'Date and time are valid';
-// };
 
 const validateAdmin = (data) => {
     const schema = Joi.object({
@@ -286,7 +279,7 @@ module.exports = {
   validateUserLogin,
   validateResetPassword,
   validateUserForgotPassword,
-  validateDateTime,
+  validateAppointmentRequest,
   validateMessage,
     validateAdmin
 }

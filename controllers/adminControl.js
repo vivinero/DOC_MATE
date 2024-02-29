@@ -1,11 +1,11 @@
 const adminModel = require("../models/adminModel.js");
 const sendEmail = require("../middleware/email.js");
-const generateDynamicEmail = require("../verify.js");
+const generateDynamicEmail = require("../verifyAdmin.js");
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
 // const {validateUser} = require("../middleware/validator.js")
 const cloudinary = require("../middleware/cloudinary")
-
+const notificationModel = require("../models/notificateModel")
 
 const {validateAdmin} = require("../middleware/validator.js")
 
@@ -13,14 +13,14 @@ const register = async (req, res) => {
     try {
         const { error } = validateAdmin(req.body);
             if (error) {
-                res.status(400).json({
+               return res.status(400).json({
                     message: error.details[0].message
                 })
             }
             // Get the required field from the request object body
 
             const { hospitalName, hospitalAddress, email, phoneNumber, password, confirmPassword } = req.body
-            console.log(req.body)
+            //console.log(req.body)
 
             const checkUser = await adminModel.findOne({ email })
             if (checkUser) {
@@ -52,7 +52,7 @@ const register = async (req, res) => {
             const token = jwt.sign({ userId: admin._id, firstName: admin.firstName, lastName: admin.lastName, email: admin.email }, process.env.jwtSecret, { expiresIn: "300s" })
             admin.token = token;
 
-            const link = `${ req.protocol }://${req.get("host")}/verify/${admin.id}/${token}`
+            const link = `${ req.protocol }://${req.get("host")}/verify-admin/${admin.id}/${token}`
 
             sendEmail({
                 email: admin.email,
@@ -67,7 +67,7 @@ const register = async (req, res) => {
             })
             
     } catch (error) {
-        res.status(500).json({
+       return res.status(500).json({
             message: error.message
         });
     }
@@ -93,7 +93,7 @@ const verifyAdmin = async (req, res) => {
             return res.status(200).send("<h1>You have been successfully verified. Kindly visit the login page.</h1>");
         }
         //handle your redirection here
-        res.redirect(`${req.protocol}://${req.get('host')}/login` )
+        res.redirect(`${req.protocol}://${req.get('host')}/adminlogin` )
 
     } catch (error) {
         if (error instanceof jwt.JsonWebTokenError) {
@@ -103,10 +103,10 @@ const verifyAdmin = async (req, res) => {
             //const { firstName, lastName, email } = updatedUser;
             const newtoken = jwt.sign({ email: updatedAdmin.email, firstName: updatedAdmin.firstName, lastName: updatedAdmin.lastName }, process.env.jwtSecret, { expiresIn: "300s" });
             updatedAdmin.token = newtoken;
-            
+
             updatedAdmin.save();
 
-            const link = `${req.protocol}://${req.get('host')}/verify/${id}`;
+            const link = `${req.protocol}://${req.get('host')}/verify-admin/${id}/${token}`;
             sendEmail({
                 email: updatedAdmin.email,
                 html: generateDynamicEmail(link, updatedAdmin.firstName, updatedAdmin.lastName),
@@ -177,47 +177,22 @@ const loginAdmin = async (req, res) => {
             })
         }
     }
-    catch (err) {
+    catch (errpr) {
         return res.status(500).json({
-            message: "Internal server error " + err.message,
+            message: "Internal server error " + error.message,
         })
     }
 }
-// const makeAdmin = async (req, res, next) => {
-//     try {
-//         const adminId = req.params.adminId
-//         const admin = await adminModel.findById(adminId)
 
-//         const adminData = await adminModel.findByIdAndUpdate(adminId, { isAdmin: true }, { new: true })
-//         if (!admin) {
-//             return res.status(400).json({
-//                 message: `Admin with id ${adminId} does not exist`
-//             })
-//         }
-//         else {
-//             return res.status(201).json({
-//                 message: `Admin with id ${adminId} updated as an Admin`,
-//                 data: adminData
-
-//             })
-//         }
-
-//     } catch (err) {
-//         res.status(500).json({
-//             message: err.message
-//         })
-//     }
-
-// }
 const forgotpassWordAdmin = async (req, res) => {
-    const resetFunc = require("../forget.js")
+    const resetFunc = require("../forgetAdmin.js")
     try {
         const checkUser = await adminModel.findOne({ email: req.body.email })
         if (!checkUser) {
             res.status(404).json("Email doesn't exist")
         } else {
             const subject = " Kindly reset your password"
-            const link = `${req.protocol}://${req.get("host")}/reset/${checkUser.id}`
+            const link = `${req.protocol}://${req.get("host")}/reset-admin/${checkUser.id}`
             const html = resetFunc(link, checkUser.firstName, checkUser.lastName)
             sendEmail({
                 email: checkUser.email,
@@ -276,8 +251,8 @@ const uploadProfilePictureAdmin = async (req, res) => {
                 fs.unlinkSync(req.files.profilePicture.tempFilePath);
 
                 return profilePicture
-            } catch (err) {
-                return err
+            } catch (error) {
+                return error
             }
         })
 
@@ -291,7 +266,9 @@ const uploadProfilePictureAdmin = async (req, res) => {
         });
 
     } catch (error) {
-        return res.status(500).json({ error: 'An error occurred while uploading the profile picture.' + error.message });
+        return res.status(500).json({
+            error: 'An error occurred while uploading the profile picture.' + error.message
+        });
     }
 };
 
@@ -349,16 +326,86 @@ const logOutAdmin = async (req, res) => {
 
         return res.status(200).json({ message: "You have logged out successfully" })
 
-    } catch (err) {
+    } catch (error) {
         return res.status(500).json({
-            message: err.message
+            message: error.message
         })
     }
 }
+
+const getAllRequest = async (req, res) => {
+    try {
+      const notification = await notificationModel.find().sort({createdAt: -1});
+      if (!notification) {
+        res.status(404).json({
+          message: "No request found",
+        });
+      } else {
+        res.status(201).json({
+          message: "All appointment request.",
+          data: notification,
+          totalNumberOfAppointmentRequests: notification.length,
+        });
+      }
+    } catch (error) {
+      return res.status(500).json({ error: "Internal server error " + error.message });
+    }
+  };
+  
+  const viewOneAppointRequest = async (req, res) => {
+    try {
+      const appointmentId = req.params.appointmentId;
+  
+      const request = await notificationModel.findById(appointmentId);
+      if (!request) {
+        return res.status(404).json({
+          message: 'The appointment request not found'
+        })
+        return;
+      } else {
+        return res.status(200).json({
+          message: `The appointment request with id: ${appointmentId} found`,
+          data: request
+        })
+      }
+    } catch (err) {
+      res.status(500).json({
+        message: "internal server error: " + err.message
+      })
+    }
+  
+  }
+  
+  
+  const deleteRequest = async (req, res) => {
+    try {
+      const appointmentId = req.params.appointmentId;
+      const request = await notificationModel.findById(appointmentId);
+      if (!request) {
+        return res.status(404).json({
+          message: 'The appointment request not found'
+        })
+  
+      }
+  
+      await notificationModel.findByIdAndDelete(appointmentId)
+      return res.status(200).json({
+        message: `The appointment request with appointmentId: ${appointmentId} deleted successfully`,
+        data: request
+      })
+  
+    } catch (err) {
+      res.status(500).json({
+        message: "Internal server  error: " + err.message,
+      })
+    }
+  }
+  
+  
 
 
 
 
 
 module.exports = {
-    register, verifyAdmin, loginAdmin, forgotpassWordAdmin, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin}
+    register, verifyAdmin, loginAdmin, forgotpassWordAdmin, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest}

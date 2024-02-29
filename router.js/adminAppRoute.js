@@ -1,17 +1,17 @@
 const adminAppointmentRouter = require("express").Router()
 
-const { createAppointment, confirmAppointment, getAllApp,
-    getOneApp, deleteAppointment, getAllPendingAppointments, getAllConfirmedAppointments, getAllRescheduleAppointments, rescheduleAppointment } = require("../controllers/appointmentsController")
+const { createAppointment,  getAllApp,
+    getOneApp, deleteAppointment, getAllPendingAppointments, getAllConfirmedAppointment, rescheduleAppointment, getAllPending, getAllPendingReschedule } = require("../controllers/appointmentsController")
 const { adminAuthenticate } = require("../middleware/adminAuth")
 
 adminAppointmentRouter.post("/createAppointment/:id", adminAuthenticate, createAppointment)
-adminAppointmentRouter.put("/confirmappointment/:id", confirmAppointment)
 adminAppointmentRouter.post("/reschedule/:id", rescheduleAppointment)
-adminAppointmentRouter.get("/allappointment", getAllApp)
+adminAppointmentRouter.get("/all-appointments", getAllApp)
 adminAppointmentRouter.get("/oneappointment/:id", getOneApp)
 adminAppointmentRouter.get("/deleteappointment/:id", deleteAppointment)
 adminAppointmentRouter.get("/pendingappointment/", getAllPendingAppointments)
-adminAppointmentRouter.get("/getconfirmedappointments/", getAllConfirmedAppointments)
-adminAppointmentRouter.get("/getrescheduleappointments/", getAllRescheduleAppointments)
+adminAppointmentRouter.get("/allpending/", getAllPending)
+adminAppointmentRouter.get("/all-pending-reschedule/", getAllPendingReschedule)
 
+adminAppointmentRouter.get("/get-all-confirmed/", getAllConfirmedAppointment)
 module.exports = adminAppointmentRouter

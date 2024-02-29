@@ -61,6 +61,10 @@ const patientSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref:"Hospital"
     }],
+    profileUpdated:{
+        type: Boolean,
+        default: false
+    }
 }, {timestamps: true})
 
 

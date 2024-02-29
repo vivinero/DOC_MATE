@@ -1,9 +1,18 @@
 const express = require('express');
-const router = express.Router();
+const patientAppointmentRouter = express.Router();
 
-const { requestPatientAppointment}= require("../controllers/appointment")
+const { 
+    handleAppointmentRequest,
+    confirmedPayment,
+    rescheduleAppointment}= require("../controllers/appointment")
 const {authenticate} = require('../middleware/authentication')
 
-router.post("/request/:id", authenticate, requestPatientAppointment );
+;
+patientAppointmentRouter.post("/request/:userId", authenticate,handleAppointmentRequest );
+patientAppointmentRouter.put("/reschedule-app/:appointmentId",authenticate, rescheduleAppointment)
+patientAppointmentRouter.post('/confirm-payment',authenticate, confirmedPayment)
+//patientAppointmentRouter.post('/updates-profile', updatesProfile)
 
-module.exports= router
+
+
+module.exports= patientAppointmentRouter

@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const userModel = require('../models/userModel')
+const patientModel = require('../models/userModel')
 require('dotenv').config();
 
 const authenticate =async (req, res, next)=>{
@@ -24,7 +24,7 @@ const authenticate =async (req, res, next)=>{
         //decode the token
         const decodeToken = jwt.verify(token, process.env.jwtSecret); 
 
-        const user = await userModel.findById(decodeToken.userId);
+        const user = await patientModel.findById(decodeToken.userId);
 
         if (!user) {
             return res.status(404).json({
@@ -38,12 +38,7 @@ const authenticate =async (req, res, next)=>{
         
 
         }
-        // if (user.isAdmin) {
-        //     req.isAdmin = true;
-        // }else{
-        //     req.isAdmin = false;
-        // }
-        //pass the payload into the request user
+
         req.user = decodeToken
         next();
         
@@ -63,28 +58,4 @@ const authenticate =async (req, res, next)=>{
 
 }
 
-// const hospital = (req, res, next) => {
-//     authenticate(req, res, async () => {
-//         if (req.user && req.user.role === 'hospital') {
-//             next();
-//         } else {
-//             return res.status(401).json({
-//                 message: "Unauthorized access"
-//             });
-//         }
-//     });
-// }
-
-// const admin = (req, res, next) => {
-//     authenticate(req, res, async () => {
-//         if (req.user.admin) {
-//             next()
-//         } else {
-//             return res.status(401).json({
-//                 message: "Unauthorized access", 
-//             })
-//         }
-
-//     })
-// }
 module.exports = {authenticate}

@@ -2,38 +2,51 @@
 const mongoose = require('mongoose');
 
 const appointmentSchema = new mongoose.Schema({
-  date: { 
-    type: Date, 
-    required: true
-  },
-  doctorName: { 
-    type: Date, 
-    required: true
-  },
-
-  patientName: {
+  fullName: { type: String, required: true },
+  patientEmail: { type: String, required: true },
+  date: { type: Date, required: true },
+  lastDiagnosis: { type: String  },
+  presentSymptoms: { type: String, },
+  lastVisitation:{type: Date},
+  paymentStatus: {
+    type: Boolean,
+    default: false
+},
+patient: {
+  type: mongoose.SchemaTypes.ObjectId,
+  ref: "patient"
+},
+  reschedule: { 
     type: String,
-    required: true
-  },
+     enum: ['attended', "Unattended", "Unassigned", "Assigned"] },
 
+     createdAppId:{
+      type: String,
 
-  // specialist: {
+     },
+     confirmAppId:{ type: String,},
+
+       // specialist: {
   //   type: String,
   //   required: true,
   //   enum: ["Gynachologist", "Dentist", "Optician"]
   // },
   status: { 
     type: String, 
-    enum: ['pending', "confirmed", "reschedule"] 
+    enum: ['Pending', "Confirmed", "cancelled"] 
   },
-
-  reschedule: { 
-    type: String,
-    //  enum: ['attended', "Unattended", "Unassigned", "Assigned"] 
-    },
 
 
 }, { timestamps: true });
+appointmentSchema.pre('save', function(next) {
+  // Convert the name to lowercase before saving
+  if (this.isModified('fullName', 'patientEmail')) {
+    this.fullName = this.fullName.toLowerCase();
+    this.patientEmail = this.patientEmail.toLowerCase();
+  
+  }
+  next();
+});
 
 
 const Appointment = mongoose.model('Appointment', appointmentSchema);

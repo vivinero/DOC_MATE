@@ -9,9 +9,9 @@ const bodyParser = require('body-parser');
 const cors = require ("cors")
 
 const patientRouter = require('./router.js/patientRout');
-const patientAppRoute = require("./router.js/patientAppRoute")
+const patientAppointmentRouter = require("./router.js/patientAppRoute")
 const appointmentRouter = require('./router.js/adminAppRoute');
-const notificationRouter = require('./router.js/notificationRout');
+//const notificationRouter = require('./router.js/notificationRout');
 const adminRouter = require('./router.js/adminRout');
 const fileUpload = require ("express-fileupload")
 const app = express();
@@ -46,8 +46,8 @@ app.get('/', (req, res) => {
 app.use(patientRouter); 
 app.use(adminRouter);
 app.use(appointmentRouter);
-app.use(notificationRouter);
-app.use(patientAppRoute)
+//app.use(notificationRouter);
+app.use(patientAppointmentRouter)
 
 
 

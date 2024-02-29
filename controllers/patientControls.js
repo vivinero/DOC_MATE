@@ -343,12 +343,12 @@ const deleteProfilePicture = async (req, res) => {
 const updateProfile = async (req, res) => {
     try {
         const userId = req.params.userId;       
-        const profile = await patientModel.findOne({userId: userId});
+        const profile = await patientModel.findById(userId);
         if (!profile) {
-            res.status(404).json({
+            return res.status(404).json({
                 message: "The Patient's  information not found"
             })
-            return;
+            
         }
 
         const profileData = {
@@ -358,19 +358,21 @@ const updateProfile = async (req, res) => {
             
         }
 
-        const newProfile = await patientModel.findOneAndUpdate({userId}, profileData, {new:true});
+        const newProfile = await patientModel.findByIdAndUpdate(userId, profileData, {new:true});
         if (!newProfile) { 
-            res.status(404).json({
+            return res.status(404).json({
                 message: "The Patient's information not found"
             })
-            return;
+            
         } 
+        newProfile.profileUpdated = true;
+        await newProfile.save();
         res.status(200).json({
             message: `Your profile has been updated successfully`,
             data: newProfile
         })
     } catch (err) {
-        res.status(500).json({
+        return res.status(500).json({
             message: "Internal server error: " +err.message
         })
     } 
@@ -441,5 +443,5 @@ const logOut = async (req, res) => {
 
 
 module.exports = {
-    signUp, verify, login, forgotpassWord, resetpassword, getAllHospitals, uploadProfilePicture, deleteProfilePicture, logOut,
+    signUp, verify, login, forgotpassWord, updateProfile, resetpassword, getAllHospitals, uploadProfilePicture, deleteProfilePicture, logOut,
 }

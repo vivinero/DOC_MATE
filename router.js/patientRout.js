@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 
-const {signUp, verify, login, forgotpassWord, resetpassword, uploadProfilePicture, deleteProfilePicture, getAllHospitals, logOut
+const {signUp, verify, login, forgotpassWord, resetpassword,updateProfile, uploadProfilePicture, deleteProfilePicture, getAllHospitals, logOut
 }= require ("../controllers/patientControls");
 const {authenticate, admin} = require ("../middleware/authentication");
 
@@ -14,6 +14,8 @@ router.post("/register", signUp);
 router.put("/uploadimage", authenticate, uploadProfilePicture);
 router.delete("/deleteimage", authenticate, deleteProfilePicture);
 router.get("all-hospitals", authenticate, getAllHospitals)
+router.put("/update-profile/:userId", authenticate, updateProfile)
+
 
 router.get("/verify/:id/:token",verify);
 router.post("/login", login);
