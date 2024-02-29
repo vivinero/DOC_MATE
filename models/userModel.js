@@ -19,15 +19,6 @@ const patientSchema = new mongoose.Schema({
     confirmPassword: {
         type: String,
     },
-    phoneNumber:{
-        type: String,
-        required: true
-    },
-
-    gender:{
-        type: String,
-        required: true
-    },
     isVerified :{
         type : Boolean,
         default : false

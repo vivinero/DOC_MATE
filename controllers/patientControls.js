@@ -33,9 +33,7 @@ const signUp = async (req, res) => {
             const lastName = req.body.lastName.trim();
             const email = req.body.email.trim();
             const password = req.body.password.trim();
-            const phoneNumber = req.body.phoneNumber.trim();
             const confirmPassword = req.body.confirmPassword.trim();
-            const gender = req.body.gender.trim();
 
 
             const checkPatient = await patientModel.findOne({ email: email.toLowerCase() })
@@ -61,10 +59,7 @@ const signUp = async (req, res) => {
                 firstName,
                 lastName,
                 email,
-                password: hashedPassword,
-                phoneNumber,
-                gender,
-
+                password: hashedPassword
             }
             )
 
@@ -90,7 +85,8 @@ const signUp = async (req, res) => {
             await patient.save();
 
             return res.status(201).json({
-                message: "Your profile has been created! A link has been sent to your email to verify your email address",
+                // message: `Hi ${checkPatient.} profile has been created! A link has been sent to your email to verify your email address`,
+                message: `Congratulations!!!, ${firstName.charAt(0).toUpperCase()}${firstName.slice(1)}.${lastName.slice(0, 1).toUpperCase()} you are successfully registered on DOCMATE APP`,
                 data: patient
             })
         }
