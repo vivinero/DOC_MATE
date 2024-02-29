@@ -68,7 +68,7 @@ const signUp = async (req, res) => {
 
 
             const link = `${ req.protocol }://${req.get("host")}/verify/${patient.id}/${token}`
-            console.log(link)
+            
             sendEmail({
 
                 email: patient.email,
