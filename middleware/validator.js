@@ -34,13 +34,14 @@ const validateUser = (data) => {
                              'any.required': 'Password is required',
                              "string.pattern.base": "Empty space not allowed"
                          }),
-                            confirmPassword: hapiJoiValidator.string().required().min(8)
-                           .pattern(new RegExp(/^(?=.*[A-Za-z0-9])[A-Za-z0-9 !@#$%^&*()_+{}[\]:;<>,.?~\\/-]+$/)).messages({
-                             'string.empty': 'Password cannot be empty',
-                              'string.min': 'Minimum 8 characters required',
-                            'any.pattern.base': 'Password should contain letters, numbers, and special characters',
-                            "string.pattern.base": "Empty space not allowed"
-                            }),
+                            // confirmPassword: hapiJoiValidator.string().required().min(8)
+                            confirmPassword: Joi.any().valid(Joi.ref('password')).required().label('Confirm password').options({
+                                language: {
+                                  any: {
+                                    allowOnly: '!!Passwords do not match',
+                                  },
+                                },
+                              })
         })
         return validateSchema.validate(data);
     } catch (error) {
