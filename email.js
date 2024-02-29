@@ -10,7 +10,7 @@ async function sendMail(options) {
                 pass: process.env.emailPassWord,
             }
         })
-            const mailOption = await transporter.sendMail({
+            const mailOption = ({
               from: process.env.user,
               to: options.email,
               subject: options.subject,

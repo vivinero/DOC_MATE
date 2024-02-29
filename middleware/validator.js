@@ -77,7 +77,7 @@ const validateUser = (data) => {
                              'string.empty': 'Password cannot be empty',
                               'string.min': 'Minimum 8 characters required',
                             'any.pattern.base': 'Password should contain letters, numbers, and special characters',
-                            'any.required': 'Passwords do not match',
+                            // 'any.required': 'Passwords do not match',
                             "string.pattern.base": "Empty space not allowed"
                             }),
         })
