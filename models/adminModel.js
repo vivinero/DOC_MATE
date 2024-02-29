@@ -48,10 +48,10 @@ const hospitalSchema = new mongoose.Schema({
             type: String,
         },
     },
-    appointment:[{
+    appointment:{
         type: mongoose.Schema.Types.ObjectId,
-        ref:"appointments"
-    }],
+        ref:"Appointment"
+    },
     blacklist:{
         type: Array,
         default:[]

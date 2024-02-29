@@ -33,7 +33,7 @@ patient: {
   // },
   status: { 
     type: String, 
-    enum: ['Pending', "Confirmed", "cancelled"] 
+    enum: ['Pending', "Confirmed", "Reschedule"] 
   },
 
 

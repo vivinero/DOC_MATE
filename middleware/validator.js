@@ -64,14 +64,24 @@ const validateUser = (data) => {
                 'string.empty': "Email field can't be left empty",
                 'any.required': "Please Email is required"
             }),
-                    password: hapiJoiValidator.string().required().min(8)
-                            .pattern(new RegExp(/^(?=.[A-Za-z0-9])[A-Za-z0-9 !@#$%^&()_+{}[\]:;<>,.?~\\/-]+$/)).messages({
-                              'string.empty': 'Password cannot be empty',
+
+            password: Joi.string()
+            .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()])[A-Za-z\d!@#$%^&*()]{8,}$/)
+            .required()
+            .messages({
+              'string.pattern.base': 'Password must contain at least one lowercase letter, one uppercase letter, one digit, one special character, and must be at least 8 characters long',
+              'string.empty': 'Password cannot be empty',
                                'string.min': 'Minimum 8 characters required',
-                              'any.pattern.base': 'Password should contain letters, numbers, and special characters',
                              'any.required': 'Password is required',
                              "string.pattern.base": "Empty space not allowed"
-                         }),
+            }),
+                    // password: hapiJoiValidator.string().required().min(8).pattern(new RegExp(/^(?=.[A-Za-z0-9])[A-Za-z0-9 !@#$%^&()_+{}[\]:;<>,.?~\\/-]+$/)).messages({  
+                    //           'string.empty': 'Password cannot be empty',
+                    //            'string.min': 'Minimum 8 characters required',
+                    //           'any.pattern.base': 'Password should contain letters, numbers, and special characters',
+                    //          'any.required': 'Password is required',
+                    //          "string.pattern.base": "Empty space not allowed"
+                    //      }),
                             confirmPassword: hapiJoiValidator.string().min(8)
                         //    .pattern(new RegExp(/^(?=.[A-Za-z0-9])[A-Za-z0-9 !@#$%^&()_+{}[\]:;<>,.?~\\/-]+$/)).messages({
                         //      'string.empty': 'Password cannot be empty',
@@ -288,7 +298,7 @@ const validateAdmin = (data) => {
             'string.min': 'Password must be at least 8 characters long',
             'any.required': 'Password is required',
         }),
-        confirmPassword: joi.string().trim().valid(Joi.ref('password')).required().messages({
+        confirmPassword: joi.string().trim().valid(joi.ref('password')).required().messages({
             'any.only': 'Passwords do not match',
             'any.required': 'Confirm password is required',
         }),

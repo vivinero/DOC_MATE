@@ -11,7 +11,6 @@ const notificationModel = require("../models/notificateModel")
 const { validateAppointmentRequest } = require("../middleware/validator");
 const sendMail = require('../middleware/email');
 const viewApp = require('../createAppMail')
-const { notify } = require('../router.js/patientAppRoute');
 
 
 

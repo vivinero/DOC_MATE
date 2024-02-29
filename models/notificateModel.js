@@ -19,7 +19,7 @@ const notificationSchema = new mongoose.Schema({
     // },
     appointments: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'appointments'
+        ref: 'Appointments'
     }]
 
 

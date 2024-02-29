@@ -5,7 +5,7 @@ const { createAppointment,  getAllApp,
 const { adminAuthenticate } = require("../middleware/adminAuth")
 
 adminAppointmentRouter.post("/createAppointment/:id", adminAuthenticate, createAppointment)
-adminAppointmentRouter.post("/reschedule/:id", rescheduleAppointment)
+adminAppointmentRouter.post("/reschedule/:id", adminAuthenticate, rescheduleAppointment)
 adminAppointmentRouter.get("/all-appointments", getAllApp)
 adminAppointmentRouter.get("/oneappointment/:id", getOneApp)
 adminAppointmentRouter.get("/deleteappointment/:id", deleteAppointment)

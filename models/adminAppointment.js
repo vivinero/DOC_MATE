@@ -10,20 +10,16 @@ const Appointments = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['pending', 'Confirmed', 'rechedule'],
-        default: 'pending'
+        enum: ['Pending', 'Confirmed', 'Rechedule'],
+        default: 'Pending'
     },
-    specialist: {
+    speciality: {
         type: String,
-        enum: ["General_Doctor", "Dentist", "Optician", "Gynechologist", "Other"],
         required: true
     },
-    patient: [{
+    patient: {
         type: mongoose.SchemaTypes.ObjectId,
-        ref: "patient"
-    }],
-    selectedOptionIndex: {
-        type: Number,
+        ref: "Patient"
     },
 
 })
