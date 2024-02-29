@@ -43,14 +43,14 @@ const authenticate =async (req, res, next)=>{
         next();
         
 
-    } catch(err){
-        if(err instanceof jwt.JsonWebTokenError){
+    } catch(error){
+        if(error instanceof jwt.JsonWebTokenError){
             return res.status(500).json({
                 message: 'Session timedout, please log in again'
             })
-            return res.status(500).json({
-                message: "Error authenticating" + err.message
-            })
+            // return res.status(500).json({
+            //     message: "Error authenticating" + error.message
+            // })
             
         }
         
