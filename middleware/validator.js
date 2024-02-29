@@ -24,21 +24,12 @@ const validateUser = (data) => {
             phoneNumber: joi.string().min(11).max(11).trim().regex(/^0\d{10}$/).required().messages({
                 'string.empty': "Phone number field can't be left empty",
                 'string.min': "Phone number must be atleast 11 digit long e.g: 08123456789",
-                'any.required': "Please phone number is required",
                 "string.pattern.base": "Invalid phone number"
             }),
             email: joi.string().max(40).trim().email( {tlds: {allow: false} } ).required().messages({
                 'string.empty': "Email field can't be left empty",
                 'any.required': "Please Email is required"
             }),
-            gender: hapiJoiValidator.string().valid("male", "female", "Male", "F", "M", "Female", "FEMALE", "MALE").trim().required().min(4).max(6)
-                    .pattern(/^[A-Za-z\s]+$/).messages({
-                      'string.empty': 'Gender cannot be empty',
-                      'string.min': 'Minimum 4 characters required for gender',
-                      'string.max': 'Maximum 6 characters allowed',
-                      'any.pattern.base': 'Gender should only contain letters and no spaces',
-                      'any.required': 'Gender is required',
-                    }),
                     password: hapiJoiValidator.string().required().min(8)
                             .pattern(new RegExp(/^(?=.*[A-Za-z0-9])[A-Za-z0-9 !@#$%^&*()_+{}[\]:;<>,.?~\\/-]+$/)).messages({
                               'string.empty': 'Password cannot be empty',
