@@ -18,6 +18,85 @@ const {
 
 } = require("../middleware/validator.js")
 
+// const signUp = async (req, res) => {
+//     try {
+//         const { error } = validateUser(req.body);
+//         if (error) {
+//             return res.status(500).json({
+//                 message: error.details[0].message
+//             })
+//         } else {
+//             //Get the required field from the request object body
+
+//             const firstName = req.body.firstName.trim();
+//             const lastName = req.body.lastName.trim();
+//             const email = req.body.email.trim();
+//             const password = req.body.password.trim();
+//             const confirmPassword = req.body.confirmPassword.trim();
+
+
+//             const checkPatient = await patientModel.findOne({ email: email.toLowerCase() })
+//             if (checkPatient) {
+//                 return res.status(200).json({
+//                     message: "Profile already exists"
+//                 })
+//             }
+
+//             //Encrypt the user's password
+
+//             const salt = bcrypt.genSaltSync(10);
+//             const hashedPassword = bcrypt.hashSync(password, salt);
+
+//             if (password !== confirmPassword) {
+//                 return res.status(400).json({
+//                     message: "Password must match"
+//                 })
+//             }
+
+//             //Create a user
+//             const patient = new patientModel({
+//                 firstName,
+//                 lastName,
+//                 email,
+//                 password: hashedPassword
+//             }
+//             )
+
+//             const token = jwt.sign({ userId: patient._id, firstName: patient.firstName, lastName: patient.lastName, email: patient.email }, process.env.jwtSecret, { expiresIn: "300s" })
+//             patient.token = token;
+
+
+//             const link = `${ req.protocol }://${req.get("host")}/verify/${patient.id}/${token}`
+            
+//             sendEmail({
+
+//                 email: patient.email,
+//                 subject: 'KINDLY VERIFY YOUR ACCOUNT',
+//                 html: generateDynamicEmail(link, patient.firstName, patient.lastName)
+
+
+//             })
+
+//             patient.patientId = patient._id
+
+
+
+//             await patient.save();
+
+//             return res.status(201).json({
+//                 // message: `Hi ${checkPatient.} profile has been created! A link has been sent to your email to verify your email address`,
+//                 message: `Congratulations!!!, ${firstName.charAt(0).toUpperCase()}${firstName.slice(1)}.${lastName.slice(0, 1).toUpperCase()} you are successfully registered on DOCMATE APP. A link has been sent to your email to verify`,
+//                 data: patient
+//             })
+//         }
+//     } catch (error) {
+//         return res.status(500).json({
+//             message: error.message
+//         })
+
+//     }
+// }
+
 const signUp = async (req, res) => {
     try {
         const { error } = validateUser(req.body);
@@ -25,6 +104,7 @@ const signUp = async (req, res) => {
             return res.status(500).json({
                 message: error.details[0].message
             })
+
         } else {
             //Get the required field from the request object body
 
@@ -58,7 +138,8 @@ const signUp = async (req, res) => {
                 firstName,
                 lastName,
                 email,
-                password: hashedPassword
+                password: hashedPassword,
+
             }
             )
 
@@ -67,7 +148,6 @@ const signUp = async (req, res) => {
 
 
             const link = `${ req.protocol }://${req.get("host")}/verify/${patient.id}/${token}`
-            
             sendEmail({
 
                 email: patient.email,
@@ -84,19 +164,17 @@ const signUp = async (req, res) => {
             await patient.save();
 
             return res.status(201).json({
-                // message: `Hi ${checkPatient.} profile has been created! A link has been sent to your email to verify your email address`,
-                message: `Congratulations!!!, ${firstName.charAt(0).toUpperCase()}${firstName.slice(1)}.${lastName.slice(0, 1).toUpperCase()} you are successfully registered on DOCMATE APP. A link has been sent to your email to verify`,
+                message: "Your profile has been created! A link has been sent to your email to verify your email address",
                 data: patient
             })
         }
     } catch (error) {
         return res.status(500).json({
             message: error.message
-        })
+        })
 
-    }
+    }
 }
-
 
 
 //Function to verify a new user with a link

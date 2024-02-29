@@ -2,6 +2,50 @@ const hapiJoiValidator = require("@hapi/joi");
 
 const joi = require('@hapi/joi');
 
+// const validateUser = (data) => {
+//     try {
+//         const validateSchema = joi.object({
+//             firstName: joi.string().min(3).max(30).regex(/^[a-zA-Z]+$/).trim().required().messages({
+//                 'string.empty': "First name field can't be left empty",
+//                 'string.min': "Minimum of 3 characters for the first name field",
+//                 'any.required': "Please first name is required",
+//                 "string.pattern.base": "Please no space is allowed/No special characters allowed"
+//             }),
+//             lastName: joi.string().min(3).max(30).regex(/^[a-zA-Z]+$/).trim().required().messages({
+//                 'string.empty': "Last name field can't be left empty",
+//                 'string.min': "Minimum of 3 characters for the last name field",
+//                 'any.required': "Please last name is required"
+//             }),
+            
+//             email: joi.string().max(40).trim().email( {tlds: {allow: false} } ).required().messages({
+//                 'string.empty': "Email field can't be left empty",
+//                 'any.required': "Please Email is required"
+//             }),
+//                     password: hapiJoiValidator.string().required().min(8)
+//                             .pattern(new RegExp(/^(?=.*[A-Za-z0-9])[A-Za-z0-9 !@#$%^&*()_+{}[\]:;<>,.?~\\/-]+$/)).messages({
+//                               'string.empty': 'Password cannot be empty',
+//                                'string.min': 'Minimum 8 characters required',
+//                               'any.pattern.base': 'Password should contain letters, numbers, and special characters',
+//                              'any.required': 'Password is required',
+//                              "string.pattern.base": "Empty space not allowed"
+//                          }),
+//                             // confirmPassword: hapiJoiValidator.string().required().min(8)
+//                             confirmPassword: joi.any().valid(joi.ref('password')).required().label('Confirm password').options({
+//                                 language: {
+//                                   any: {
+//                                     allowOnly: '!!Passwords do not match',
+//                                   },
+//                                 },
+//                               })
+//         })
+//         return validateSchema.validate(data);
+//     } catch (error) {
+//         return res.status(500).json({
+//             Error: "Error while validating user: " + error.message,
+//         })
+//     }
+// }
+
 const validateUser = (data) => {
     try {
         const validateSchema = joi.object({
@@ -16,32 +60,26 @@ const validateUser = (data) => {
                 'string.min': "Minimum of 3 characters for the last name field",
                 'any.required': "Please last name is required"
             }),
-            // userName: joi.string().min(3).max(30).alphanum().trim().required().messages({
-            //     'string.empty': "Username field can't be left empty",
-            //     'string.min': "Minimum of 3 characters for the username field",
-            //     'any.required': "Please username is required"
-            // }),
-            
             email: joi.string().max(40).trim().email( {tlds: {allow: false} } ).required().messages({
                 'string.empty': "Email field can't be left empty",
                 'any.required': "Please Email is required"
             }),
                     password: hapiJoiValidator.string().required().min(8)
-                            .pattern(new RegExp(/^(?=.*[A-Za-z0-9])[A-Za-z0-9 !@#$%^&*()_+{}[\]:;<>,.?~\\/-]+$/)).messages({
+                            .pattern(new RegExp(/^(?=.[A-Za-z0-9])[A-Za-z0-9 !@#$%^&()_+{}[\]:;<>,.?~\\/-]+$/)).messages({
                               'string.empty': 'Password cannot be empty',
                                'string.min': 'Minimum 8 characters required',
                               'any.pattern.base': 'Password should contain letters, numbers, and special characters',
                              'any.required': 'Password is required',
                              "string.pattern.base": "Empty space not allowed"
                          }),
-                            // confirmPassword: hapiJoiValidator.string().required().min(8)
-                            confirmPassword: Joi.any().valid(Joi.ref('password')).required().label('Confirm password').options({
-                                language: {
-                                  any: {
-                                    allowOnly: '!!Passwords do not match',
-                                  },
-                                },
-                              })
+                            confirmPassword: hapiJoiValidator.string().required().min(8)
+                           .pattern(new RegExp(/^(?=.[A-Za-z0-9])[A-Za-z0-9 !@#$%^&()_+{}[\]:;<>,.?~\\/-]+$/)).messages({
+                             'string.empty': 'Password cannot be empty',
+                              'string.min': 'Minimum 8 characters required',
+                            'any.pattern.base': 'Password should contain letters, numbers, and special characters',
+                            'any.required': 'Passwords do not match',
+                            "string.pattern.base": "Empty space not allowed"
+                            }),
         })
         return validateSchema.validate(data);
     } catch (error) {
