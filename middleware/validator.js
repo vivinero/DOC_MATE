@@ -21,7 +21,8 @@ const validateUser = (data) => {
             //     'string.min': "Minimum of 3 characters for the username field",
             //     'any.required': "Please username is required"
             // }),
-            il: joi.string().max(40).trim().email( {tlds: {allow: false} } ).required().messages({
+            
+            email: joi.string().max(40).trim().email( {tlds: {allow: false} } ).required().messages({
                 'string.empty': "Email field can't be left empty",
                 'any.required': "Please Email is required"
             }),

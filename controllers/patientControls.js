@@ -86,7 +86,7 @@ const signUp = async (req, res) => {
 
             return res.status(201).json({
                 // message: `Hi ${checkPatient.} profile has been created! A link has been sent to your email to verify your email address`,
-                message: `Congratulations!!!, ${firstName.charAt(0).toUpperCase()}${firstName.slice(1)}.${lastName.slice(0, 1).toUpperCase()} you are successfully registered on DOCMATE APP`,
+                message: `Congratulations!!!, ${firstName.charAt(0).toUpperCase()}${firstName.slice(1)}.${lastName.slice(0, 1).toUpperCase()} you are successfully registered on DOCMATE APP. A link has been sent to your email to verify`,
                 data: patient
             })
         }
