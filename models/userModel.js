@@ -16,9 +16,6 @@ const patientSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    confirmPassword: {
-        type: String,
-    },
     isVerified :{
         type : Boolean,
         default : false
