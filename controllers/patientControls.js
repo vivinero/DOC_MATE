@@ -22,10 +22,9 @@ const signUp = async (req, res) => {
     try {
         const { error } = validateUser(req.body);
         if (error) {
-            res.status(500).json({
+            return res.status(500).json({
                 message: error.details[0].message
             })
-            return;
         } else {
             //Get the required field from the request object body
 

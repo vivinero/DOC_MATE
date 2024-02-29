@@ -225,32 +225,32 @@ const validateAppointmentRequest = (data) => {
 
 
 const validateAdmin = (data) => {
-    const schema = Joi.object({
-        hospitalName: Joi.string().trim().min(3).max(30).required().messages({
+    const schema = joi.object({
+        hospitalName: joi.string().trim().min(3).max(30).required().messages({
             'string.empty': 'Hospital name cannot be empty',
             'string.min': 'Hospital name must be at least 3 characters long',
             'string.max': 'Hospital name cannot exceed 30 characters',
             'any.required': 'Hospital name is required',
         }),
-        hospitalAddress: Joi.string().trim().required().messages({
+        hospitalAddress: joi.string().trim().required().messages({
             'string.empty': 'Hospital address cannot be empty',
             'any.required': 'Hospital address is required',
         }),
-        email: Joi.string().trim().email().required().messages({
+        email: joi.string().trim().email().required().messages({
             'string.empty': 'Email cannot be empty',
             'string.email': 'Invalid email format',
             'any.required': 'Email is required',
         }),
-        phoneNumber: Joi.string().trim().required().messages({
+        phoneNumber: joi.string().trim().required().messages({
             'string.empty': 'Phone number cannot be empty',
             'any.required': 'Phone number is required',
         }),
-        password: Joi.string().trim().min(8).required().messages({
+        password: joi.string().trim().min(8).required().messages({
             'string.empty': 'Password cannot be empty',
             'string.min': 'Password must be at least 8 characters long',
             'any.required': 'Password is required',
         }),
-        confirmPassword: Joi.string().trim().valid(Joi.ref('password')).required().messages({
+        confirmPassword: joi.string().trim().valid(Joi.ref('password')).required().messages({
             'any.only': 'Passwords do not match',
             'any.required': 'Confirm password is required',
         }),
