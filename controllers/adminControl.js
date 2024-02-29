@@ -9,94 +9,176 @@ const notificationModel = require("../models/notificateModel")
 
 const {validateAdmin} = require("../middleware/validator.js")
 
+// const register = async (req, res) => {
+//     try {
+//         const { error } = validateAdmin(req.body);
+//         if (error) {
+//             return res.status(400).json({
+//                 message: error.details[0].message
+//             });
+//         }
+
+//         // Get the required fields from the request object body
+//         const { hospitalName, hospitalAddress, email, phoneNumber, password, confirmPassword } = req.body;
+
+//         const checkUser = await adminModel.findOne({ email });
+//         if (checkUser) {
+//             return res.status(400).json({
+//                 message: "Hospital already exists"
+//             });
+//         }
+//         //Encrypt the user's password
+//         const salt = bcrypt.genSaltSync(10);
+//         const hashedPassword = bcrypt.hashSync(password, salt);
+
+        
+//         if (password !== confirmPassword) {
+//             return res.status(404).json({
+//                 message: "Please enter the correct password"
+//             });
+//         }
+
+//         // Check if a file was uploaded
+//         if (!req.files || !req.files.profilePicture) {
+//             return res.status(400).json({
+//                 message: "Profile picture is required"
+//             });
+//         }
+
+//         // Validate file type (ensure it's an image)
+//         const profilePicture = req.files.profilePicture;
+//         if (!profilePicture.mimetype.startsWith('image')) {
+//             return res.status(400).json({
+//                 message: "Profile picture must be an image file"
+//             });
+//         }
+
+//         // Upload the profile picture to Cloudinary
+//         const fileUploader = await cloudinary.uploader.upload(profilePicture.tempFilePath, { folder: "Hospital-Media" });
+
+//         // Create a user with uploaded profile picture
+//         const admin = new adminModel({
+//             hospitalName,
+//             email,
+//             password: hashedPassword,
+//             phoneNumber,
+//             hospitalAddress,
+//             profilePicture: {
+//                 public_id: fileUploader.public_id,
+//                 url: fileUploader.secure_url
+//             }
+//         });
+
+//         // Generate JWT token
+//         const token = jwt.sign({ userId: admin._id, firstName: admin.firstName, lastName: admin.lastName, email: admin.email }, process.env.jwtSecret, { expiresIn: "300s" });
+//         admin.token = token;
+
+//         // Send verification email
+//         const link = `${req.protocol}://${req.get("host")}/verify-admin/${admin.id}/${token}`;
+//         sendEmail({
+//             email: admin.email,
+//             subject: 'KINDLY VERIFY YOUR ACCOUNT',
+//             html: generateDynamicEmail(link, admin.hospitalName)
+//         });
+
+//         // Save user to the database
+//         await admin.save();
+
+//         return res.status(201).json({
+//             message: "Your profile has been created! A link has been sent to your email to verify your email address",
+//             data: admin
+//         });
+
+//     } catch (error) {
+//         return res.status(500).json({
+//             message: error.message
+//         });
+//     }
+// }
+
 const register = async (req, res) => {
     try {
         const { error } = validateAdmin(req.body);
         if (error) {
-            return res.status(400).json({
+            res.status(500).json({
                 message: error.details[0].message
-            });
-        }
+            })
+            return;
+        } else {
+            //Get the required field from the request object body
 
-        // Get the required fields from the request object body
-        const { hospitalName, hospitalAddress, email, phoneNumber, password, confirmPassword } = req.body;
-
-        const checkUser = await adminModel.findOne({ email });
-        if (checkUser) {
-            return res.status(400).json({
-                message: "Hospital already exists"
-            });
-        }
-        //Encrypt the user's password
-        const salt = bcrypt.genSaltSync(10);
-        const hashedPassword = bcrypt.hashSync(password, salt);
-
+            const hospitalName = req.body.hospitalName;
+            const hospitalAddress = req.body.hospitalAddress;
+            const email = req.body.email;
+            const password = req.body.password;
+            const phoneNumber = req.body.phoneNumber;
+            const confirmPassword = req.body.confirmPassword
+            
         
-        if (password !== confirmPassword) {
-            return res.status(404).json({
-                message: "Please enter the correct password"
-            });
-        }
 
-        // Check if a file was uploaded
-        if (!req.files || !req.files.profilePicture) {
-            return res.status(400).json({
-                message: "Profile picture is required"
-            });
-        }
-
-        // Validate file type (ensure it's an image)
-        const profilePicture = req.files.profilePicture;
-        if (!profilePicture.mimetype.startsWith('image')) {
-            return res.status(400).json({
-                message: "Profile picture must be an image file"
-            });
-        }
-
-        // Upload the profile picture to Cloudinary
-        const fileUploader = await cloudinary.uploader.upload(profilePicture.tempFilePath, { folder: "Hospital-Media" });
-
-        // Create a user with uploaded profile picture
-        const admin = new adminModel({
-            hospitalName,
-            email,
-            password: hashedPassword,
-            phoneNumber,
-            hospitalAddress,
-            profilePicture: {
-                public_id: fileUploader.public_id,
-                url: fileUploader.secure_url
+            const checkUser = await adminModel.findOne({ email: email.toLowerCase() })
+            if (checkUser) {
+                return res.status(200).json({
+                    message: "Hospital already exists"
+                })
             }
-        });
 
-        // Generate JWT token
-        const token = jwt.sign({ userId: admin._id, firstName: admin.firstName, lastName: admin.lastName, email: admin.email }, process.env.jwtSecret, { expiresIn: "300s" });
-        admin.token = token;
+            //Encrypt the user's password
 
-        // Send verification email
-        const link = `${req.protocol}://${req.get("host")}/verify-admin/${admin.id}/${token}`;
-        sendEmail({
-            email: admin.email,
-            subject: 'KINDLY VERIFY YOUR ACCOUNT',
-            html: generateDynamicEmail(link, admin.hospitalName)
-        });
+            const salt = bcrypt.genSaltSync(10);
+            const hashedPassword = bcrypt.hashSync(password, salt);
 
-        // Save user to the database
-        await admin.save();
+            // if (password !== confirmPassword) {
+            //     return res.status(400).json({
+            //         message: "Password must match"
+            //     })
+            // }
 
-        return res.status(201).json({
-            message: "Your profile has been created! A link has been sent to your email to verify your email address",
-            data: admin
-        });
+            //Create a user
+            const user = new adminModel({
+                hospitalName,
+                email,
+                password: hashedPassword,
+                hospitalAddress,
+                phoneNumber,
 
+
+            }
+            )
+
+            const token = jwt.sign({ userId: user._id, hospitalName: user.hospitalName, hospitalAddress: user.hospitalAddress, email: user.email }, process.env.jwtSecret, { expiresIn: "300s" })
+
+
+
+            const link = `${ req.protocol }://${req.get("host")}/verify-admin/${user.id}/${token}`
+            
+        
+            sendEmail({
+
+                email: user.email,
+                subject: 'KINDLY VERIFY YOUR ACCOUNT',
+                html: generateDynamicEmail(link, user.hospitalName)
+
+
+            })
+
+
+            await user.save();
+
+            return res.status(201).json({
+                message: "Your profile has been created! A link has been sent to your email to verify your email address",
+                data: user
+            })
+
+
+        }
     } catch (error) {
         return res.status(500).json({
             message: error.message
-        });
+        })
+
     }
 }
-
-
 
 //Function to verify a new user with a link
 const verifyAdmin = async (req, res) => {

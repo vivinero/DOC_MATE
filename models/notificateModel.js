@@ -7,7 +7,6 @@ const notificationSchema = new mongoose.Schema({
 
     date: {
         type: String,
-        required: true
     },
     lastDiagnosis: { type: String  },
   presentSymptoms: { type: String},

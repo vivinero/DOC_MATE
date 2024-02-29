@@ -238,10 +238,7 @@ const validateAppointmentRequest = (data) => {
         //     "string.pattern.base": "Please input a valid address"
         // }),
 
-        date: joi.date().iso().required().messages({
-            'any.required': 'Date is required',
-            'date.base': 'Invalid date format',
-        }),
+        
         // specialist: hapiJoiValidator.string().trim().required().valid("optician", "Optician")
         // .pattern(/^[A-Za-z\s]+$/).messages({
         //   'string.empty': 'specialist cannot be empty',
