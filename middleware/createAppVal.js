@@ -41,6 +41,8 @@ const validateConfirmAppointment = (data) => {
 const validateRescheduleOptions = (data) => {
     const rescheduleOptionsSchema = Joi.object({
         firstAvailability: Joi.number().valid(1, 2, 3).required(),
+        secondAvailability: Joi.number().valid(1, 2, 3).required(),
+        thirdAvailability: Joi.number().valid(1, 2, 3).required(),
 });
 return rescheduleOptionsSchema.validate(data)
 }

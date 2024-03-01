@@ -174,8 +174,8 @@ const rescheduleAppointment = async (req, res) => {
         appointment.status = 'Reschedule'; // Update status
         await appointment.save();
 
-        const subject = "Your Appointment Details";
-        const link = `${req.protocol}://${req.get("host")}/viewApp/${createApp.id}`;
+        const subject = "Choose from the Appointment Options";
+        const link = `${req.protocol}://${req.get("host")}/viewApp/${appointment.id}`;
         const html = viewApp(link, appointment.firstName); // Assuming you have access to patient's first name
         await sendMail({
             email: appointment.patientEmail,

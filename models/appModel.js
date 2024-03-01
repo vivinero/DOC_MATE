@@ -63,6 +63,15 @@ patient: [{
     type: String, 
     enum: ['Pending', "Confirmed", "Reschedule"] 
   },
+  firstAvailability: {
+    type: String
+  },
+   secondAvailability: {
+    type: String,
+   },
+   thirdAvailability: {
+    type: String,
+   }
 
 
 }, { timestamps: true });
