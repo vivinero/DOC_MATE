@@ -12,10 +12,10 @@ const appointmentSchema = new mongoose.Schema({
     type: Boolean,
     default: false
 },
-patient: {
+patient: [{
   type: mongoose.SchemaTypes.ObjectId,
-  ref: "patient"
-},
+  ref: "Patient"
+}],
   reschedule: { 
     type: String,
      enum: ['attended', "Unattended", "Unassigned", "Assigned"] },
