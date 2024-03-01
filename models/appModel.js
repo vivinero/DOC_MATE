@@ -4,16 +4,25 @@ const mongoose = require('mongoose');
 const appointmentSchema = new mongoose.Schema({
   fullName: { 
     type: String,
-    required: true 
   },
 
   patientEmail: { 
     type: String,
-    required: true
   },
-
+  fee: {
+    type: String,
+  },
+  speciality: {
+    type: String,
+  },
+  doctorName: {
+    type: String,
+  },
   date: { 
-    type: Date
+    type: String
+  },
+  time: { 
+    type: String
   },
 
   lastDiagnosis: { 
@@ -26,7 +35,7 @@ const appointmentSchema = new mongoose.Schema({
   lastVisitation:{
     type: Date
   },
-  
+
   paymentStatus: {
     type: Boolean,
     default: false

@@ -59,10 +59,11 @@ const createAppointment = async (req, res) => {
             date: date,
             time: time,
             speciality: speciality,
-            patient: app.patient
+            patient: app.patient,
+            status: app.status
         });
 
-        createApp.status = app.status;
+        //createApp.status = app.status;
 
         // Send email to the patient with appointment details
         const subject = "Your Appointment Details";
@@ -74,7 +75,7 @@ const createAppointment = async (req, res) => {
             html: html
         });
 
-        await createApp.save();
+        //await createApp.save();
 
         // Success message
         res.status(200).json({
