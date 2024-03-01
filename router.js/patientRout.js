@@ -14,7 +14,7 @@ router.post("/register", signUp);
 router.put("/uploadimage", authenticate, uploadProfilePicture);
 router.delete("/deleteimage", authenticate, deleteProfilePicture);
 router.get("/all-hospitals", authenticate, getAllHospitals)
-router.get("/one-hospital", authenticate, getOneHospital)
+router.get("/one-hospital/:id", authenticate, getOneHospital)
 router.put("/update-profile/:userId", authenticate, updateProfile)
 
 
