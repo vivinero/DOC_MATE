@@ -217,7 +217,7 @@ const rescheduleAppointment = async (req, res) => {
     }
 
     // Set the appointment status to 'Pending Reschedule'
-    appointment.status = 'Pending Reschedule';
+    appointment.status = 'Reschedule';
 
     // Save the updated appointment
     await appointment.save();
