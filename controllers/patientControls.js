@@ -277,9 +277,9 @@ const login = async (req, res) => {
             })
         }
     }
-    catch (err) {
+    catch (error) {
         return res.status(500).json({
-            message: "Internal server error " + err.message,
+            message: "Internal server error " + error.message,
         })
     }
 }
@@ -312,7 +312,9 @@ const forgotpassWord = async (req, res) => {
             }
         }
     } catch (error) {
-        res.status(500).json(error.message)
+        return res.status(500).json({
+            message: "Internal server error " + error.message,
+        })
     }
 
 }
@@ -343,7 +345,9 @@ const resetpassword = async (req, res) => {
             res.status(200).json(`your password has been succesfully changed`)
         }
     } catch (error) {
-        res.status(500).json(error.message)
+        return res.status(500).json({
+            message: "Internal server error " + error.message,
+        })
     }
 }
 
@@ -367,8 +371,8 @@ const uploadProfilePicture = async (req, res) => {
                 fs.unlinkSync(req.files.profilePicture.tempFilePath);
 
                 return profilePicture
-            } catch (err) {
-                return err
+            } catch (error) {
+                return error
             }
         })
 

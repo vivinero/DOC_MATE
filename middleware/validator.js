@@ -65,7 +65,7 @@ const validateUser = (data) => {
                 'any.required': "Please Email is required"
             }),
 
-            password: Joi.string()
+            password: joi.string()
             .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()])[A-Za-z\d!@#$%^&*()]{8,}$/)
             .required()
             .messages({
@@ -73,7 +73,7 @@ const validateUser = (data) => {
               'string.empty': 'Password cannot be empty',
                                'string.min': 'Minimum 8 characters required',
                              'any.required': 'Password is required',
-                             "string.pattern.base": "Empty space not allowed"
+                            //  "string.pattern.base": "Empty space not allowed"
             }),
                     // password: hapiJoiValidator.string().required().min(8).pattern(new RegExp(/^(?=.[A-Za-z0-9])[A-Za-z0-9 !@#$%^&()_+{}[\]:;<>,.?~\\/-]+$/)).messages({  
                     //           'string.empty': 'Password cannot be empty',
@@ -94,7 +94,7 @@ const validateUser = (data) => {
         return validateSchema.validate(data);
     } catch (error) {
         return res.status(500).json({
-            Error: "Error while validating user: " + error.message,
+            error: "Error while validating user: " + error.message,
         })
     }
 }
@@ -122,7 +122,7 @@ const validateUserLogin = (data) => {
         return validateSchema.validate(data);
     } catch (error) {
         return res.status(500).json({
-            Error: "Error while validating user: " + error.message,
+            error: "Error while validating user: " + error.message,
         })
     }
 }
@@ -139,7 +139,7 @@ const validateUserForgotPassword = (data) => {
         return validateSchema.validate(data);
     } catch (error) {
         return res.status(500).json({
-            Error: "Error while validating user: " + error.message,
+            error: "Error while validating user: " + error.message,
         })
     }
 }
@@ -158,7 +158,7 @@ const validateResetPassword = (data) => {
         return validateSchema.validate(data);
     } catch (error) {
         return res.status(500).json({
-            Error: "Error while validating user: " + error.message,
+            error: "Error while validating user: " + error.message,
         })
     }
 }
@@ -195,7 +195,7 @@ const validateMessage = (data) => {
         return validateSchema.validate(data);
     } catch (error) {
         return res.status(500).json({
-            Error: "Error while validating user: " + error.message,
+            error: "Error while validating user: " + error.message,
         })
     }
 }

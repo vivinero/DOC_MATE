@@ -39,9 +39,9 @@ app.use(express.json());
 app.use(cors(``*``))
 require("./config/config")
 
-app.get('/', (req, res) => {
-    res.send("Welcome to DocMate");
-})
+// app.get('/', (req, res) => {
+//     res.send("Welcome to DocMate");
+// })
 
 app.use(patientRouter); 
 app.use(adminRouter);
