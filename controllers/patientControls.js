@@ -458,11 +458,48 @@ const logOut = async (req, res) => {
     }
 }
 
+const searchHospital = async (req, res) => {
+    try {
+        // Extract the search query from the request
+        const searchQuery = req.query.q;
+        //console.log(searchQuery)
+        let hospitals;
 
+        if (searchQuery) {
+            // If search query is provided, filter hospitals by name starting with the query
+            hospitals = await hospitalModel.find({ hospitalName: { $regex: `^${searchQuery}`, $options: 'i' } })
+                .select('hospitalName hospitalAddress email')
+                // Sort hospitals alphabetically by name
+                .sort({ hospitalName: 1 });
+
+        } else {
+            // If no search query is provided, fetch all hospitals
+            hospitals = await hospitalModel.find()
+                .select('hospitalName hospitalAddress email')
+                .sort({ createdAt: -1 }); // Sort hospitals by creation date
+        }
+
+        if (hospitals.length === 0) {
+            return res.status(200).json({
+                message: "No hospitals found."
+            });
+        } else {
+            return res.status(200).json({
+                message: "List of hospitals",
+                totalNumberOfHospitals: hospitals.length,
+                data: hospitals
+            });
+        }
+    } catch (err) {
+        return res.status(500).json({
+            message: err.message
+        });
+    }
+}
 
 
 
 
 module.exports = {
-    signUp, verify, login, forgotpassWord, updateProfile, resetpassword, getAllHospitals, getOneHospital, uploadProfilePicture, deleteProfilePicture, logOut,
+    signUp, verify, login, forgotpassWord, updateProfile, resetpassword, getAllHospitals, getOneHospital, uploadProfilePicture, deleteProfilePicture, logOut, searchHospital
 }
