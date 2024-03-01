@@ -15,51 +15,58 @@ const { id } = require("@hapi/joi/lib/base");
 
 const createAppointment = async (req, res) => {
     try {
-        const userId = req.user.userId
-        const id = req.params.id
+        const userId = req.user.userId;
+        const id = req.params.id;
 
-        if(!userId){
+        if (!userId) {
             return res.status(403).json({
-                message: `Hospital not found`
-            })
+                message: "No Hospital not found"
+            });
         }
+
         // Validate the request body for creating an appointment
         const { error: createError } = validateCreateAppointment(req.body);
         if (createError) {
-            return res.status(400).json({ 
+            return res.status(400).json({
                 message: createError.details[0].message
             });
         }
 
         // Extract necessary details from the request body
-        const { doctorName, fee, date, time, speciality } = req.body;
-        const app = await appointmentModel.findById(id)
+        const { doctorName, date, fee, speciality, time } = req.body;
+        
+        // Validate appointment date
+        const currentDate = new Date();
+        const appointmentDate = new Date(date);
+        if (appointmentDate <= currentDate) {
+            return res.status(400).json({ message: 'Appointment date must be in the future' });
+        }
 
-        app.status = "Confirmed"
-        // Fetch patient details from the database
-    //     const requestedApp = await appointmentModel.findByIdAndUpdate(id, { status : "Confirmed"
-    // }, {new:true});
+        const app = await appointmentModel.findById(id);
         if (!app) {
-            return res.status(404).json({ 
+            return res.status(404).json({
                 message: `Patient request ID: ${id} was not found`
             });
         }
-        // if (requestedApp = "pending") {
-        //     requestedApp : "Confirmed" 
-        //     // return res.status()
-        // }
-        // await requestedApp.save();
+
+        app.status = "Confirmed";
         await app.save();
 
         // Create the appointment
-        const createApp = await appointmentsModel.create({doctorName, fee, date, time, speciality,
-        patient: app.patient });
+        const createApp = await appointmentsModel.create({
+            doctorName: doctorName.toLowerCase(),
+            fee: fee,
+            date: date,
+            time: time,
+            speciality: speciality,
+            patient: app.patient
+        });
 
         createApp.status = app.status;
 
         // Send email to the patient with appointment details
         const subject = "Your Appointment Details";
-        const link = `${req.protocol}://${req.get("host")}/viewApp/${createApp.id}`;
+        const link = `${req.protocol}:`//${req.get("host")}/viewApp/${createApp.id};
         const html = viewApp(link, app.firstName); // Assuming you have access to patient's first name
         await sendMail({
             email: app.patientEmail,
@@ -67,21 +74,20 @@ const createAppointment = async (req, res) => {
             html: html
         });
 
-        await createApp.save()
+        await createApp.save();
 
         // Success message
         res.status(200).json({
-            message: `, your appointment has been created successfully. Check your email for details.`,
+            message: `your appointment has been created successfully. Check your email for details.`,
             appointment: createApp
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ 
+        res.status(500).json({
             message: error.message
         });
     }
 };
-
 
 const rescheduleAppointment = async (req, res) => {
     try {

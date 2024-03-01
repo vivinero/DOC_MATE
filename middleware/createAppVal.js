@@ -21,9 +21,9 @@ const validateCreateAppointment = (data) => {
         // }),
         speciality: Joi.string().trim().required()
                 .pattern(/^[A-Za-z\s]+$/).messages({
-                  'string.empty': 'Specialty cannot be empty',
-                  'any.pattern.base': 'Specialty should only contain letters and no spaces',
-                  'any.required': 'Specialty is required',
+                  'string.empty': 'Speciality cannot be empty',
+                  'any.pattern.base': 'Speciality should only contain letters and no spaces',
+                  'any.required': 'Speciality is required',
                 }),
     });
     return schema.validate(data);
