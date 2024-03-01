@@ -3,18 +3,28 @@ const Joi = require('@hapi/joi');
 // Validator for creating a new appointment
 const validateCreateAppointment = (data) => {
     const schema = Joi.object({
-        fee: Joi.string().required(),
-        date: Joi.date().required(),
+        fee: Joi.number().required().valid(3000),
+        date: Joi.date().iso().required().messages({
+            'any.required': 'Date is required',
+            'date.base': 'Invalid date format',
+        }),
         time: Joi.string().required(),
         doctorName: Joi.string().trim().required().messages({
             'string.empty': 'Doctor name cannot be empty',
             'any.required': 'Doctor name is required',
         }),
-        fee: Joi.number().min(3000).required().messages({
-            'number.base': 'Fee must be a number',
-            'number.min': 'Fee must be at least 3000',
-            'any.required': 'Fee is required',
-        })
+        //fee: Joi.string().min(3000).required().messages({
+        //     'number.base': 'Fee must be a number',
+        //     'number.min': 'Fee must be at least 3000',
+        //     'any.required': 'Fee is required',
+        //     "number.max" : "Fee must be at most 3000"
+        // }),
+        speciality: Joi.string().trim().required()
+                .pattern(/^[A-Za-z\s]+$/).messages({
+                  'string.empty': 'Specialty cannot be empty',
+                  'any.pattern.base': 'Specialty should only contain letters and no spaces',
+                  'any.required': 'Specialty is required',
+                }),
     });
     return schema.validate(data);
 };
