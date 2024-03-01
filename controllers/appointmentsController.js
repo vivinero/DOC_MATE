@@ -53,7 +53,7 @@ const createAppointment = async (req, res) => {
         await app.save();
 
         // Create the appointment
-        const createApp = await appointmentsModel.create({
+        const createApp = await appointmentModel.create({
             doctorName: doctorName.toLowerCase(),
             fee: fee,
             date: date,

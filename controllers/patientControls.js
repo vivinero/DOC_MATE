@@ -457,7 +457,7 @@ const updateProfile = async (req, res) => {
 
 const getAllHospitals = async (req, res) => {
     try {
-        const hospitals = await hospitalModel.find().sort({createdAt: -1});
+        const hospitals = await hospitalModel.find().sort({createdAt: -1}).populate();
         if (hospitals.length === 0) {
            return res.status(200).json({
                 message: "There are currently no Hospitals in the database."
@@ -476,6 +476,30 @@ const getAllHospitals = async (req, res) => {
         })
     }
 }
+
+const getOneHospital = async (req, res) => {
+    try {
+      const Id = req.params.Id;
+  
+      const request = await hospitalModel.findById(Id);
+      if (!request) {
+        return res.status(404).json({
+          message: 'No hospital found'
+        })
+
+      } else {
+        return res.status(200).json({
+          message: `The hospital with id: ${Id} found`,
+          data: request
+        })
+      }
+    } catch (err) {
+     return res.status(500).json({
+        message: "internal server error: " + err.message
+      })
+    }
+  
+  }
 
 
 const logOut = async (req, res) => {
@@ -520,5 +544,5 @@ const logOut = async (req, res) => {
 
 
 module.exports = {
-    signUp, verify, login, forgotpassWord, updateProfile, resetpassword, getAllHospitals, uploadProfilePicture, deleteProfilePicture, logOut,
+    signUp, verify, login, forgotpassWord, updateProfile, resetpassword, getAllHospitals, getOneHospital, uploadProfilePicture, deleteProfilePicture, logOut,
 }
