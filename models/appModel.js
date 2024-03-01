@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const appointmentSchema = new mongoose.Schema({
   fullName: { type: String, required: true },
   patientEmail: { type: String, required: true },
-  date: { type: Date, required: true },
+  date: { type: Date },
   lastDiagnosis: { type: String  },
   presentSymptoms: { type: String, },
   lastVisitation:{type: Date},
