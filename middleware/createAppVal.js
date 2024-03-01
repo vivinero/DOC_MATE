@@ -4,7 +4,7 @@ const Joi = require('@hapi/joi');
 const validateCreateAppointment = (data) => {
     const schema = Joi.object({
         fee: Joi.string().required(),
-        // date: Joi.date().required(),
+        date: Joi.date().required(),
         time: Joi.string().required(),
         doctorName: Joi.string().trim().required().messages({
             'string.empty': 'Doctor name cannot be empty',
