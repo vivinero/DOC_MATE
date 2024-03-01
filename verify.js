@@ -27,7 +27,7 @@ const generateDynamicEmail=( link,firstName)=> {
                   <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                           <!-- <td style="text-align: center;">
-                            <h1 style="margin: 0;"><a href="#" style="color: #30e3ca; font-size: 24px; font-weight: 700; font-family: 'Lato', sans-serif;">THE CURVE COHORT3</a></h1>
+                            <h1 style="margin: 0;"><a href="#" style="color: #30e3ca; font-size: 24px; font-weight: 700; font-family: 'Lato', sans-serif;">DOCMATE</a></h1>
                           </td> -->
                       </tr>
                   </table>
@@ -35,7 +35,7 @@ const generateDynamicEmail=( link,firstName)=> {
               </tr><!-- end tr -->
               <tr>
               <td valign="middle" style="padding: 3em 0 2em 0;">
-                <img src="https://res.cloudinary.com/dgdsmfgx6/image/upload/v1709299701/tradturqku7nisqf5oiz.png" alt="" style="width: 150px; max-width: 300px; height: auto; margin: auto; display: block;">
+                <img src="https://res.cloudinary.com/dgdsmfgx6/image/upload/v1709299701/tradturqku7nisqf5oiz.png">
               </td>
               </tr><!-- end tr -->
                     <tr>
@@ -46,7 +46,7 @@ const generateDynamicEmail=( link,firstName)=> {
                             <div style="padding: 0 2.5em; text-align: center; margin-bottom: 0px;">
                                 <h2 style="font-family: 'Lato', sans-serif; color: rgba(0,0,0,.3); font-size: 30px; margin-bottom: 0; font-weight: 400;">Please verify your email</h2>
                                 <h3 style="font-family: 'Lato', sans-serif; font-size: 22px; font-weight: 300;"> Welcome on Board, ${firstName},<br/>Click the button below to verify your account.</h3>
-                                <p><a href=${link} class="btn btn-primary" style="padding: 10px 30px; display: inline-block; border-radius: 3px;  margin-top:20px; background: #00FFEF; color: #ffffff; text-decoration: none;">Verify</a></p>
+                                <p><a href=${link} class="btn btn-primary" style="padding: 10px 30px; display: inline-block; border-radius: 3px;  margin-top:20px; background: #2C7DA0; color: #ffffff; text-decoration: none;">Verify</a></p>
                                 <h6 style="font-family: 'Lato', sans-serif; font-size: 18px; font-weight: 300; margin-bottom: 0px; padding: 0px;">This email expires in 5minutes</h6>
                             </div>
                         </td>
