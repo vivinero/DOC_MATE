@@ -32,7 +32,7 @@ const createAppointment = async (req, res) => {
         }
 
         // Extract necessary details from the request body
-        const { doctorName, fee, date, time  } = req.body;
+        const { doctorName, fee, date, time, speciality } = req.body;
         const app = await appointmentModel.findById(id)
 
         app.status = "Confirmed"
