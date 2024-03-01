@@ -406,9 +406,9 @@ const deleteProfilePicture = async (req, res) => {
             message: `Profile picture deleted successfully`
         })
 
-    } catch (err) {
+    } catch (error) {
         return res.status(500).json({
-            message: "Internal server  error: " + err.message,
+            message: "Internal server  error: " + error.message,
         })
     }
 }
@@ -444,9 +444,9 @@ const updateProfile = async (req, res) => {
             message: `Your profile has been updated successfully`,
             data: newProfile
         })
-    } catch (err) {
+    } catch (error) {
         return res.status(500).json({
-            message: "Internal server error: " +err.message
+            message: "Internal server error: " + error.message
         })
     } 
 }
@@ -466,9 +466,9 @@ const getAllHospitals = async (req, res) => {
             })
         }
 
-    } catch (err) {
+    } catch (error) {
         res.status(500).json({
-            message: err.message
+            message: error.message
         })
     }
 }
@@ -503,9 +503,9 @@ const logOut = async (req, res) => {
 
         return res.status(200).json({ message: "You have logged out successfully" })
 
-    } catch (err) {
+    } catch (error) {
         return res.status(500).json({
-            message: err.message
+            message: error.message
         })
     }
 }

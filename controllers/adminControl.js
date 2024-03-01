@@ -506,6 +506,24 @@ const getAllRequest = async (req, res) => {
     }
   }
   
+//   exports.getAllHospitals = async (req, res) => {
+//     try {
+//         const comment = await commentModel.find()
+//         if (comment.length === 0) {
+//             return res.status(200).json({
+//                 message: "No Comment found"
+//             })
+//         }
+//         return res.status(200).json({
+//             message: "These are the comments in the blog",
+//             comment
+//         })
+//     } catch (error) {
+//         res.status(500).json({
+//             message: error.message
+//         })
+//     }
+// }
   
 
 

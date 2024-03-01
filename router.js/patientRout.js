@@ -13,7 +13,7 @@ router.post("/register", signUp);
 
 router.put("/uploadimage", authenticate, uploadProfilePicture);
 router.delete("/deleteimage", authenticate, deleteProfilePicture);
-router.get("all-hospitals", authenticate, getAllHospitals)
+router.get("/all-hospitals", authenticate, getAllHospitals)
 router.put("/update-profile/:userId", authenticate, updateProfile)
 
 
