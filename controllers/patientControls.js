@@ -38,7 +38,7 @@ const signUp = async (req, res) => {
 
             const checkPatient = await patientModel.findOne({ email: email.toLowerCase() })
             if (checkPatient) {
-                return res.status(200).json({
+                return res.status(400).json({
                     message: "Profile already exists"
                 })
             }
