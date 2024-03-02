@@ -350,7 +350,7 @@ const updateProfile = async (req, res) => {
 
         const profileData = {
             bloodType: req.body.bloodType || profile.bloodType,
-            allegies: req.body.allegies || profile.allegies,
+            allegies: req.body.allegies || profile.allergies,
             patientAddress: req.body.patientAddress || profile.patientAddress,
             
         }

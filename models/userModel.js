@@ -49,6 +49,23 @@ const patientSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref:"Hospital"
     }],
+    bloodType: {
+        type: String,
+    },
+    allergies: {
+        type: String,
+    },
+    patientAddress: {
+        type: String,
+    },
+    phoneNumber: {
+        type: String,
+        required: true
+    },
+    gender: {
+        type: String,
+        required: true
+    },
     profileUpdated:{
         type: Boolean,
         default: false

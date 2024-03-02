@@ -286,7 +286,9 @@ const validateAdmin = (data) => {
             'string.email': 'Invalid email format',
             'any.required': 'Email is required',
         }),
-        phoneNumber: joi.string().trim().required().messages({
+        phoneNumber: joi.string().trim().min(11).max(11).required().messages({
+            'string.min': 'Phone number must be at least 11 characters long',
+            'string.max': 'phone number cannot exceed 11 characters',
             'string.empty': 'Phone number cannot be empty',
             'any.required': 'Phone number is required',
         }),
