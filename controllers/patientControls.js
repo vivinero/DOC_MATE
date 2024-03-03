@@ -186,7 +186,7 @@ const login = async (req, res) => {
         await patient.save();
         if (patient.isVerified === true) {
             return res.status(200).json({
-                message: "Welcome " + patient.firstName,
+                message: "Welcome to DOCMATE " + patient.firstName,
                 data: user,
                 token: token
             })
@@ -301,6 +301,7 @@ const uploadProfilePicture = async (req, res) => {
             public_id: fileUploader.public_id
         }
         await patientModel.findByIdAndUpdate(userId, { profilePicture: data }, { new: true })
+
         res.status(200).json({
             message: "Profile picture updated successfully"
         });
@@ -364,9 +365,20 @@ const updateProfile = async (req, res) => {
         } 
         newProfile.profileUpdated = true;
         await newProfile.save();
+
+        const newData = {
+            firstName: newProfile.firstName,
+            lastName: newProfile.lastName,
+            bloodType: newProfile.bloodType,
+            allergies: newProfile.allergies,
+            patientAddress: newProfile.patientAddress,
+            phoneNumber: newProfile.phoneNumber,
+            gender: newProfile.gender
+        }
+
         res.status(200).json({
             message: `Your profile has been updated successfully`,
-            data: newProfile
+            data: newData
         })
     } catch (error) {
         return res.status(500).json({

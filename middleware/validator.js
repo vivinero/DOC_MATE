@@ -2,50 +2,6 @@ const hapiJoiValidator = require("@hapi/joi");
 
 const joi = require('@hapi/joi');
 
-// const validateUser = (data) => {
-//     try {
-//         const validateSchema = joi.object({
-//             firstName: joi.string().min(3).max(30).regex(/^[a-zA-Z]+$/).trim().required().messages({
-//                 'string.empty': "First name field can't be left empty",
-//                 'string.min': "Minimum of 3 characters for the first name field",
-//                 'any.required': "Please first name is required",
-//                 "string.pattern.base": "Please no space is allowed/No special characters allowed"
-//             }),
-//             lastName: joi.string().min(3).max(30).regex(/^[a-zA-Z]+$/).trim().required().messages({
-//                 'string.empty': "Last name field can't be left empty",
-//                 'string.min': "Minimum of 3 characters for the last name field",
-//                 'any.required': "Please last name is required"
-//             }),
-            
-//             email: joi.string().max(40).trim().email( {tlds: {allow: false} } ).required().messages({
-//                 'string.empty': "Email field can't be left empty",
-//                 'any.required': "Please Email is required"
-//             }),
-//                     password: hapiJoiValidator.string().required().min(8)
-//                             .pattern(new RegExp(/^(?=.*[A-Za-z0-9])[A-Za-z0-9 !@#$%^&*()_+{}[\]:;<>,.?~\\/-]+$/)).messages({
-//                               'string.empty': 'Password cannot be empty',
-//                                'string.min': 'Minimum 8 characters required',
-//                               'any.pattern.base': 'Password should contain letters, numbers, and special characters',
-//                              'any.required': 'Password is required',
-//                              "string.pattern.base": "Empty space not allowed"
-//                          }),
-//                             // confirmPassword: hapiJoiValidator.string().required().min(8)
-//                             confirmPassword: joi.any().valid(joi.ref('password')).required().label('Confirm password').options({
-//                                 language: {
-//                                   any: {
-//                                     allowOnly: '!!Passwords do not match',
-//                                   },
-//                                 },
-//                               })
-//         })
-//         return validateSchema.validate(data);
-//     } catch (error) {
-//         return res.status(500).json({
-//             Error: "Error while validating user: " + error.message,
-//         })
-//     }
-// }
-
 const validateUser = (data) => {
     try {
         const validateSchema = joi.object({
@@ -53,7 +9,7 @@ const validateUser = (data) => {
                 'string.empty': "First name field can't be left empty",
                 'string.min': "Minimum of 3 characters for the first name field",
                 'any.required': "Please first name is required",
-                "string.pattern.base": "Please no space is allowed/No special characters allowed"
+                "string.pattern.base": "No special characters allowed on firstname"
             }),
             lastName: joi.string().min(3).max(30).regex(/^[a-zA-Z]+$/).trim().required().messages({
                 'string.empty': "Last name field can't be left empty",
@@ -252,21 +208,37 @@ const validateAppointmentRequest = (data) => {
     return schema.validate(data);
 };
 
+const validateUserProfile = (data) => {
+    const schema = hapiJoiValidator.object({
+        bloodType: hapiJoiValidator.string().valid('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-').message({
+            'any.only': 'Blood type must be one of: A+, A-, B+, B-, AB+, AB-, O+, O-',
+            "string.empty": "Blood type field must be filled"
 
-// const Joi = require('joi');
+        }),
+        gender: hapiJoiValidator.string().valid("male", "female", "Male", "F", "M", "Female", "FEMALE", "MALE").trim().required()
+            .pattern(/^[A-Za-z\s]+$/).messages({
+                'string.empty': 'Gender cannot be empty',
+                'any.pattern.base': 'Gender should only contain letters and no spaces',
+                'any.required': 'Gender is required',
+                'any.only': 'Gender must be one of: male, female, Male, F, M, Female, FEMALE, MALE'
 
-// // Define schema for date input validation
-// const dateSchema = Joi.date().iso().min('now').required().messages({
-//   'any.required': 'Date is required',
-//   'date.base': 'Invalid date format',
-//   'date.min': 'Date must be in the future',
-// });
+            }),
+        phoneNumber: hapiJoiValidator.string().min(11).max(11).trim().regex(/^0\d{10}$/).required().messages({
+            'string.empty': "Phone number field can't be left empty",
+            'string.min': "Phone number must be atleast 11 digit long e.g: 08123456789",
+            'any.required': "Please phone number is required",
+            "string.pattern.base": "Invalid phone number"
+        }),
+        patientAddress: hapiJoiValidator.string().trim().required().messages({
+            'string.empty': 'Home address cannot be empty',
+            'any.required': 'Home address is required',
+        }),
+        allergies:hapiJoiValidator.string().trim().messages({
+            'string.empty': "allergies field can't be left empty",
+            'any.required': "Please allergies is required"
+    })
+})}
 
-// // Define schema for time input validation
-// const timeSchema = Joi.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/).required().messages({
-//   'any.required': 'Time is required',
-//   'string.pattern.base': 'Invalid time format (HH:MM)',
-// });
 
 
 const validateAdmin = (data) => {
@@ -315,6 +287,7 @@ module.exports = {
   validateUserForgotPassword,
   validateAppointmentRequest,
   validateMessage,
+  validateUserProfile,
     validateAdmin
 }
 
