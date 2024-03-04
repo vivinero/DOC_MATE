@@ -26,7 +26,7 @@ const generateDynamicEmail=( link,firstName, lastName)=> {
                   <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                       <tr>
                           <!-- <td style="text-align: center;">
-                            <h1 style="margin: 0;"><a href="#" style="color: #30e3ca; font-size: 24px; font-weight: 700; font-family: 'Lato', sans-serif;">THE CURVE COHORT3</a></h1>
+                            <h1 style="margin: 0;"><a href="#" style="color: #30e3ca; font-size: 24px; font-weight: 700; font-family: 'Lato', sans-serif;">DOCMATE</a></h1>
                           </td> -->
                       </tr>
                   </table>
@@ -34,7 +34,7 @@ const generateDynamicEmail=( link,firstName, lastName)=> {
               </tr><!-- end tr -->
               <tr>
               <td valign="middle" style="padding: 3em 0 2em 0;">
-                <img src="https://www.the-curve.africa/static/media/curve2.b90648ddd7482f82d25a.png" alt="" style="width: 300px; max-width: 600px; height: auto; margin: auto; display: block;">
+              <img src="https://res.cloudinary.com/dgdsmfgx6/image/upload/v1709299701/tradturqku7nisqf5oiz.png">
               </td>
               </tr><!-- end tr -->
                     <tr>
@@ -45,7 +45,7 @@ const generateDynamicEmail=( link,firstName, lastName)=> {
                             <div style="padding: 0 2.5em; text-align: center;">
                                 <h2 style="font-family: 'Lato', sans-serif; color: rgba(0,0,0,.3); font-size: 40px; margin-bottom: 0; font-weight: 400;">Please reset your password</h2>
                                 <h3 style="font-family: 'Lato', sans-serif; font-size: 24px; font-weight: 300;">Dear , ${firstName, lastName},<br/>Click the button below to reset your password.</h3>
-                                <p><a href=${link} class="btn btn-primary" style="padding: 15px 35px; display: inline-block; border-radius: 3px; background: #7e2e00; color: #ffffff; text-decoration: none;">reset password</a></p>
+                                <p><a href=${link} class="btn btn-primary" style="padding: 15px 35px; display: inline-block; border-radius: 3px; background: #2C7DA0; color: #ffffff; text-decoration: none;">reset password</a></p>
                                 <h6 style="font-family: 'Lato', sans-serif; font-size: 18px; font-weight: 300;">This email expires in 2minutes</h6>
                             </div>
                         </td>

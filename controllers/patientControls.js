@@ -186,7 +186,7 @@ const login = async (req, res) => {
         await patient.save();
         if (patient.isVerified === true) {
             return res.status(200).json({
-                message: "Welcome to DOCMATE " + patient.firstName,
+                message: `Congratulations! ${patient.firstName}, you have successfully logged in`,
                 data: user,
                 token: token
             })

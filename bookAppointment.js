@@ -34,7 +34,7 @@ const generateDynamicEmail=( link,firstName)=> {
               </tr><!-- end tr -->
               <tr>
               <td valign="middle" style="padding: 3em 0 2em 0;">
-                <img src="https://www.the-curve.africa/static/media/curve2.b90648ddd7482f82d25a.png" alt="" style="width: 300px; max-width: 600px; height: auto; margin: auto; display: block;">
+              <img src="https://res.cloudinary.com/dgdsmfgx6/image/upload/v1709299701/tradturqku7nisqf5oiz.png">
               </td>
               </tr><!-- end tr -->
                     <tr>
@@ -43,9 +43,9 @@ const generateDynamicEmail=( link,firstName)=> {
                     <tr>
                         <td>
                             <div style="padding: 0 2.5em; text-align: center;">
-                                <h2 style="font-family: 'Lato', sans-serif; color: rgba(0,0,0,.3); font-size: 40px; margin-bottom: 0; font-weight: 400;">Please reset your password</h2>
+                                <h2 style="font-family: 'Lato', sans-serif; color: rgba(0,0,0,.3); font-size: 40px; margin-bottom: 0; font-weight: 400;">BOOK APPOINTMENT</h2>
                                 <h3 style="font-family: 'Lato', sans-serif; font-size: 24px; font-weight: 300;">Dear , ${firstName},<br/>You have successfully booked an Appointment.</h3>
-                                <p><a href=${link} class="btn btn-primary" style="padding: 15px 35px; display: inline-block; border-radius: 3px; background: #7e2e00; color: #ffffff; text-decoration: none;">View Appointment</a></p>
+                                <p><a href=${link} class="btn btn-primary" style="padding: 15px 35px; display: inline-block; border-radius: 3px; background: #2C7DA0; color: #ffffff; text-decoration: none;">View Appointment</a></p>
                                 <h6 style="font-family: 'Lato', sans-serif; font-size: 18px; font-weight: 300;">This email expires in 2minutes</h6>
                             </div>
                         </td>

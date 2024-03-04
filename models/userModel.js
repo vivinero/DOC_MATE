@@ -60,11 +60,9 @@ const patientSchema = new mongoose.Schema({
     },
     phoneNumber: {
         type: String,
-        required: true
     },
     gender: {
         type: String,
-        required: true
     },
     profileUpdated:{
         type: Boolean,
