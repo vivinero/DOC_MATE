@@ -100,11 +100,11 @@ const signUp = async (req, res) => {
 const verify = async (req, res) => {
     try {
         const id = req.params.id;
-        //   const token = req.params.token;
+          const token = req.params.token;
         const patient = await patientModel.findById(id);
 
         // Verify the token
-        jwt.verify(patient.token, process.env.jwtSecret);
+        jwt.verify(token, process.env.jwtSecret);
 
 
         // Update the user if verification is successful
@@ -340,6 +340,13 @@ const deleteProfilePicture = async (req, res) => {
 
 const updateProfile = async (req, res) => {
     try {
+        const { error } = validateUserProfile(req.body);
+        if (error) {
+            return res.status(500).json({
+                message: error.details[0].message
+            })
+
+        } else {
         const userId = req.params.userId;       
         const profile = await patientModel.findById(userId);
         if (!profile) {
@@ -351,21 +358,26 @@ const updateProfile = async (req, res) => {
 
         const profileData = {
             bloodType: req.body.bloodType || profile.bloodType,
-            allegies: req.body.allegies || profile.allergies,
+            allergies: req.body.allergies || profile.allergies,
             patientAddress: req.body.patientAddress || profile.patientAddress,
+            phoneNumber: req.body.phoneNumber || profile.phoneNumber,
+            gender: req.body.gender || profile.gender
             
         }
 
         const newProfile = await patientModel.findByIdAndUpdate(userId, profileData, {new:true});
+        console.log(newProfile)
         if (!newProfile) { 
             return res.status(404).json({
                 message: "The Patient's information not found"
             })
             
         } 
-        newProfile.profileUpdated = true;
-        await newProfile.save();
+        
 
+        newProfile.profileUpdated = true;
+        
+        await newProfile.save();
         const newData = {
             firstName: newProfile.firstName,
             lastName: newProfile.lastName,
@@ -375,18 +387,21 @@ const updateProfile = async (req, res) => {
             phoneNumber: newProfile.phoneNumber,
             gender: newProfile.gender
         }
+            
 
-        res.status(200).json({
-            message: `Your profile has been updated successfully`,
+        
+        return res.status(200).json({
+            message: "Your profile has been updated successfully",
             data: newData
         })
-    } catch (error) {
+    }
+        
+    } catch (err) {
         return res.status(500).json({
-            message: "Internal server error: " + error.message
+            message: "Internal server error: " +err.message
         })
     } 
 }
-
 const getAllHospitals = async (req, res) => {
     try {
         const hospitals = await hospitalModel.find().sort({createdAt: -1}).populate();
@@ -395,10 +410,16 @@ const getAllHospitals = async (req, res) => {
                 message: "There are currently no Hospitals in the database."
             })
         }else {
+
+            const newData = {
+                hospitalName: hospitals.hospitalName,
+                hospitalAddress: hospitals.hospitalAddress,
+                email: hospitals.email
+            }
             return res.status(200).json({
                 message: "List of available Hospitals",
                 totalNumberOfHospitals: hospitals.length,
-                data: hospitals
+                data: newData
             })
         }
 
@@ -420,9 +441,15 @@ const getOneHospital = async (req, res) => {
         })
 
       } else {
+        const newData = {
+            hospitalName: request.hospitalName,
+            hospitalAddress: request.hospitalAddress,
+            email: request.email
+            
+        }
         return res.status(200).json({
           message: `The hospital with id: ${Id} found`,
-          data: request
+          data: newData
         })
       }
     } catch (err) {

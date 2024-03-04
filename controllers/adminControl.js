@@ -7,7 +7,8 @@ const jwt = require("jsonwebtoken");
 const cloudinary = require("../middleware/cloudinary")
 const notificationModel = require("../models/notificateModel")
 
-const {validateAdmin} = require("../middleware/validator.js")
+const {validateAdmin} = require("../middleware/validator.js");
+const patientModel = require("../models/userModel.js");
 
 const register = async (req, res) => {
     try {
@@ -437,11 +438,69 @@ const getAllRequest = async (req, res) => {
 //         })
 //     }
 // }
+
+
+const getAllPatient = async (req, res) => {
+    try {
+        const patient = await patientModel.find().sort({createdAt: -1}).populate();
+        if (patient.length === 0) {
+           return res.status(200).json({
+                message: "There are currently no Patients in the database."
+            })
+        }else {
+
+            const newData = {
+                firstName: patient.firstName,
+                lastName: patient.lastName,
+                email: patient.email
+            }
+            return res.status(200).json({
+                message: "List of available patients",
+                totalNumberOfPatients: patient.length,
+                data: newData
+            })
+        }
+
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        })
+    }
+}
+
+const getOnePatient = async (req, res) => {
+    try {
+      const Id = req.params.Id;
   
+      const request = await patientModel.findById(Id);
+      if (!request) {
+        return res.status(404).json({
+          message: 'No Patient found'
+        })
+
+      } else {
+        const newData = {
+            firstName: patient.firstName,
+            lastName: patient.lastName,
+            email: patient.email
+        }
+            
+        }
+        return res.status(200).json({
+          message: `The patient with id: ${Id} found`,
+          data: newData
+        })
+    } catch (err) {
+     return res.status(500).json({
+        message: "internal server error: " + err.message
+      })
+    }
+  
+  }
 
 
 
 
 
 module.exports = {
-    register, verifyAdmin, loginAdmin, forgotpassWordAdmin, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest}
+    register, verifyAdmin, loginAdmin, forgotpassWordAdmin, getAllPatient, getOnePatient, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest}
