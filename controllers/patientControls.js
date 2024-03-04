@@ -181,6 +181,7 @@ const login = async (req, res) => {
             lastName: patient.lastName,
             email: patient.email,
             isVerified: patient.isVerified,
+            id: patient._id
         };
         patient.token = token;
         await patient.save();
@@ -188,7 +189,7 @@ const login = async (req, res) => {
             return res.status(200).json({
                 message: `Welcome ${patient.firstName}`,
                 data: user,
-                token: token
+                token: token,
             })
         }
         else {
@@ -362,7 +363,6 @@ const updateProfile = async (req, res) => {
             patientAddress: req.body.patientAddress || profile.patientAddress,
             phoneNumber: req.body.phoneNumber || profile.phoneNumber,
             gender: req.body.gender || profile.gender
-            
         }
 
         const newProfile = await patientModel.findByIdAndUpdate(userId, profileData, {new:true});
