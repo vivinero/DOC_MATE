@@ -404,22 +404,16 @@ const updateProfile = async (req, res) => {
 }
 const getAllHospitals = async (req, res) => {
     try {
-        const hospitals = await hospitalModel.find().sort({createdAt: -1}).populate();
+        const hospitals = await hospitalModel.find().sort({createdAt: -1}).populate().select("hospitalName", "hospitalAddress", "email");
         if (hospitals.length === 0) {
            return res.status(200).json({
                 message: "There are currently no Hospitals in the database."
             })
         }else {
-
-            const newData = {
-                hospitalName: hospitals.hospitalName,
-                hospitalAddress: hospitals.hospitalAddress,
-                email: hospitals.email
-            }
             return res.status(200).json({
                 message: "List of available Hospitals",
                 totalNumberOfHospitals: hospitals.length,
-                data: newData
+                data: hospitals
             })
         }
 
@@ -434,22 +428,16 @@ const getOneHospital = async (req, res) => {
     try {
       const Id = req.params.Id;
   
-      const request = await hospitalModel.findById(Id);
+      const request = await hospitalModel.findById(Id).populate().select("hospitalName", "hospitalAddress", "email");
       if (!request) {
         return res.status(404).json({
           message: 'No hospital found'
         })
 
       } else {
-        const newData = {
-            hospitalName: request.hospitalName,
-            hospitalAddress: request.hospitalAddress,
-            email: request.email
-            
-        }
         return res.status(200).json({
           message: `The hospital with id: ${Id} found`,
-          data: newData
+          data: request
         })
       }
     } catch (err) {

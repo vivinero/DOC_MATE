@@ -442,22 +442,22 @@ const getAllRequest = async (req, res) => {
 
 const getAllPatient = async (req, res) => {
     try {
-        const patient = await patientModel.find().sort({createdAt: -1}).populate();
+        const patient = await patientModel.find().sort({createdAt: -1}).populate().select("firstName", "lastName", "email");
         if (patient.length === 0) {
            return res.status(200).json({
                 message: "There are currently no Patients in the database."
             })
         }else {
 
-            const newData = {
-                firstName: patient.firstName,
-                lastName: patient.lastName,
-                email: patient.email
-            }
+            // const newData = {
+            //     firstName: patient.firstName,
+            //     lastName: patient.lastName,
+            //     email: patient.email
+            // }
             return res.status(200).json({
                 message: "List of available patients",
                 totalNumberOfPatients: patient.length,
-                data: newData
+                data: patient
             })
         }
 
@@ -472,7 +472,7 @@ const getOnePatient = async (req, res) => {
     try {
       const Id = req.params.Id;
   
-      const request = await patientModel.findById(Id);
+      const request = await patientModel.findById(Id).select("firstName", "lastName", "email");;
       if (!request) {
         return res.status(404).json({
           message: 'No Patient found'
