@@ -404,7 +404,7 @@ const updateProfile = async (req, res) => {
 }
 const getAllHospitals = async (req, res) => {
     try {
-        const hospitals = await hospitalModel.find().sort({createdAt: -1}).populate().select("hospitalName", "hospitalAddress", "email");
+        const hospitals = await hospitalModel.find().sort({createdAt: -1}).populate().select("hospitalName, hospitalAddressg, email");
         if (hospitals.length === 0) {
            return res.status(200).json({
                 message: "There are currently no Hospitals in the database."
@@ -428,7 +428,7 @@ const getOneHospital = async (req, res) => {
     try {
       const Id = req.params.Id;
   
-      const request = await hospitalModel.findById(Id).populate().select("hospitalName", "hospitalAddress", "email");
+      const request = await hospitalModel.findById(Id).populate().select("hospitalName, hospitalAddress, email");
       if (!request) {
         return res.status(404).json({
           message: 'No hospital found'
