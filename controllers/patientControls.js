@@ -186,7 +186,7 @@ const login = async (req, res) => {
         await patient.save();
         if (patient.isVerified === true) {
             return res.status(200).json({
-                message: `Congratulations! ${patient.firstName}, you have successfully logged in`,
+                message: `Welcome ${patient.firstName}`,
                 data: user,
                 token: token
             })
