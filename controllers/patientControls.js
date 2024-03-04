@@ -189,7 +189,7 @@ const login = async (req, res) => {
             return res.status(200).json({
                 message: `Welcome ${patient.firstName}`,
                 data: user,
-                token: token,
+                token: token
             })
         }
         else {
