@@ -486,7 +486,7 @@ const updateProfile = async (req, res) => {
             });
         }
         newProfile.profileUpdated = true
-        await updatedPatient.save()
+        await newProfile.save()
 
         const newData = {
             firstName: newProfile.firstName,
@@ -503,11 +503,11 @@ const updateProfile = async (req, res) => {
             message: "Your profile has been updated successfully",
             data: newData
         });
-    } catch (err) {
+    } catch (error) {
         // Handle internal server error
-        console.error("Error updating user profile:", err);
+        console.error("Error updating user profile:", error);
         return res.status(500).json({
-            message: "Internal server error"
+            message: "Internal server error" + error.message
         });
     }
 }
