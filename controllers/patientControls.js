@@ -535,6 +535,30 @@ const getAllHospitals = async (req, res) => {
     }
 }
 
+const getOnePatient = async (req, res) => {
+    try {
+      const Id = req.user.userId;
+  
+      const user = await patientModel.findOne({Id});
+      if (!user) {
+        return res.status(404).json({
+          message: 'User cannot be found'
+        })
+
+      } else {
+        return res.status(200).json({
+          message: `The user's id: ${Id} has been found`,
+          data: user
+        })
+      }
+    } catch (error) {
+     return res.status(500).json({
+        message: "internal server error: " + error.message
+      })
+    }
+  
+  }
+
 const getOneHospital = async (req, res) => {
     try {
       const Id = req.params.Id;
@@ -639,5 +663,5 @@ const searchHospital = async (req, res) => {
 
 
 module.exports = {
-    signUp, verify, login, forgotpassWord, updateProfile, resetpassword, getAllHospitals, getOneHospital, uploadProfilePicture, deleteProfilePicture, logOut, searchHospital
+    signUp, verify, login, forgotpassWord, updateProfile, resetpassword, getOnePatient, getAllHospitals, getOneHospital, uploadProfilePicture, deleteProfilePicture, logOut, searchHospital
 }
