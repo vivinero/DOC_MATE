@@ -259,11 +259,11 @@ const validateAdmin = (data) => {
             'string.email': 'Invalid email format',
             'any.required': 'Email is required',
         }),
-        phoneNumber: joi.string().trim().min(11).max(11).required().messages({
-            'string.min': 'Phone number must be at least 11 characters long',
-            'string.max': 'phone number cannot exceed 11 characters',
-            'string.empty': 'Phone number cannot be empty',
-            'any.required': 'Phone number is required',
+        phoneNumber: joi.string().min(11).max(11).trim().regex(/^0\d{10}$/).required().messages({
+            'string.empty': "Phone number field can't be left empty",
+            'string.min': "Phone number must be at least 11 digits long e.g: 08123456789",
+            'any.required': "Please phone number is required",
+            "string.pattern.base": "Invalid phone number"
         }),
         password: joi.string().trim().min(8).required().messages({
             'string.empty': 'Password cannot be empty',
