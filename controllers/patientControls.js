@@ -14,6 +14,7 @@ const {
     validateUserLogin,
     validateResetPassword,
     validateUserForgotPassword,
+    validateUserProfile,
     validateDateTime
 
 } = require("../middleware/validator.js")
