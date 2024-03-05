@@ -475,7 +475,8 @@ const updateProfile = async (req, res) => {
             patientAddress: req.body.patientAddress,
             phoneNumber: req.body.phoneNumber,
             gender: req.body.gender,
-            age: req.body.age
+            age: req.body.age,
+            profileUpdated: true
         };
 
         // Update the user profile
@@ -485,23 +486,23 @@ const updateProfile = async (req, res) => {
                 message: "Failed to update the patient's information"
             });
         }
-        newProfile.profileUpdated = true
-        await newProfile.save()
+        // newProfile.profileUpdated = true
+        // await newProfile.save()
 
-        const newData = {
-            firstName: newProfile.firstName,
-            lastName: newProfile.lastName,
-            bloodType: newProfile.bloodType,
-            allergies: newProfile.allergies,
-            patientAddress: newProfile.patientAddress,
-            phoneNumber: newProfile.phoneNumber,
-            gender: newProfile.gender,
-            age: newProfile.age
-        }
+        // const newData = {
+        //     firstName: newProfile.firstName,
+        //     lastName: newProfile.lastName,
+        //     bloodType: newProfile.bloodType,
+        //     allergies: newProfile.allergies,
+        //     patientAddress: newProfile.patientAddress,
+        //     phoneNumber: newProfile.phoneNumber,
+        //     gender: newProfile.gender,
+        //     age: newProfile.age
+        // }
         // Respond with success message and updated profile data
         return res.status(200).json({
             message: "Your profile has been updated successfully",
-            data: newData
+            data: newProfile
         });
     } catch (error) {
         // Handle internal server error
