@@ -537,7 +537,7 @@ const getAllHospitals = async (req, res) => {
 
 const getOnePatient = async (req, res) => {
     try {
-      const Id = req.user.userId;
+      const Id = req.user.decodeToken;
   
       const user = await patientModel.findById(Id);
       if (!user) {
