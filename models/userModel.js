@@ -51,21 +51,27 @@ const patientSchema = new mongoose.Schema({
     }],
     bloodType: {
         type: String,
+        default: ""
     },
     allergies: {
         type: String,
+        default: ""
     },
     patientAddress: {
         type: String,
+        default: ""
     },
     phoneNumber: {
         type: String,
+        default: ""
     },
     gender: {
         type: String,
+        default: ""
     },
     age: {
         type: Number,
+        default: ""
     },
     profileUpdated:{
         type: Boolean,
