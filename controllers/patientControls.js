@@ -480,7 +480,7 @@ const updateProfile = async (req, res) => {
         };
 
         // Update the user profile
-        const newProfile = await patientModel.findByIdAndUpdate(userId, profileData, { new: true });
+        const newProfile = await patientModel.updateOne({_id:userId}, profileData, { new: true });
         if (!newProfile) {
             return res.status(404).json({
                 message: "Failed to update the patient's information"
