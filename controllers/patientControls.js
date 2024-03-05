@@ -223,7 +223,14 @@ const login = async (req, res) => {
             lastName: patient.lastName,
             email: patient.email,
             isVerified: patient.isVerified,
-            id: patient._id
+            id: patient._id,
+            bloodType: patient.bloodType,
+            patientAddress: patient.patientAddress,
+            allergies: patient.allergies,
+            gender: patient.gender,
+            phoneNumber: patient.phoneNumber,
+            profilePicture: patient.profilePicture,
+
         };
         patient.token = token;
         await patient.save();
