@@ -381,69 +381,123 @@ const deleteProfilePicture = async (req, res) => {
     }
 }
 
+// const updateProfile = async (req, res) => {
+//     try {
+//         const { error } = validateUserProfile(req.body);
+//         if (error) {
+//             return res.status(500).json({
+//                 message: error.details[0].message
+//             })
+
+//         } else {
+//         const userId = req.params.userId;       
+//         const profile = await patientModel.findById(userId);
+//         if (!profile) {
+//             return res.status(404).json({
+//                 message: "The Patient's  information not found"
+//             })
+            
+//         }
+
+//         const profileData = {
+//             bloodType: req.body.bloodType || profile.bloodType,
+//             allergies: req.body.allergies || profile.allergies,
+//             patientAddress: req.body.patientAddress || profile.patientAddress,
+//             phoneNumber: req.body.phoneNumber || profile.phoneNumber,
+//             gender: req.body.gender || profile.gender
+//         }
+
+//         const newProfile = await patientModel.findByIdAndUpdate(userId, profileData, {new:true});
+//         console.log(newProfile)
+//         if (!newProfile) { 
+//             return res.status(404).json({
+//                 message: "The Patient's information not found"
+//             })
+            
+//         } 
+        
+
+//         newProfile.profileUpdated = true;
+        
+//         await newProfile.save();
+//         const newData = {
+//             firstName: newProfile.firstName,
+//             lastName: newProfile.lastName,
+//             bloodType: newProfile.bloodType,
+//             allergies: newProfile.allergies,
+//             patientAddress: newProfile.patientAddress,
+//             phoneNumber: newProfile.phoneNumber,
+//             gender: newProfile.gender
+//         }
+            
+
+        
+//         return res.status(200).json({
+//             message: "Your profile has been updated successfully",
+//             data: newData
+//         })
+//     }
+        
+//     } catch (err) {
+//         return res.status(500).json({
+//             message: "Internal server error: " +err.message
+//         })
+//     } 
+// }
+
 const updateProfile = async (req, res) => {
     try {
+        // Validate the user profile data
         const { error } = validateUserProfile(req.body);
         if (error) {
-            return res.status(500).json({
+            return res.status(400).json({
                 message: error.details[0].message
-            })
+            });
+        }
 
-        } else {
-        const userId = req.params.userId;       
+        // Extract user ID from request parameters
+        const userId = req.params.userId;
+
+        // Find the user profile by ID
         const profile = await patientModel.findById(userId);
         if (!profile) {
             return res.status(404).json({
-                message: "The Patient's  information not found"
-            })
-            
+                message: "The patient's information was not found"
+            });
         }
 
+        // Prepare updated profile data
         const profileData = {
-            bloodType: req.body.bloodType || profile.bloodType,
-            allergies: req.body.allergies || profile.allergies,
-            patientAddress: req.body.patientAddress || profile.patientAddress,
-            phoneNumber: req.body.phoneNumber || profile.phoneNumber,
-            gender: req.body.gender || profile.gender
-        }
+            bloodType: req.body.bloodType,
+            allergies: req.body.allergies,
+            patientAddress: req.body.patientAddress,
+            phoneNumber: req.body.phoneNumber,
+            gender: req.body.gender
+        };
 
-        const newProfile = await patientModel.findByIdAndUpdate(userId, profileData, {new:true});
-        console.log(newProfile)
-        if (!newProfile) { 
+        // Update the user profile
+        const updatedProfile = await patientModel.findByIdAndUpdate(userId, profileData, { new: true });
+        if (!updatedProfile) {
             return res.status(404).json({
-                message: "The Patient's information not found"
-            })
-            
-        } 
-        
-
-        newProfile.profileUpdated = true;
-        
-        await newProfile.save();
-        const newData = {
-            firstName: newProfile.firstName,
-            lastName: newProfile.lastName,
-            bloodType: newProfile.bloodType,
-            allergies: newProfile.allergies,
-            patientAddress: newProfile.patientAddress,
-            phoneNumber: newProfile.phoneNumber,
-            gender: newProfile.gender
+                message: "Failed to update the patient's information"
+            });
         }
-            
 
-        
+        // Respond with success message and updated profile data
         return res.status(200).json({
             message: "Your profile has been updated successfully",
-            data: newData
-        })
-    }
-        
+            data: updatedProfile
+        });
     } catch (err) {
+        // Handle internal server error
+        console.error("Error updating user profile:", err);
         return res.status(500).json({
-            message: "Internal server error: " +err.message
-        })
-    } 
+            message: "Internal server error"
+        });
+    }
 }
+
+
 const getAllHospitals = async (req, res) => {
     try {
         const hospitals = await hospitalModel.find().sort({createdAt: -1}).populate();

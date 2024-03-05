@@ -211,34 +211,32 @@ const validateAppointmentRequest = (data) => {
 };
 
 const validateUserProfile = (data) => {
-    const schema = hapiJoiValidator.object({
-        bloodType: hapiJoiValidator.string().valid('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-').messages({
+    const schema = Joi.object({
+        bloodType: Joi.string().valid('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-').required().messages({
             'any.only': 'Blood type must be one of: A+, A-, B+, B-, AB+, AB-, O+, O-',
             "string.empty": "Blood type field must be filled"
         }),
-        gender: hapiJoiValidator.string().valid("male", "female", "Male", "F", "M", "Female", "FEMALE", "MALE").trim().required()
-            .pattern(/^[A-Za-z\s]+$/).messages({
-                'string.empty': 'Gender cannot be empty',
-                'any.pattern.base': 'Gender should only contain letters and no spaces',
-                'any.required': 'Gender is required',
-                'any.only': 'Gender must be one of: male, female, Male, F, M, Female, FEMALE, MALE'
-            }),
-        phoneNumber: hapiJoiValidator.string().min(11).max(11).trim().regex(/^0\d{10}$/).required().messages({
+        gender: Joi.string().valid("male", "female", "Male", "F", "M", "Female", "FEMALE", "MALE").trim().required().messages({
+            'string.empty': 'Gender cannot be empty',
+            'any.pattern.base': 'Gender should only contain letters and no spaces',
+            'any.required': 'Gender is required',
+            'any.only': 'Gender must be one of: male, female, Male, F, M, Female, FEMALE, MALE'
+        }),
+        phoneNumber: Joi.string().min(11).max(11).trim().regex(/^0\d{10}$/).required().messages({
             'string.empty': "Phone number field can't be left empty",
             'string.min': "Phone number must be at least 11 digits long e.g: 08123456789",
             'any.required': "Please phone number is required",
             "string.pattern.base": "Invalid phone number"
         }),
-        patientAddress: hapiJoiValidator.string().trim().required().messages({
+        patientAddress: Joi.string().trim().required().messages({
             'string.empty': 'Home address cannot be empty',
             'any.required': 'Home address is required',
         }),
-        allergies: hapiJoiValidator.string().trim().messages({
-            'string.empty': "allergies field can't be left empty",
-            'any.required': "Please allergies is required"
+        allergies: Joi.string().trim().allow('').optional().messages({
+            'string.empty': "Allergies field can't be left empty",
         })
     });
-    return schema;
+    return schema.validate(data);
 }
 
 
