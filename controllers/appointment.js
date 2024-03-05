@@ -43,9 +43,9 @@ const handleAppointmentRequest = async (req, res) => {
 
     // Extract appointment details from request body
     const data = {
-      fullName: req.body.fullName,
+      fullName: req.body.fullName.toLowerCase(),
       date: req.body.date,
-      patientEmail: req.body.patientEmail,
+      patientEmail: req.body.patientEmail.toLowerCase(),
       lastDiagnosis: req.body.lastDiagnosis,
       presentSymptoms: req.body.presentSymptoms,
       lastVisitation: req.body.lastVisitation
