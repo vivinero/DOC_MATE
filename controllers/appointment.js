@@ -14,15 +14,15 @@ const viewApp = require('../createAppMail')
 
 
 
-const checkProfile = async (userId) => {
-  try {
-    const user = await patientModel.findById(userId);
-    return user && user.profileUpdated;
-  } catch (error) {
-    console.error(error);
-    return false;
-  }
-};
+// const checkProfile = async (userId) => {
+//   try {
+//     const user = await patientModel.findById(userId);
+//     return user && user.profileUpdated;
+//   } catch (error) {
+//     console.error(error);
+//     return false;
+//   }
+// };
 
 // Logic for handling appointment requests
 const handleAppointmentRequest = async (req, res) => {
@@ -30,10 +30,10 @@ const handleAppointmentRequest = async (req, res) => {
     const userId = req.params.userId;
     
     // Check if the user has updated their profile
-    const isProfileUpdated = await checkProfile(userId);
-    if (!isProfileUpdated) {
-      return res.status(400).json({ message: 'Please update your profile before scheduling an appointment' });
-    }
+    // const isProfileUpdated = await checkProfile(userId);
+    // if (!isProfileUpdated) {
+    //   return res.status(400).json({ message: 'Please update your profile before scheduling an appointment' });
+    // }
 
     // Continue with appointment scheduling logic...
     const { error } = validateAppointmentRequest(req.body);
@@ -67,7 +67,7 @@ const handleAppointmentRequest = async (req, res) => {
     // Check if the user's full name matches the database record
     const databaseName = user.firstName + ' ' + user.lastName;
     if (data.fullName !== databaseName) {
-      return res.status(400).json({ message: 'User not in the database' });
+      return res.status(400).json({ message: 'Please, full name must correspond with first name and last name' });
     }
 
     // Create instance of AppointmentModel and store the request
