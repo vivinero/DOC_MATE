@@ -175,7 +175,7 @@ const verify = async (req, res) => {
 
         if (updatedPatient.isVerified === true) {
             // Redirect the user to the login page after successful verification
-            return res.redirect(`${req.protocol}://${req.get('host')}/login`);
+            return res.redirect(`https://docmate-tau.vercel.app/#/patientLogin`);
         }
     } catch (error) {
         // Handle other errors

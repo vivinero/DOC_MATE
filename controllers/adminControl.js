@@ -172,7 +172,9 @@ const verifyAdmin = async (req, res) => {
 
         if (updatedAdmin.isVerified === true) {
             // Redirect the user to the login page after successful verification
-            return res.redirect( `${req.protocol}://${req.get('host')}/login`);
+            //return res.redirect( `${req.protocol}://${req.get('host')}/login`);
+            return res.redirect(`https://docmate-tau.vercel.app/#/hospitalLogin`);
+
         }
     } catch (error) {
         // Handle other errors
