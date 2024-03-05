@@ -466,6 +466,8 @@ const updateProfile = async (req, res) => {
             });
         }
 
+        
+
         // Prepare updated profile data
         const profileData = {
             bloodType: req.body.bloodType,
@@ -477,17 +479,29 @@ const updateProfile = async (req, res) => {
         };
 
         // Update the user profile
-        const updatedProfile = await patientModel.findByIdAndUpdate(userId, profileData, { new: true });
-        if (!updatedProfile) {
+        const newProfile = await patientModel.findByIdAndUpdate(userId, profileData, { new: true });
+        if (!newProfile) {
             return res.status(404).json({
                 message: "Failed to update the patient's information"
             });
         }
+        newProfile.profileUpdated = true
+        await updatedPatient.save()
 
+        const newData = {
+            firstName: newProfile.firstName,
+            lastName: newProfile.lastName,
+            bloodType: newProfile.bloodType,
+            allergies: newProfile.allergies,
+            patientAddress: newProfile.patientAddress,
+            phoneNumber: newProfile.phoneNumber,
+            gender: newProfile.gender,
+            age: newProfile.age
+        }
         // Respond with success message and updated profile data
         return res.status(200).json({
             message: "Your profile has been updated successfully",
-            data: updatedProfile
+            data: newData
         });
     } catch (err) {
         // Handle internal server error
