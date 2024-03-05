@@ -293,6 +293,7 @@ const resetpassword = async (req, res) => {
             return;
         } else {
             const password = req.body.password
+            const confirmPassword =req.body.password
 
             const id = req.params.id
 
@@ -301,11 +302,16 @@ const resetpassword = async (req, res) => {
             const hashedPassword = bcrypt.hashSync(password, salt);
 
             const data = { password: hashedPassword }
+            if (password !== confirmPassword) {
+                return res.status(400).json({
+                    message: "Password must match"
+                })
+            }
 
             const reset = await patientModel.findByIdAndUpdate(id, data, { new: true })
 
 
-            res.status(200).json(`your password has been succesfully changed`)
+            res.status(200).json("your password has been succesfully changed")
         }
     } catch (error) {
         return res.status(500).json({

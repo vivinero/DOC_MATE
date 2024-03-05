@@ -274,6 +274,8 @@ const resetpasswordAdmin = async (req, res) => {
     try {
         const password = req.body.password
 
+        const confirmPassword = req.body.confirmPassword
+
         const id = req.params.id
 
         const salt = bcrypt.genSaltSync(10);
@@ -281,6 +283,12 @@ const resetpasswordAdmin = async (req, res) => {
         const hashedPassword = bcrypt.hashSync(password, salt);
 
         const data = { password: hashedPassword }
+
+        if (password !== confirmPassword) {
+            return res.status(400).json({
+                message: "Password must match"
+            })
+            }
 
         const reset = await adminModel.findByIdAndUpdate(id, data, { new: true })
 
