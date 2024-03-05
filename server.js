@@ -13,6 +13,7 @@ const patientAppointmentRouter = require("./router.js/patientAppRoute")
 const appointmentRouter = require('./router.js/adminAppRoute');
 //const notificationRouter = require('./router.js/notificationRout');
 const adminRouter = require('./router.js/adminRout');
+const contactUs = require("./router.js/messageRoute")
 const fileUpload = require ("express-fileupload")
 const app = express();
 app.use(bodyParser.json());
@@ -48,6 +49,7 @@ app.use(adminRouter);
 app.use(appointmentRouter);
 //app.use(notificationRouter);
 app.use(patientAppointmentRouter)
+app.use(contactUs)
 
 
 
