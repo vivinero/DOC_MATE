@@ -10,6 +10,7 @@ async function sendMail(options) {
                 pass: process.env.emailPassWord,
             }
         })
+        
             const mailOption = ({
               from: process.env.user,
               to: options.email,
