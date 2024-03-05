@@ -211,28 +211,28 @@ const validateAppointmentRequest = (data) => {
 };
 
 const validateUserProfile = (data) => {
-    const schema = Joi.object({
-        bloodType: Joi.string().valid('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-').required().messages({
+    const schema = joi.object({
+        bloodType: joi.string().valid('A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-').required().messages({
             'any.only': 'Blood type must be one of: A+, A-, B+, B-, AB+, AB-, O+, O-',
             "string.empty": "Blood type field must be filled"
         }),
-        gender: Joi.string().valid("male", "female", "Male", "F", "M", "Female", "FEMALE", "MALE").trim().required().messages({
+        gender: joi.string().valid("male", "female", "Male", "F", "M", "Female", "FEMALE", "MALE").trim().required().messages({
             'string.empty': 'Gender cannot be empty',
             'any.pattern.base': 'Gender should only contain letters and no spaces',
             'any.required': 'Gender is required',
             'any.only': 'Gender must be one of: male, female, Male, F, M, Female, FEMALE, MALE'
         }),
-        phoneNumber: Joi.string().min(11).max(11).trim().regex(/^0\d{10}$/).required().messages({
+        phoneNumber: joi.string().min(11).max(11).trim().regex(/^0\d{10}$/).required().messages({
             'string.empty': "Phone number field can't be left empty",
             'string.min': "Phone number must be at least 11 digits long e.g: 08123456789",
             'any.required': "Please phone number is required",
             "string.pattern.base": "Invalid phone number"
         }),
-        patientAddress: Joi.string().trim().required().messages({
+        patientAddress: joi.string().trim().required().messages({
             'string.empty': 'Home address cannot be empty',
             'any.required': 'Home address is required',
         }),
-        allergies: Joi.string().trim().allow('').optional().messages({
+        allergies: joi.string().trim().allow('').optional().messages({
             'string.empty': "Allergies field can't be left empty",
         })
     });
