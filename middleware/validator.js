@@ -234,6 +234,13 @@ const validateUserProfile = (data) => {
         }),
         allergies: joi.string().trim().allow('').optional().messages({
             'string.empty': "Allergies field can't be left empty",
+        }),
+        age: joi.number().integer().min(1).max(150).required().messages({
+            'number.base': 'Age must be a number',
+            'number.integer': 'Age must be an integer',
+            'number.min': 'Age must be at least 1',
+            'number.max': 'Age must be at most 150',
+            'any.required': 'Age is required'
         })
     });
     return schema.validate(data);

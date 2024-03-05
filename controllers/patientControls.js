@@ -472,7 +472,8 @@ const updateProfile = async (req, res) => {
             allergies: req.body.allergies,
             patientAddress: req.body.patientAddress,
             phoneNumber: req.body.phoneNumber,
-            gender: req.body.gender
+            gender: req.body.gender,
+            age: req.body.age
         };
 
         // Update the user profile

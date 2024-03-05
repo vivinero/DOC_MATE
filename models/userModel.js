@@ -64,6 +64,9 @@ const patientSchema = new mongoose.Schema({
     gender: {
         type: String,
     },
+    age: {
+        type: Number,
+    },
     profileUpdated:{
         type: Boolean,
         default: false
