@@ -239,6 +239,7 @@ const validateUserProfile = (data) => {
             'string.empty': "allergies field can't be left empty",
             'any.required': "Please allergies is required"
     })
+    
 })}
 
 

@@ -95,52 +95,92 @@ const register = async (req, res) => {
 }
 
 //Function to verify a new user with a link
+// const verifyAdmin = async (req, res) => {
+//     try {
+//         const id = req.params.id;
+//         //   const token = req.params.token;
+//         const admin = await adminModel.findById(id);
+
+//         // Verify the token
+//         jwt.verify(admin.token, process.env.jwtSecret);
+
+
+//         // Update the user if verification is successful
+//         const updatedAdmin = await adminModel.findByIdAndUpdate(id, { isVerified: true }, { new: true });
+
+//         if (updatedAdmin.isVerified === true) {
+//             return res.status(200).send("<h1>You have been successfully verified. Kindly visit the login page.</h1>");
+//         }
+//         //handle your redirection here
+//         res.redirect(`${req.protocol}://${req.get('host')}/adminlogin` )
+
+//     } catch (error) {
+//         if (error instanceof jwt.JsonWebTokenError) {
+//             // Handle token expiration
+//             const id = req.params.id;
+//             const updatedAdmin = await adminModel.findById(id);
+//             //const { firstName, lastName, email } = updatedUser;
+//             const newtoken = jwt.sign({ email: updatedAdmin.email, firstName: updatedAdmin.firstName, lastName: updatedAdmin.lastName }, process.env.jwtSecret, { expiresIn: "300s" });
+//             updatedAdmin.token = newtoken;
+
+//             updatedAdmin.save();
+
+//             const link = `${req.protocol}://${req.get('host')}/verify-admin/${id}/${token}`;
+//             sendEmail({
+//                 email: updatedAdmin.email,
+//                 html: generateDynamicEmail(link, updatedAdmin.firstName, updatedAdmin.lastName),
+//                 subject: "RE-VERIFY YOUR ACCOUNT"
+//             });
+//             return res.status(401).send("<h1>This link is expired. Kindly check your email for another email to verify.</h1>");
+//         } else {
+//             return res.status(500).json({
+//                 message: "Internal server error: " + error.message,
+//             });
+
+//         };
+//     }
+// }
+
 const verifyAdmin = async (req, res) => {
     try {
         const id = req.params.id;
-        //   const token = req.params.token;
+        const token = req.params.token;
         const admin = await adminModel.findById(id);
 
-        // Verify the token
-        jwt.verify(admin.token, process.env.jwtSecret);
+        // Verify if the token has expired
+        try {
+            jwt.verify(token, process.env.jwtSecret);
+        } catch (err) {
+            // Token has expired
+            const newToken = jwt.sign({ email: admin.email, firstName: admin.firstName, lastName: admin.lastName }, process.env.jwtSecret, { expiresIn: "300s" });
+            admin.token = newToken;
+            await admin.save();
+            
+            // Send a new verification email
+            const link =  `${req.protocol}://${req.get('host')}/verify/${id}/${newToken} `;
+            sendEmail({
+                email: admin.email,
+                html: generateDynamicEmail(link, admin.firstName, admin.lastName),
+                subject: "RE-VERIFY YOUR ACCOUNT"
+            });
 
+            return res.status(401).send("<h1>This link is expired. Kindly check your email for another email to verify.</h1>");
+        }
 
         // Update the user if verification is successful
         const updatedAdmin = await adminModel.findByIdAndUpdate(id, { isVerified: true }, { new: true });
 
         if (updatedAdmin.isVerified === true) {
-            return res.status(200).send("<h1>You have been successfully verified. Kindly visit the login page.</h1>");
+            // Redirect the user to the login page after successful verification
+            return res.redirect( `${req.protocol}://${req.get('host')}/login`);
         }
-        //handle your redirection here
-        res.redirect(`${req.protocol}://${req.get('host')}/adminlogin` )
-
     } catch (error) {
-        if (error instanceof jwt.JsonWebTokenError) {
-            // Handle token expiration
-            const id = req.params.id;
-            const updatedAdmin = await adminModel.findById(id);
-            //const { firstName, lastName, email } = updatedUser;
-            const newtoken = jwt.sign({ email: updatedAdmin.email, firstName: updatedAdmin.firstName, lastName: updatedAdmin.lastName }, process.env.jwtSecret, { expiresIn: "300s" });
-            updatedAdmin.token = newtoken;
-
-            updatedAdmin.save();
-
-            const link = `${req.protocol}://${req.get('host')}/verify-admin/${id}/${token}`;
-            sendEmail({
-                email: updatedAdmin.email,
-                html: generateDynamicEmail(link, updatedAdmin.firstName, updatedAdmin.lastName),
-                subject: "RE-VERIFY YOUR ACCOUNT"
-            });
-            return res.status(401).send("<h1>This link is expired. Kindly check your email for another email to verify.</h1>");
-        } else {
-            return res.status(500).json({
-                message: "Internal server error: " + error.message,
-            });
-
-        };
+        // Handle other errors
+        return res.status(500).json({
+            message: "Internal server error: " + error.message
+        });
     }
 }
-
 
 
 const loginAdmin = async (req, res) => {
@@ -383,7 +423,7 @@ const getAllRequest = async (req, res) => {
         return;
       } else {
         return res.status(200).json({
-          message: `The appointment request with id: ${appointmentId} found`,
+          message: `The appointment request with : ${request.fullName} has been found`,
           data: request
         })
       }
