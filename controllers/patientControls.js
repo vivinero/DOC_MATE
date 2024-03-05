@@ -539,7 +539,7 @@ const getOnePatient = async (req, res) => {
     try {
       const Id = req.user.userId;
   
-      const user = await patientModel.findOne({Id});
+      const user = await patientModel.findById(Id);
       if (!user) {
         return res.status(404).json({
           message: 'User cannot be found'
