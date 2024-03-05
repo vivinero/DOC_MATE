@@ -45,7 +45,7 @@ const handleAppointmentRequest = async (req, res) => {
     const data = {
       fullName: req.body.fullName,
       date: req.body.date,
-      patientEmail: req.body.patientEmail.toLowerCase(),
+      patientEmail: req.body.patientEmail,
       lastDiagnosis: req.body.lastDiagnosis,
       presentSymptoms: req.body.presentSymptoms,
       lastVisitation: req.body.lastVisitation
