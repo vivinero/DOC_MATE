@@ -88,16 +88,16 @@ const handleAppointmentRequest = async (req, res) => {
     // admin.appointment.push(appointmentRequest._id)
 
     // await admin.save()
-    // if (!admin.patient) {
-    //   admin.patient = [];
-    // }
-    // admin.patient.push(user.patientId);
+    if (!admin.patient) {
+      admin.patient = [];
+    }
+    admin.patient.push(user.patientId);
     
-    // // if (!admin.appointment) {
-    // //   admin.appointment = [];
-    // // }
-    // admin.appointment.push(appointmentRequest._id);
-    // await admin.save()
+    // if (!admin.appointment) {
+    //   admin.appointment = [];
+    // }
+    admin.appointment.push(appointmentRequest);
+    await admin.save()
 
     appointmentRequest.createdAppId = appointmentRequest._id;
     appointmentRequest.status = "Pending"
@@ -122,7 +122,6 @@ const handleAppointmentRequest = async (req, res) => {
     return res.status(500).json({ error: 'Internal server error: ' + error.message });
   }
 };
-
 
 const confirmPayment = async (appointmentId) => {
   // Find the appointment by ID
