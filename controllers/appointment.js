@@ -71,7 +71,7 @@ const handleAppointmentRequest = async (req, res) => {
     }
 
     // Create instance of AppointmentModel and store the request
-    const appointmentRequest = new appointmentModel({
+    const appointmentRequest = await appointmentModel.create({
       fullName: user.firstName,
       patientEmail: data.patientEmail,
       date: data.date,
