@@ -88,16 +88,16 @@ const handleAppointmentRequest = async (req, res) => {
     // admin.appointment.push(appointmentRequest._id)
 
     // await admin.save()
-    if (!admin.patient) {
-      admin.patient = [];
-    }
-    admin.patient.push(user.patientId);
-    
-    // if (!admin.appointment) {
-    //   admin.appointment = [];
+    // if (!admin.patient) {
+    //   admin.patient = [];
     // }
-    admin.appointment.push(appointmentRequest._id);
-    await admin.save()
+    // admin.patient.push(user.patientId);
+    
+    // // if (!admin.appointment) {
+    // //   admin.appointment = [];
+    // // }
+    // admin.appointment.push(appointmentRequest._id);
+    // await admin.save()
 
     appointmentRequest.createdAppId = appointmentRequest._id;
     appointmentRequest.status = "Pending"
