@@ -82,7 +82,7 @@ const handleAppointmentRequest = async (req, res) => {
       patient: userId
     });
 
-    const admin = await adminModel.findOne()
+    const admin = await adminModel.findOne(email)
 
     // admin.patient.push(user._id)
     // admin.appointment.push(appointmentRequest._id)
