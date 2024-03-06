@@ -22,7 +22,7 @@ router.get('/hospitals-search',authenticate, searchHospital)
 router.get("/verify/:id/:token",verify);
 router.post("/login", login);
 router.post("/forgot", forgotpassWord);
-router.put("/reset/:id", authenticate, resetpassword);
+router.put("/reset/:id", resetpassword);
 router.put('/logout',authenticate, logOut);
 
 module.exports = router

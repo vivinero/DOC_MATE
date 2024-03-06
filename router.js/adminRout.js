@@ -8,9 +8,9 @@ const {adminAuthenticate} = require("../middleware/adminAuth")
 
 adminRouter.post("/signup", register)
 adminRouter.post("/adminlogin", loginAdmin)
-adminRouter.post("/forgot-admin",adminAuthenticate, forgotpassWordAdmin)
+adminRouter.post("/forgot-admin", forgotpassWordAdmin)
 adminRouter.get("/verify-admin/:id/:token", verifyAdmin)
-adminRouter.put("/reset-admin/:id",adminAuthenticate, resetpasswordAdmin);
+adminRouter.put("/reset-admin/:id", resetpasswordAdmin);
 adminRouter.post("/updateadmin/:id", adminAuthenticate,uploadProfilePictureAdmin)
 adminRouter.post("/signout-admin", adminAuthenticate,logOutAdmin)
 adminRouter.delete("/deleteImg/:id",adminAuthenticate, deleteProfilePictureAdmin)
