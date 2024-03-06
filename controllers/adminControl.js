@@ -55,8 +55,6 @@ const register = async (req, res) => {
                 password: hashedPassword,
                 hospitalAddress,
                 phoneNumber,
-
-
             }
             )
 
