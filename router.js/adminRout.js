@@ -18,7 +18,7 @@ adminRouter.get("/all-requests",adminAuthenticate, getAllRequest)
 adminRouter.get("/one-request", adminAuthenticate,viewOneAppointRequest)
 adminRouter.get("/all-patient", adminAuthenticate,getAllPatient)
 adminRouter.get("/one-patient", adminAuthenticate,getOnePatient)
-adminRouter.get("/one-patient", adminAuthenticate,getOneAdmin)
+adminRouter.get("/one-admin", adminAuthenticate, getOneAdmin)
 
 
 
