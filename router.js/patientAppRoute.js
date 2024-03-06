@@ -8,9 +8,9 @@ const {
 const {authenticate} = require('../middleware/authentication')
 
 ;
-patientAppointmentRouter.post("/request/:userId", authenticate,handleAppointmentRequest );
+patientAppointmentRouter.post("/request/:adminId", authenticate,handleAppointmentRequest );
 patientAppointmentRouter.put("/reschedule-app/:appointmentId",authenticate, rescheduleAppointment)
-patientAppointmentRouter.post('/confirm-payment',authenticate, confirmedPayment)
+patientAppointmentRouter.post('/confirm-payment',authenticate, confirmedPayment)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 //patientAppointmentRouter.post('/updates-profile', updatesProfile)
 
 

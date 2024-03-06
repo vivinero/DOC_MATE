@@ -27,7 +27,7 @@ const viewApp = require('../createAppMail')
 // Logic for handling appointment requests
 const handleAppointmentRequest = async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = req.user.userId;
     
     // Check if the user has updated their profile
     // const isProfileUpdated = await checkProfile(userId);
@@ -81,8 +81,8 @@ const handleAppointmentRequest = async (req, res) => {
       paymentStatus: false,
       patient: userId
     });
-
-    const admin = await adminModel.findOne()
+    const adminId = req.params.adminId
+    const admin = await adminModel.findById(adminId)
 
     // admin.patient.push(user._id)
     // admin.appointment.push(appointmentRequest._id)
@@ -91,6 +91,7 @@ const handleAppointmentRequest = async (req, res) => {
     if (!admin.patient) {
       admin.patient = [];
     }
+
     admin.patient.push(user.patientId);
     
     // if (!admin.appointment) {
@@ -112,7 +113,7 @@ const handleAppointmentRequest = async (req, res) => {
       presentSymptoms: data.presentSymptoms,
       lastVisitation: data.lastVisitation
     });
-    
+
     if (!adminNotification) {
       return res.status(404).json({ message: 'Notification not sent' });
     }
