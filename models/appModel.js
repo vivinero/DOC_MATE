@@ -48,9 +48,9 @@ hospital: [{
   type: mongoose.SchemaTypes.ObjectId,
   ref: "Hospital"
 }],
-  reschedule: { 
-    type: String,
-     enum: ['attended', "Unattended", "Unassigned", "Assigned"] },
+  // reschedule: { 
+  //   type: String,
+  //    enum: ['attended', "Unattended", "Unassigned", "Assigned"] },
 
      createdAppId:{
       type: String,
@@ -65,17 +65,9 @@ hospital: [{
   // },
   status: { 
     type: String, 
-    enum: ['Pending', "Confirmed", "Reschedule"] 
+    enum: ["Pending", "Confirmed", "Reschedule"] 
   },
-  firstAvailability: {
-    type: String
-  },
-   secondAvailability: {
-    type: String,
-   },
-   thirdAvailability: {
-    type: String,
-   }
+
 
 
 }, { timestamps: true });

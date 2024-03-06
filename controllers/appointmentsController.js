@@ -1,4 +1,5 @@
 const appointmentsModel = require("../models/adminAppointment.js")
+const rescheduleModel = require("../models/reschedule.js")
 // const sendEmail = require("../creatAppMail")
 const getUserDetailsById = require("../utils/patientID")
 const viewApp = require("../createAppMail");
@@ -273,23 +274,28 @@ const createAppointment = async (req, res) => {
 
 const rescheduleAppointment = async (req, res) => {
     try {
-        const {appId} = req.params
-        const appointment = await appointmentModel.findById(appId)
+        const {id} = req.params
         const {firstAvailability, secondAvailability, thirdAvailability} = req.body
+        const appointment = await appointmentModel.findById(id)
         if (!appointment) {
             return res.status(404).json({
                 message: "Unable to find appointment"
             })
         }
-        console.log(appointment)
-        const adminApp = await Appointment.find()
-        Appointment.firstAvailability = firstAvailability
-        Appointment.secondAvailability = secondAvailability
-        Appointment.thirdAvailability = thirdAvailability
 
-        appointment.status = "pending"
+        const reschedule = await rescheduleModel.create({
+            firstAvailability,
+            secondAvailability,
+            thirdAvailability,
+            appointment:appointment._id
+        })
 
-        await appointment.save()
+        // appointment.status = "Pending"
+        // await appointment.save()
+
+        res.status(200).json({
+            message:"success"
+        })
 
     } catch (error) {
         res.status(500).json({
