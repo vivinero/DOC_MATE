@@ -91,13 +91,13 @@ const handleAppointmentRequest = async (req, res) => {
     if (!admin.patient) {
       admin.patient = [];
     }
-    admin.patient.push(userId);
+    admin.patient.push(user.patientId);
     
-    if (!admin.appointment) {
-      admin.appointment = [];
-    }
+    // if (!admin.appointment) {
+    //   admin.appointment = [];
+    // }
     admin.appointment.push(appointmentRequest._id);
-    
+    await admin.save()
 
     appointmentRequest.createdAppId = appointmentRequest._id;
     appointmentRequest.status = "Pending"
