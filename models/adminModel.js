@@ -46,6 +46,7 @@ const hospitalSchema = new mongoose.Schema({
         },
         url:{
             type: String,
+            default :"https://cdn3.iconfinder.com/data/icons/leto-user-group/64/__user_person_profile-1024.png"
         },
     },
     appointment:[{

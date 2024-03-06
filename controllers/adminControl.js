@@ -220,6 +220,7 @@ const loginAdmin = async (req, res) => {
             hospitalName: admin.hospitalName,
             email: admin.email,
             isVerified: admin.isVerified,
+            profilePicture: admin.profilePicture,
         };
         admin.token = token;
         await admin.save();
