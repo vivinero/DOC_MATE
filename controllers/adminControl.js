@@ -444,6 +444,30 @@ const getAllRequest = async (req, res) => {
     }
   
   }
+  const getOneAdmin = async (req, res) => {
+    try {
+      const Id = req.user.userId;
+  
+      const user = await adminModel.findById(Id);
+      if (!user) {
+        return res.status(404).json({
+          message: 'Hospital no found'
+        })
+
+      } else 
+        return res.status(200).json({
+          message: `The hospital's id: ${Id} has been found`,
+          data: user
+        })
+      }
+    catch (error) {
+     return res.status(500).json({
+        message: "internal server error: " + error.message
+      })
+    }}
+  
+  
+
   
   
   const deleteRequest = async (req, res) => {
@@ -541,4 +565,4 @@ const getOnePatient = async (req, res) => {
 
 
 module.exports = {
-    register, verifyAdmin, loginAdmin, forgotpassWordAdmin, getAllPatient, getOnePatient, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest}
+    register, verifyAdmin, loginAdmin, getOneAdmin, forgotpassWordAdmin, getAllPatient, getOnePatient, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest}

@@ -165,112 +165,138 @@ const createAppointment = async (req, res) => {
 };
 
 
+// const rescheduleAppointment = async (req, res) => {
+//     try {
+//         const appointmentId = req.params.id;
+//         const userId = req.user.userId;
+
+//         if (!userId) {
+//             return res.status(403).json({
+//                 message: `Hospital not found`
+//             });
+//         }
+
+//         // Validate the request body for rescheduling options
+//         const { error: optionsError } = validateRescheduleOptions(req.body);
+//         if (optionsError) {
+//             return res.status(400).json({
+//                 message: optionsError.details[0].message
+//             });
+//         }
+
+//         // Extract necessary details from the request body
+//         const { firstAvailability, secondAvailability, thirdAvailability } = req.body;
+
+//         // Find the appointment by ID
+//         const appointment = await appointmentModel.findById(appointmentId);
+
+//         if (!appointment) {
+//             return res.status(404).json({
+//                 message: "Appointment not found"
+//             });
+//         }
+
+//         // Update the appointment based on the selected availability slot
+//         let newDate;
+//         let newTime;
+
+//         switch (true) {
+//             case firstAvailability === 1:
+//                 newDate = appointment.date;
+//                 newTime = '9:00 AM';
+//                 break;
+//             case firstAvailability === 2:
+//                 newDate = appointment.date;
+//                 newTime = '11:00 AM';
+//                 break;
+//             case firstAvailability === 3:
+//                 newDate = appointment.date;
+//                 newTime = '1:00 PM';
+//                 break;
+//             case secondAvailability === 1:
+//                 newDate = appointment.date;
+//                 newTime = '9:00 AM'; // Example time for the second slot
+//                 break;
+//             case secondAvailability === 2:
+//                 newDate = appointment.date;
+//                 newTime = '11:00 AM'; // Example time for the second slot
+//                 break;
+//             case secondAvailability === 3:
+//                 newDate = appointment.date;
+//                 newTime = '1:00 PM'; // Example time for the second slot
+//                 break;
+//             case thirdAvailability === 1:
+//                 newDate = appointment.date;
+//                 newTime = '9:00 AM'; // Example time for the third slot
+//                 break;
+//             case thirdAvailability === 2:
+//                 newDate = appointment.date;
+//                 newTime = '11:00 AM'; // Example time for the third slot
+//                 break;
+//             case thirdAvailability === 3:
+//                 newDate = appointment.date;
+//                 newTime = '1:00 PM'; // Example time for the third slot
+//                 break;
+//             default:
+//                 return res.status(400).json({
+//                     message: "Invalid reschedule option"
+//                 });
+//         }
+
+//         // Update appointment details
+//         appointment.date = newDate;
+//         appointment.time = newTime;
+//         appointment.status = 'Reschedule'; // Update status
+//         await appointment.save();
+
+//         const subject = "Choose from the Appointment Options";
+//         const link = `${req.protocol}://${req.get("host")}/viewApp/${appointment.id}`;
+//         const html = viewApp(link, appointment.firstName); // Assuming you have access to patient's first name
+//         await sendMail({
+//             email: appointment.patientEmail,
+//             subject: subject,
+//             html: html
+//         });
+
+//         // Success message
+//         res.status(200).json({
+//             message: `Appointment rescheduled successfully`,
+//             appointment: appointment
+//         });
+//     } catch (error) {
+//         console.error(error);
+//         res.status(500).json({
+//             message: error.message
+//         });
+//     }
+// };
+
 const rescheduleAppointment = async (req, res) => {
     try {
-        const appointmentId = req.params.id;
-        const userId = req.user.userId;
-
-        if (!userId) {
-            return res.status(403).json({
-                message: `Hospital not found`
-            });
-        }
-
-        // Validate the request body for rescheduling options
-        const { error: optionsError } = validateRescheduleOptions(req.body);
-        if (optionsError) {
-            return res.status(400).json({
-                message: optionsError.details[0].message
-            });
-        }
-
-        // Extract necessary details from the request body
-        const { firstAvailability, secondAvailability, thirdAvailability } = req.body;
-
-        // Find the appointment by ID
-        const appointment = await appointmentModel.findById(appointmentId);
-
+        const {appId} = req.params
+        const appointment = await appointmentModel.findById(appId)
+        const {firstAvailability, secondAvailability, thirdAvailability} = req.body
         if (!appointment) {
             return res.status(404).json({
-                message: "Appointment not found"
-            });
+                message: "Unable to find appointment"
+            })
         }
+        console.log(appointment)
+        const adminApp = await Appointment.find()
+        Appointment.firstAvailability = firstAvailability
+        Appointment.secondAvailability = secondAvailability
+        Appointment.thirdAvailability = thirdAvailability
 
-        // Update the appointment based on the selected availability slot
-        let newDate;
-        let newTime;
+        appointment.status = "pending"
 
-        switch (true) {
-            case firstAvailability === 1:
-                newDate = appointment.date;
-                newTime = '9:00 AM';
-                break;
-            case firstAvailability === 2:
-                newDate = appointment.date;
-                newTime = '11:00 AM';
-                break;
-            case firstAvailability === 3:
-                newDate = appointment.date;
-                newTime = '1:00 PM';
-                break;
-            case secondAvailability === 1:
-                newDate = appointment.date;
-                newTime = '9:00 AM'; // Example time for the second slot
-                break;
-            case secondAvailability === 2:
-                newDate = appointment.date;
-                newTime = '11:00 AM'; // Example time for the second slot
-                break;
-            case secondAvailability === 3:
-                newDate = appointment.date;
-                newTime = '1:00 PM'; // Example time for the second slot
-                break;
-            case thirdAvailability === 1:
-                newDate = appointment.date;
-                newTime = '9:00 AM'; // Example time for the third slot
-                break;
-            case thirdAvailability === 2:
-                newDate = appointment.date;
-                newTime = '11:00 AM'; // Example time for the third slot
-                break;
-            case thirdAvailability === 3:
-                newDate = appointment.date;
-                newTime = '1:00 PM'; // Example time for the third slot
-                break;
-            default:
-                return res.status(400).json({
-                    message: "Invalid reschedule option"
-                });
-        }
+        await appointment.save()
 
-        // Update appointment details
-        appointment.date = newDate;
-        appointment.time = newTime;
-        appointment.status = 'Reschedule'; // Update status
-        await appointment.save();
-
-        const subject = "Choose from the Appointment Options";
-        const link = `${req.protocol}://${req.get("host")}/viewApp/${appointment.id}`;
-        const html = viewApp(link, appointment.firstName); // Assuming you have access to patient's first name
-        await sendMail({
-            email: appointment.patientEmail,
-            subject: subject,
-            html: html
-        });
-
-        // Success message
-        res.status(200).json({
-            message: `Appointment rescheduled successfully`,
-            appointment: appointment
-        });
     } catch (error) {
-        console.error(error);
         res.status(500).json({
             message: error.message
-        });
+        })
     }
-};
-
+} 
 
 
 
