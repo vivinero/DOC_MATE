@@ -96,8 +96,8 @@ const handleAppointmentRequest = async (req, res) => {
     // if (!admin.appointment) {
     //   admin.appointment = [];
     // }
-    admin.appointment.push(appointmentRequest._id);
-    await admin.save()
+    admin.appointment.push(appointmentRequest);
+    await admin.save()
 
     appointmentRequest.createdAppId = appointmentRequest._id;
     appointmentRequest.status = "Pending"
