@@ -251,7 +251,7 @@ const validateUserProfile = (data) => {
 
 const validateAdmin = (data) => {
     const schema = joi.object({
-        hospitalName: joi.string().trim().min(3).max(30).required().messages({
+        hospitalName: joi.string().trim().min(3).required().messages({
             'string.empty': 'Hospital name cannot be empty',
             'string.min': 'Hospital name must be at least 3 characters long',
             'string.max': 'Hospital name cannot exceed 30 characters',

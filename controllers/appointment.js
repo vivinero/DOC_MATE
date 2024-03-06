@@ -132,7 +132,7 @@ const confirmPayment = async (appointmentId) => {
       return res.status(404).json({ message: 'Appointment not found' });
   }
 
-  // Update payment status to true
+  // Update payment status to truez
   appointment.paymentStatus = true;
   await appointment.save();
 };
