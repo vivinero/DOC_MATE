@@ -20,6 +20,36 @@ const Appointments = new mongoose.Schema({
         type: mongoose.SchemaTypes.ObjectId,
         ref: "Patient"
     },
+    firstAvailability: {
+        date: {
+            type: Date,
+            required: true
+        },
+        time: {
+            type: String,
+            required: true
+        }
+    },
+    secondAvailability: {
+        date: {
+            type: Date,
+            required: true
+        },
+        time: {
+            type: String,
+            required: true
+        }
+    },
+    thirdAvailability: {
+        date: {
+            type: Date,
+            required: true
+        },
+        time: {
+            type: String,
+            required: true
+        }
+    },
 
 })
 

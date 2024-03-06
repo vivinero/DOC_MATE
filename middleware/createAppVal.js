@@ -38,14 +38,14 @@ const validateConfirmAppointment = (data) => {
 };
 
 // // Validator for rescheduling an appointment
-const validateRescheduleOptions = (data) => {
-    const rescheduleOptionsSchema = Joi.object({
-        firstAvailability: Joi.number().valid(1, 2, 3).required(),
-        secondAvailability: Joi.number().valid(1, 2, 3).required(),
-        thirdAvailability: Joi.number().valid(1, 2, 3).required(),
-});
-return rescheduleOptionsSchema.validate(data)
-}
+// const validateRescheduleOptions = (data) => {
+//     const rescheduleOptionsSchema = Joi.object({
+//         firstAvailability: Joi.number().valid(1, 2, 3).required(),
+//         secondAvailability: Joi.number().valid(1, 2, 3).required(),
+//         thirdAvailability: Joi.number().valid(1, 2, 3).required(),
+// });
+// return rescheduleOptionsSchema.validate(data)
+// }
 
 
-module.exports = { validateCreateAppointment, validateConfirmAppointment,  validateRescheduleOptions };
+module.exports = { validateCreateAppointment, validateConfirmAppointment };
