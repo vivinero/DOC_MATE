@@ -252,7 +252,7 @@ const forgotpassWordAdmin = async (req, res) => {
             res.status(404).json("Email doesn't exist")
         } else {
             const subject = " Kindly reset your password"
-            const link = `${req.protocol}://${req.get("host")}/reset-admin/${checkUser.id}`
+            const link = `${req.protocol}://https://docmate-tau.vercel.app/#/setPasswordHospital${checkUser.id}`
             const html = resetFunc(link, checkUser.firstName, checkUser.lastName)
             sendEmail({
                 email: checkUser.email,
