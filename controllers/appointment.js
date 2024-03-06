@@ -84,10 +84,20 @@ const handleAppointmentRequest = async (req, res) => {
 
     const admin = await adminModel.find()
 
-    admin.patient.push(user._id)
-    admin.appointment.push(appointmentRequest._id)
+    // admin.patient.push(user._id)
+    // admin.appointment.push(appointmentRequest._id)
 
-    await admin.save()
+    // await admin.save()
+    if (!admin.patient) {
+      admin.patient = [];
+    }
+    admin.patient.push(userId);
+    
+    if (!admin.appointment) {
+      admin.appointment = [];
+    }
+    admin.appointment.push(appointmentRequest._id);
+    
 
     appointmentRequest.createdAppId = appointmentRequest._id;
     appointmentRequest.status = "Pending"
