@@ -82,7 +82,7 @@ const handleAppointmentRequest = async (req, res) => {
       patient: userId
     });
 
-    const admin = await adminModel.findOne(email)
+    const admin = await adminModel.findOne()
 
     // admin.patient.push(user._id)
     // admin.appointment.push(appointmentRequest._id)
@@ -97,7 +97,7 @@ const handleAppointmentRequest = async (req, res) => {
     //   admin.appointment = [];
     // }
     admin.appointment.push(appointmentRequest);
-    await admin.save()
+    await admin.save()
 
     appointmentRequest.createdAppId = appointmentRequest._id;
     appointmentRequest.status = "Pending"
@@ -112,7 +112,7 @@ const handleAppointmentRequest = async (req, res) => {
       presentSymptoms: data.presentSymptoms,
       lastVisitation: data.lastVisitation
     });
-
+    
     if (!adminNotification) {
       return res.status(404).json({ message: 'Notification not sent' });
     }

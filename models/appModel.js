@@ -44,6 +44,10 @@ patient: [{
   type: mongoose.SchemaTypes.ObjectId,
   ref: "Patient"
 }],
+hospital: [{
+  type: mongoose.SchemaTypes.ObjectId,
+  ref: "Hospital"
+}],
   reschedule: { 
     type: String,
      enum: ['attended', "Unattended", "Unassigned", "Assigned"] },
