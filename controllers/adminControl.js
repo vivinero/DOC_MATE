@@ -21,9 +21,9 @@ const register = async (req, res) => {
         } else {
             //Get the required field from the request object body
 
-            const hospitalName = req.body.hospitalName;
+            const hospitalName = req.body.hospitalName.toLowerCase();
             const hospitalAddress = req.body.hospitalAddress;
-            const email = req.body.email;
+            const email = req.body.email.toLowerCase();
             const password = req.body.password;
             const phoneNumber = req.body.phoneNumber;
             const confirmPassword = req.body.confirmPassword
@@ -252,7 +252,7 @@ const forgotpassWordAdmin = async (req, res) => {
             res.status(404).json("Email doesn't exist")
         } else {
             const subject = " Kindly reset your password"
-            const link = `${req.protocol}://${req.get("host")}/reset-admin/${checkUser.id}`
+            const link = `${req.protocol}://https://docmate-tau.vercel.app/#/setPasswordHospital${checkUser.id}`
             const html = resetFunc(link, checkUser.firstName, checkUser.lastName)
             sendEmail({
                 email: checkUser.email,
