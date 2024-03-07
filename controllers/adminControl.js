@@ -21,9 +21,9 @@ const register = async (req, res) => {
         } else {
             //Get the required field from the request object body
 
-            const hospitalName = req.body.hospitalName;
+            const hospitalName = req.body.hospitalName.toLowerCase();
             const hospitalAddress = req.body.hospitalAddress;
-            const email = req.body.email;
+            const email = req.body.email.toLowerCase();
             const password = req.body.password;
             const phoneNumber = req.body.phoneNumber;
             const confirmPassword = req.body.confirmPassword
