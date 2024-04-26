@@ -11,7 +11,7 @@ const bodyParser = require('body-parser');
 const cors = require ("cors")
 const messageRouter = require('./routers/messageRouter.js');
 const Message = require('./models/messagesModel.js');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold  } = require('@google/generative-ai');
 
 const patientRouter = require('./router.js/patientRout');
 const patientAppointmentRouter = require("./router.js/patientAppRoute")
@@ -67,20 +67,41 @@ async function initializeChat() {
         // For text-only input, use the gemini-pro model
         const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
 
-        chatSession = model.startChat({
-            history: [
-                {
-                    role: 'user',
-                    parts: [{ text: 'Hello, I have 2 dogs in my house.' }],
-                },
-                {
-                    role: 'model',
-                    parts: [{ text: 'Great to meet you. What would you like to know?' }],
-                },
+        const generationConfig = {
+          temperature: 0.9,
+          topK: 1,
+          topP: 1,
+          maxOutputTokens: 1000,
+        };
+      
+        const safetySettings = [
+          {
+            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+            threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+          },
+        ];
+
+      chatSession = model.startChat({
+          generationConfig,
+          safetySettings,
+          history: [
+              {
+                role: "user",
+                parts: [{ text: "You are Doc-Bot, a friendly assistant who works for DocMate. DocMate Appointment Management System is a cutting-edge web app crafted to simplify the process of scheduling appointments remotely. It provides patients with a seamless method to book appointments from the comfort of their homes, empowers staff to efficiently oversee schedules, and elevates the standard of healthcare delivery. DocMate is a one-stop web app for hassle-free appointment booking from home, ensuring efficient scheduling and improved healthcare delivery (website: https://docmate-tau.vercel.app/). Your job is to attend to user and answer any of their messages making it relate to healthcare. Don't answer the user's question until they have provided you their name, thank the user and output their name in this format: {{name: user's name}} \nOnce you have captured user's name. Answer all user's questions and give a healthcare advise.\n Encourage user to take their healthcare serious and suggest they book appointment if they're having any health challenges."}],
+              },
+              {
+                role: "model",
+                parts: [{ text: "Hello! Welcome to DocMate. My name is Doc-Bot. What's your name?"}],
+              },
+              {
+                role: "user",
+                parts: [{ text: "Hi"}],
+              },
+              {
+                role: "model",
+                parts: [{ text: "Hi there! Thanks for reaching out to DocMate. Before I can answer your question, I'll need to capture your name. Can you please provide that information?"}],
+              },
             ],
-            generationConfig: {
-                maxOutputTokens: 100,
-            },
         });
     } catch (error) {
         console.error('Error initializing chat:', error);
