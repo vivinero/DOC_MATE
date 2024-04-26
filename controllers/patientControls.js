@@ -7,6 +7,7 @@ const multer = require("multer")
 const cloudinary = require("../middleware/cloudinary.js")
 const fs = require("fs")
 const hospitalModel = require("../models/adminModel.js")
+require('dotenv').config()
 
 
 const {
@@ -61,7 +62,7 @@ const signUp = async (req, res) => {
                 lastName,
                 email,
                 password: hashedPassword,
-
+                confirmPassword: hashedPassword
             }
             )
 
