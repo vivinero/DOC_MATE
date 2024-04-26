@@ -16,12 +16,12 @@ const sendMessage = async (req, res) => {
         message: message 
     });
 
-     // validation: Check if userInput is empty
-     if (!newMessage || newMessage .trim() === '') {
-      return res.status(400).json({ 
-        error: 'Chat box cannot be empty' 
-      });
-    }
+    //  // validation: Check if userInput is empty
+    //  if (!newMessage || newMessage .trim() === '') {
+    //   return res.status(400).json({ 
+    //     error: 'Chat box cannot be empty' 
+    //   });
+    // }
 
 
     if (!newMessage) {
