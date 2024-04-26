@@ -286,6 +286,16 @@ const validateAdmin = (data) => {
     return schema.validate(data);
 };
 
+const validateAI = (data) => {
+    schema = joi.object({
+        message: joi.string().max(30000).trim().required().messages({
+            'string.empty': 'Text-box must not be left empty',
+            'string.max': 'Text must not be longer than 3000 words',
+            'any.required': 'message is required'
+        })
+    })
+}
+
 
 
 module.exports = {
