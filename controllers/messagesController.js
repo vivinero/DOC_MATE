@@ -8,6 +8,11 @@ const sendMessage = async (req, res) => {
     try {
         const userId = req.user.userId;
         const { message } = req.body;
+        if(!message){
+          return res.status(400).json({
+            message: "Please provide a message"
+          })
+        }
   
       // Save the message to MongoDB
       const newMessage = new Message({ 
