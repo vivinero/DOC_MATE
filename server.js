@@ -154,9 +154,9 @@ io.on('connection', (socket) => {
 });
 
 
-// app.get('/', (req, res) => {
-//     res.send("Welcome to DocMate");
-// })
+app.get('/', (req, res) => {
+    res.send("Welcome to DocMate");
+})
 
 app.use(patientRouter); 
 app.use(adminRouter);
