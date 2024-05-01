@@ -2,7 +2,7 @@
 const appointmentModel = require("./models/appModel")
 
 const express = require('express');
-const http = require('http');
+// const http = require('http');
 const socketIo = require('socket.io');
 require('dotenv').config();
 const cron = require ("node-cron")
@@ -23,16 +23,11 @@ const fileUpload = require ("express-fileupload")
 
 
 const app = express();
-const server = http.createServer(app);
-app.use(cors(``*``))
+// const server = http.createServer(app);
+app.use(cors("*"))
 // Set up Socket.IO
 
-const io = socketIo(server, {
-  cors: {
-      origin: "*",
-      methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"] // All methods
-  }
-});
+
 
 
 const db = require("./config/config")
@@ -111,40 +106,6 @@ async function initializeChat() {
 
 initializeChat().catch(console.error); // Initialize chat session and catch errors
 
-// MongoDB Change Stream
-db.once('open', () => {
-    const changeStream = Message.watch();
-
-    changeStream.on('change', async (change) => {
-        try {
-            if (change.operationType === 'insert') {
-                const { user, role, message } = change.fullDocument;
-
-                // If the message is from the user, generate a response
-                if (role === 'user') {
-                    // Generate response using Google Generative AI
-                    const result = await chatSession.sendMessage(message);
-                    const response = await result.response;
-                    const text = response.text();
-
-                    console.log("Me: ", message);
-                    console.log("Bot: ", text);
-
-                    // Emit response to all connected clients via Socket.IO
-                    io.emit('response', { user: user, role: 'Bot', message: text });
-
-                    // Save the bot's response to MongoDB
-                    const botMessage = await Message.create({ user: user, role: 'Bot', message: text });
-
-
-                    
-                }
-            }
-        } catch (error) {
-            console.error('Error processing change stream:', error.message);
-        }
-    });
-});
 
 // // Socket.IO event listener for new connections
 // io.on('connection', (socket) => {
@@ -177,15 +138,6 @@ db.once('open', () => {
 //   });
 // });
 
-// Socket.IO event listener for new connections
-io.on('connection', (socket) => {
-  console.log('A user connected');
-
-  // Listen for disconnections
-  socket.on('disconnect', () => {
-      console.log('User disconnected');
-  });
-});
 
 
 app.get('/', (req, res) => {
@@ -221,9 +173,56 @@ cron.schedule('0 8 * * *', async () => {
 });
 // setInterval(appointmentController.sendAppointmentReminders, 24 * 60 * 60 * 1000); // Run every 24 hours
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
     console.log(`Server running on port: ${port}`);
 });
 
+const io = socketIo(server, {
+  cors: {
+      origin: "*",
+      methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"] // All methods
+  }
+});
 
+// MongoDB Change Stream
+db.once('open', () => {
+  const changeStream = Message.watch();
 
+  changeStream.on('change', async (change) => {
+      try {
+          if (change.operationType === 'insert') {
+              const { user, role, message, _id, createdAt, updatedAt } = change.fullDocument;
+              // console.log(change.fullDocument)
+
+              // If the message is from the user, generate a response
+              if (role === 'user') {
+                  // Generate response using Google Generative AI
+                  const result = await chatSession.sendMessage(message);
+                  const response = await result.response;
+                  const text = response.text();
+
+                  console.log("Me: ", message);
+                  console.log("Bot: ", text);
+
+                  // Emit response to all connected clients via Socket.IO
+                  io.emit('response', {user, role, "message": text, user, role, });
+
+                  // Save the bot's response to MongoDB
+                  const botMessage = await Message.create({ user: user, role: 'Bot', message: text });
+              }
+          }
+      } catch (error) {
+          console.error('Error processing change stream:', error.message);
+      }
+  });
+});
+
+// Socket.IO event listener for new connections
+io.on('connection', (socket) => {
+  console.log('A user connected');
+
+  // Listen for disconnections
+  socket.on('disconnect', () => {
+      console.log('User disconnected');
+  });
+});
