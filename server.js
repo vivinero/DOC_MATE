@@ -151,7 +151,38 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
       console.log('User disconnected');
   });
+
+  // Listen for incoming messages from the frontend
+  socket.on('message', async (message) => {
+    try {
+      // Process the incoming message
+      const result = await chatSession.sendMessage(message);
+      const response = await result.response;
+      const text = response.text();
+
+      // console.log("Me: ", message);
+      // console.log("Bot: ", text);
+
+      // Save the bot's response to MongoDB
+      const botMessage = await Message.create({ user: user, role: 'Bot', message: text });
+
+      // Emit the response to all connected clients via Socket.IO
+      io.emit('response', { user: user, role: 'Bot', message: text });
+    } catch (error) {
+      console.error('Error processing message:', error.message);
+    }
+  });
 });
+
+// // Socket.IO event listener for new connections
+// io.on('connection', (socket) => {
+//   console.log('A user connected');
+
+//   // Listen for disconnections
+//   socket.on('disconnect', () => {
+//       console.log('User disconnected');
+//   });
+// });
 
 
 app.get('/', (req, res) => {
