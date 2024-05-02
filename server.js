@@ -150,7 +150,7 @@ app.use(appointmentRouter);
 //app.use(notificationRouter);
 app.use(patientAppointmentRouter)
 app.use(contactUs)
-app.use('/api', messageRouter);
+app.use(messageRouter);
 
 
 cron.schedule('0 8 * * *', async () => {
