@@ -58,4 +58,22 @@ const authenticate =async (req, res, next)=>{
 
 }
 
-module.exports = {authenticate}
+const authenticateAdmin = async (req, res, next) => {
+    try {
+        await authenticate(req, res, () => {
+            if (req.user.isAdmin) {
+                next();
+            } else {
+                return res.status(403).json({
+                    error: "Unauthorized access: Admin privileges required"
+                });
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: error.message
+        });
+    }
+};
+
+module.exports = {authenticate, authenticateAdmin}

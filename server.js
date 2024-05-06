@@ -19,6 +19,9 @@ const appointmentRouter = require('./router.js/adminAppRoute');
 //const notificationRouter = require('./router.js/notificationRout');
 const adminRouter = require('./router.js/adminRout');
 const contactUs = require("./router.js/messageRoute")
+const productRouter = require('./router.js/productRoute.js')
+const categoryRouter = require('./router.js/categoryRoute.js')
+const searchRouter = require("./router.js/searchRoute.js");
 const fileUpload = require ("express-fileupload")
 
 
@@ -151,6 +154,9 @@ app.use(appointmentRouter);
 app.use(patientAppointmentRouter)
 app.use(contactUs)
 app.use(messageRouter);
+app.use(productRouter)
+app.use(categoryRouter)
+app.use(searchRouter);
 
 
 cron.schedule('0 8 * * *', async () => {
