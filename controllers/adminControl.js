@@ -558,10 +558,29 @@ const getOnePatient = async (req, res) => {
     }
   
   }
+  const deleteOnePatient = async (req, res) => {
+    try {
+        const id = req.params.id
+        const findPatient = await patientModel.findByIdAndDelete(id)
+        if (!findPatient) {
+            return res.status(404).json({
+                message: "Unable to find patient to be deleted"
+            })
+        }
+        return res.status(200).json({
+            message: `The patient with: ${findPatient.firstName} has been found`
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        })
+    }
+}
+
 
 
 
 
 
 module.exports = {
-    register, verifyAdmin, loginAdmin, getOneAdmin, forgotpassWordAdmin, getAllPatient, getOnePatient, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest}
+    register, verifyAdmin, loginAdmin, getOneAdmin, forgotpassWordAdmin, getAllPatient, getOnePatient,deleteOnePatient, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest}
