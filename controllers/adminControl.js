@@ -538,11 +538,12 @@ const deleteRequest = async (req, res) => {
 
 
 
+
 const getAllPatient = async (req, res) => {
     try {
         const patient = await patientModel.find()
             .sort({ createdAt: -1 })
-            .populate('profilePicture', 'url') 
+            .populate('profilePicture', 'url') //if picture is an object with a url field
         if (patient.length === 0) {
             return res.status(200).json({
                 message: "There are currently no Patients in the database."
@@ -551,9 +552,9 @@ const getAllPatient = async (req, res) => {
             return res.status(200).json({
                 message: "List of available patients",
                 totalNumberOfPatients: patient.length,
-                data: patient.map(patient => ({ // modify the data to include the picture
+                data: patient.map(patient => ({
                     ...patient,
-                    picture: patient.picture.url // or patient.picture if it's already a URL
+                    profilePicture: patient.profilePicture ? patient.profilePicture.url : null // added check here
                 }))
             })
         }
@@ -561,6 +562,31 @@ const getAllPatient = async (req, res) => {
         res.status(500).json({ message: error.message })
     }
 }
+
+
+// const getAllPatient = async (req, res) => {
+//     try {
+//         const patient = await patientModel.find()
+//             .sort({ createdAt: -1 })
+//             .populate('profilePicture', 'url') 
+//         if (patient.length === 0) {
+//             return res.status(200).json({
+//                 message: "There are currently no Patients in the database."
+//             })
+//         } else {
+//             return res.status(200).json({
+//                 message: "List of available patients",
+//                 totalNumberOfPatients: patient.length,
+//                 data: patient.map(patient => ({ // modify the data to include the picture
+//                     ...patient,
+//                     picture: patient.picture.url // or patient.picture if it's already a URL
+//                 }))
+//             })
+//         }
+//     } catch (error) {
+//         res.status(500).json({ message: error.message })
+//     }
+// }
 
 
 
