@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 const cloudinary = require("../middleware/cloudinary")
 const notificationModel = require("../models/notificateModel")
 
-const {validateAdmin} = require("../middleware/validator.js");
+const { validateAdmin } = require("../middleware/validator.js");
 const patientModel = require("../models/userModel.js");
 
 const register = async (req, res) => {
@@ -27,8 +27,8 @@ const register = async (req, res) => {
             const password = req.body.password;
             const phoneNumber = req.body.phoneNumber;
             const confirmPassword = req.body.confirmPassword
-            
-        
+
+
 
             const checkUser = await adminModel.findOne({ email: email.toLowerCase() })
             if (checkUser) {
@@ -62,9 +62,9 @@ const register = async (req, res) => {
 
 
 
-            const link = `${ req.protocol }://${req.get("host")}/verify-admin/${user.id}/${token}`
-            
-        
+            const link = `${req.protocol}://${req.get("host")}/verify-admin/${user.id}/${token}`
+
+
             sendEmail({
 
                 email: user.email,
@@ -153,9 +153,9 @@ const verifyAdmin = async (req, res) => {
             const newToken = jwt.sign({ email: admin.email, firstName: admin.firstName, lastName: admin.lastName }, process.env.jwtSecret, { expiresIn: "300s" });
             admin.token = newToken;
             await admin.save();
-            
+
             // Send a new verification email
-            const link =  `${req.protocol}://${req.get('host')}/verify/${id}/${newToken} `;
+            const link = `${req.protocol}://${req.get('host')}/verify/${id}/${newToken} `;
             sendEmail({
                 email: admin.email,
                 html: generateDynamicEmail(link, admin.firstName, admin.lastName),
@@ -209,7 +209,7 @@ const loginAdmin = async (req, res) => {
             })
 
         }
-        
+
 
         const token = jwt.sign({
             userId: admin._id,
@@ -289,7 +289,7 @@ const resetpasswordAdmin = async (req, res) => {
             return res.status(400).json({
                 message: "Password must match"
             })
-            }
+        }
 
         const reset = await adminModel.findByIdAndUpdate(id, data, { new: true })
 
@@ -403,96 +403,97 @@ const logOutAdmin = async (req, res) => {
 
 const getAllRequest = async (req, res) => {
     try {
-      const notification = await notificationModel.find().sort({createdAt: -1});
-      if (!notification) {
-        res.status(404).json({
-          message: "No request found",
-        });
-      } else {
-        res.status(201).json({
-          message: "All appointment request.",
-          data: notification,
-          totalNumberOfAppointmentRequests: notification.length,
-        });
-      }
+        const notification = await notificationModel.find().sort({ createdAt: -1 });
+        if (!notification) {
+            res.status(404).json({
+                message: "No request found",
+            });
+        } else {
+            res.status(201).json({
+                message: "All appointment request.",
+                data: notification,
+                totalNumberOfAppointmentRequests: notification.length,
+            });
+        }
     } catch (error) {
-      return res.status(500).json({ error: "Internal server error " + error.message });
+        return res.status(500).json({ error: "Internal server error " + error.message });
     }
-  };
-  
-  const viewOneAppointRequest = async (req, res) => {
-    try {
-      const appointmentId = req.params.appointmentId;
-  
-      const request = await notificationModel.findById(appointmentId);
-      if (!request) {
-        return res.status(404).json({
-          message: 'The appointment request not found'
-        })
-        return;
-      } else {
-        return res.status(200).json({
-          message: `The appointment request with : ${request.fullName} has been found`,
-          data: request
-        })
-      }
-    } catch (err) {
-      res.status(500).json({
-        message: "internal server error: " + err.message
-      })
-    }
-  
-  }
-  const getOneAdmin = async (req, res) => {
-    try {
-      const Id = req.user.userId;
-  
-      const user = await adminModel.findById(Id);
-      if (!user) {
-        return res.status(404).json({
-          message: 'Hospital no found'
-        })
+};
 
-      } else 
-        return res.status(200).json({
-          message: `The hospital's id: ${Id} has been found`,
-          data: user
+const viewOneAppointRequest = async (req, res) => {
+    try {
+        const appointmentId = req.params.appointmentId;
+
+        const request = await notificationModel.findById(appointmentId);
+        if (!request) {
+            return res.status(404).json({
+                message: 'The appointment request not found'
+            })
+            return;
+        } else {
+            return res.status(200).json({
+                message: `The appointment request with : ${request.fullName} has been found`,
+                data: request
+            })
+        }
+    } catch (err) {
+        res.status(500).json({
+            message: "internal server error: " + err.message
         })
-      }
+    }
+
+}
+const getOneAdmin = async (req, res) => {
+    try {
+        const Id = req.user.userId;
+
+        const user = await adminModel.findById(Id);
+        if (!user) {
+            return res.status(404).json({
+                message: 'Hospital no found'
+            })
+
+        } else
+            return res.status(200).json({
+                message: `The hospital's id: ${Id} has been found`,
+                data: user
+            })
+    }
     catch (error) {
-     return res.status(500).json({
-        message: "internal server error: " + error.message
-      })
-    }}
-  
-  
-
-  
-  
-  const deleteRequest = async (req, res) => {
-    try {
-      const appointmentId = req.params.appointmentId;
-      const request = await notificationModel.findById(appointmentId);
-      if (!request) {
-        return res.status(404).json({
-          message: 'The appointment request not found'
+        return res.status(500).json({
+            message: "internal server error: " + error.message
         })
-  
-      }
-  
-      await notificationModel.findByIdAndDelete(appointmentId)
-      return res.status(200).json({
-        message: `The appointment request with appointmentId: ${appointmentId} deleted successfully`,
-        data: request
-      })
-  
-    } catch (err) {
-      res.status(500).json({
-        message: "Internal server  error: " + err.message,
-      })
     }
-  }
-  
+}
+
+
+
+
+
+const deleteRequest = async (req, res) => {
+    try {
+        const appointmentId = req.params.appointmentId;
+        const request = await notificationModel.findById(appointmentId);
+        if (!request) {
+            return res.status(404).json({
+                message: 'The appointment request not found'
+            })
+
+        }
+
+        await notificationModel.findByIdAndDelete(appointmentId)
+        return res.status(200).json({
+            message: `The appointment request with appointmentId: ${appointmentId} deleted successfully`,
+            data: request
+        })
+
+    } catch (err) {
+        res.status(500).json({
+            message: "Internal server  error: " + err.message,
+        })
+    }
+}
+
 //   exports.getAllHospitals = async (req, res) => {
 //     try {
 //         const comment = await commentModel.find()
@@ -513,52 +514,80 @@ const getAllRequest = async (req, res) => {
 // }
 
 
+// const getAllPatient = async (req, res) => {
+//     try {
+//         const patient = await patientModel.find().sort({ createdAt: -1 }).populate();
+//         if (patient.length === 0) {
+//             return res.status(200).json({
+//                 message: "There are currently no Patients in the database."
+//             })
+//         } else {
+//             return res.status(200).json({
+//                 message: "List of available patients",
+//                 totalNumberOfPatients: patient.length,
+//                 data: patient
+//             })
+//         }
+
+//     } catch (error) {
+//         res.status(500).json({
+//             message: error.message
+//         })
+//     }
+// }
+
+
+
 const getAllPatient = async (req, res) => {
     try {
-        const patient = await patientModel.find().sort({createdAt: -1}).populate();
+        const patient = await patientModel.find()
+            .sort({ createdAt: -1 })
+            .populate('profilePicture', 'url') 
         if (patient.length === 0) {
-           return res.status(200).json({
+            return res.status(200).json({
                 message: "There are currently no Patients in the database."
             })
-        }else {
+        } else {
             return res.status(200).json({
                 message: "List of available patients",
                 totalNumberOfPatients: patient.length,
-                data: patient
+                data: patient.map(patient => ({ // modify the data to include the picture
+                    ...patient,
+                    picture: patient.picture.url // or patient.picture if it's already a URL
+                }))
             })
         }
-
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        })
+        res.status(500).json({ message: error.message })
     }
 }
 
+
+
 const getOnePatient = async (req, res) => {
     try {
-      const Id = req.params.Id;
-  
-      const request = await patientModel.findById(Id);
-      if (!request) {
-        return res.status(404).json({
-          message: 'No Patient found'
-        })
+        const Id = req.params.Id;
 
-      } else {
-        return res.status(200).json({
-          message: `The patient with: ${request.firstName} has been found`,
-          data: newData
-        })
+        const request = await patientModel.findById(Id);
+        if (!request) {
+            return res.status(404).json({
+                message: 'No Patient found'
+            })
+
+        } else {
+            return res.status(200).json({
+                message: `The patient with: ${request.firstName} has been found`,
+                data: newData
+            })
         }
     } catch (err) {
-     return res.status(500).json({
-        message: "internal server error: " + err.message
-      })
+        return res.status(500).json({
+            message: "internal server error: " + err.message
+        })
     }
-  
-  }
-  const deleteOnePatient = async (req, res) => {
+
+}
+const deleteOnePatient = async (req, res) => {
     try {
         const id = req.params.id
         const findPatient = await patientModel.findByIdAndDelete(id)
@@ -583,4 +612,5 @@ const getOnePatient = async (req, res) => {
 
 
 module.exports = {
-    register, verifyAdmin, loginAdmin, getOneAdmin, forgotpassWordAdmin, getAllPatient, getOnePatient,deleteOnePatient, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest}
+    register, verifyAdmin, loginAdmin, getOneAdmin, forgotpassWordAdmin, getAllPatient, getOnePatient, deleteOnePatient, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest
+}
