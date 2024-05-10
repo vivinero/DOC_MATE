@@ -542,6 +542,7 @@ const deleteRequest = async (req, res) => {
 const getAllPatient = async (req, res) => {
     try {
         const patient = await patientModel.find()
+        //console.log(patient)
             .sort({ createdAt: -1 })
             .populate('profilePicture', 'url') //if picture is an object with a url field
         if (patient.length === 0) {
@@ -552,11 +553,14 @@ const getAllPatient = async (req, res) => {
             return res.status(200).json({
                 message: "List of available patients",
                 totalNumberOfPatients: patient.length,
-                data: patient.map(patient => ({
-                    ...patient,
-                    profilePicture: patient.profilePicture ? patient.profilePicture.url : null // added check here
-                }))
+                data: patient
+               
             })
+            // .map(patient => ({
+            //     ...patient,
+            //     profilePicture: patient.profilePicture ? patient.profilePicture.url : null // added check here
+            // }))
+             
         }
     } catch (error) {
         res.status(500).json({ message: error.message })
