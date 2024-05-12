@@ -570,6 +570,8 @@ const getOnePatient = async (req, res) => {
     }
   
   }
+ 
+
 
 const getOneHospital = async (req, res) => {
     try {
