@@ -9,6 +9,8 @@ const notificationModel = require("../models/notificateModel")
 
 const {validateAdmin} = require("../middleware/validator.js");
 const patientModel = require("../models/userModel.js");
+const paymentModel = require("../models/paymentModel.js")
+
 
 const register = async (req, res) => {
     try {
@@ -515,25 +517,57 @@ const getAllRequest = async (req, res) => {
 
 const getAllPatient = async (req, res) => {
     try {
-        const patient = await patientModel.find().sort({createdAt: -1}).populate();
-        if (patient.length === 0) {
-           return res.status(200).json({
-                message: "There are currently no Patients in the database."
-            })
-        }else {
-            return res.status(200).json({
-                message: "List of available patients",
-                totalNumberOfPatients: patient.length,
-                data: patient
+        const userId = req.user.userId
+        const admin = await adminModel.findById(userId)
+
+        if(!admin){
+            return res.status(400).json({
+                message: `No admin found`
             })
         }
 
+        const patients = await adminModel.findById(userId).populate({
+            path: 'appointment',
+            model: 'Appointment'
+        })
+
+        if(!patients || patients.length ===0){
+            return res.status(200).json({
+                message: `No patients found`
+            })
+        }
+
+        res.status(200).json({
+            message: `Patients found`,
+            data: patients
+        })
     } catch (error) {
         res.status(500).json({
             message: error.message
         })
     }
 }
+// const getAllPatient = async (req, res) => {
+//     try {
+//         const patient = await patientModel.find().sort({createdAt: -1}).populate();
+//         if (patient.length === 0) {
+//            return res.status(200).json({
+//                 message: "There are currently no Patients in the database."
+//             })
+//         }else {
+//             return res.status(200).json({
+//                 message: "List of available patients",
+//                 totalNumberOfPatients: patient.length,
+//                 data: patient
+//             })
+//         }
+
+//     } catch (error) {
+//         res.status(500).json({
+//             message: error.message
+//         })
+//     }
+// }
 
 const getOnePatient = async (req, res) => {
     try {
@@ -559,9 +593,114 @@ const getOnePatient = async (req, res) => {
   
   }
 
+  const updateAdminProfile = async (req, res) => {
+    try {
+        // const userId = req.user.userId;
+        const {id} = req.params
+        const { email, address, phoneNumber } = req.body;
+
+        // check for errors
+        if (!email || !address || !phoneNumber) {
+            return res.status(400).json({
+                message: "Missing required fields"
+            });
+        }
+        //update user's info
+        const updatedInfo = await adminModel.findByIdAndUpdate( id, { email, address, phoneNumber },{ new: true });
+
+        //check if the user exist
+        if (!updatedInfo) {
+            return res.status(400).json({
+                message: "Unable to update user"
+            })   
+        }
+        // throw a success response
+        res.status(200).json({
+            message: "Admin information updated successfully",
+            updatedInfo
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Internal server error: " + error.message
+        });
+    }
+};
+
+
+// const checkPaymentStatus = async (req, res) => {
+//     try {
+//         const paymentId = req.params.paymentId;
+//         //Payment model defined
+//         const payment = await paymentModel.findById(paymentId);
+        
+//         if (!payment) {
+//             // If payment is not found
+//             return "Payment not found";
+//         }
+
+//         if (payment.status === "paid") {
+//             // If payment status is already "paid"
+//             return res.status(200).json({
+//                 error: "Payment has already been made"
+//             });
+//         }
+
+//         // Update users payment status to be paid
+//         payment.status = "paid";
+//         await payment.save();
+
+//         // Return success confirmation message
+//         res.status(200).json({
+//             message: "Payment confirmed"
+//         });
+//     } catch (error) {
+//         return res.status(500).json({
+//             message: "Internal server error: " + error.message
+//         });
+//     }
+// };
+
+const checkPaymentStatus = async (req, res) => {
+    try {
+        const hospitalId = req.user.hospitalId; 
+        const paymentId = req.params.paymentId;
+
+        // Check if payment belongs to the specified hospital
+        const payment = await paymentModel.findOne({ _id: paymentId, hospitalId });
+        
+        if (!payment) {
+            // If payment is not found or doesn't belong to the hospital
+            return res.status(404).json({
+                message: "Payment not found" 
+            });
+        }
+
+        if (payment.status === "paid") {
+            // If payment status is already "paid"
+            return res.status(200).json({ 
+                message: "Payment has already been made" 
+            });
+        }
+
+        // Update payment status to "paid"
+        payment.status = "paid";
+        await payment.save();
+
+        // Return success confirmation message
+        return res.status(200).json({ 
+            message: "Payment confirmed" 
+        });
+    } catch (error) {
+        return res.status(500).json({ 
+            message: "Internal server error: " + error.message 
+        });
+    }
+};
+
+
 
 
 
 
 module.exports = {
-    register, verifyAdmin, loginAdmin, getOneAdmin, forgotpassWordAdmin, getAllPatient, getOnePatient, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest}
+    register, verifyAdmin, loginAdmin, getOneAdmin, forgotpassWordAdmin, getAllPatient, getOnePatient, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest, updateAdminProfile, checkPaymentStatus}

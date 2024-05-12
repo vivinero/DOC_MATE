@@ -1,6 +1,6 @@
 const adminRouter = require("express").Router()
 
-const {register, verifyAdmin, loginAdmin, forgotpassWordAdmin,getOneAdmin, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest, getAllPatient, getOnePatient}
+const {register, verifyAdmin, loginAdmin, forgotpassWordAdmin,getOneAdmin, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest, getAllPatient, getOnePatient, updateAdminProfile}
 
  = require("../controllers/adminControl")
 const {adminAuthenticate} = require("../middleware/adminAuth")
@@ -19,9 +19,7 @@ adminRouter.get("/one-request", adminAuthenticate,viewOneAppointRequest)
 adminRouter.get("/all-patient", adminAuthenticate,getAllPatient)
 adminRouter.get("/one-patient", adminAuthenticate,getOnePatient)
 adminRouter.get("/one-admin", adminAuthenticate, getOneAdmin)
-
-
-
+adminRouter.patch("/update-admin/:id", updateAdminProfile)
 adminRouter.delete("delete-request/:id",adminAuthenticate, deleteRequest)
 
 
