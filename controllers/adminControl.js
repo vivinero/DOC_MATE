@@ -10,6 +10,7 @@ const notificationModel = require("../models/notificateModel")
 const { validateAdmin } = require("../middleware/validator.js");
 const patientModel = require("../models/userModel.js");
 const paymentModel = require("../models/paymentModel.js")
+const appointmentModel = require("../models/appModel.js")
 
 
 const register = async (req, res) => {
@@ -541,32 +542,68 @@ const deleteRequest = async (req, res) => {
 
 
 
-const getAllPatient = async (req, res) => {
-    try {
-        const patient = await patientModel.find().sort({createdAt: -1}).populate();
-        if (patient.length === 0) {
-           return res.status(200).json({
-                message: "There are currently no Patients in the database."
-            })
-        }else {
-            return res.status(200).json({
-                message: "List of available patients",
-                totalNumberOfPatients: patient.length,
-                data: patient
-            })
-            // .map(patient => ({
-            //     ...patient,
-            //     profilePicture: patient.profilePicture ? patient.profilePicture.url : null // added check here
-            // }))
+// const getAllPatient = async (req, res) => {
+//     try {
+//         const patient = await patientModel.find().sort({createdAt: -1}).populate();
+//         if (patient.length === 0) {
+//            return res.status(200).json({
+//                 message: "There are currently no Patients in the database."
+//             })
+//         }else {
+//             return res.status(200).json({
+//                 message: "List of available patients",
+//                 totalNumberOfPatients: patient.length,
+//                 data: patient
+//             })
+//             // .map(patient => ({
+//             //     ...patient,
+//             //     profilePicture: patient.profilePicture ? patient.profilePicture.url : null // added check here
+//             // }))
              
+//         }
+
+//     } catch (error) {
+//         res.status(500).json({
+//             message: error.message
+//         })
+//     }
+// }
+
+
+const getAllPatientsInHospital = async (req, res) => {
+    try {
+        // Get the hospital ID from the authenticated admin user
+        const hospitalId = req.user.hospitalId;
+
+        // Query the database to find all appointment requests associated with the hospital
+        const appointmentRequests = await appointmentModel.find({ hospitalId });
+
+        // If no appointment requests are found, return a not found error message
+        if (!appointmentRequests || appointmentRequests.length === 0) {
+            return res.status(404).json({ message: "No appointment requests found for the specified hospital" });
         }
 
+        // Extract unique patient IDs from the appointment requests
+        const uniquePatientIds = [...new Set(appointmentRequests.map(request => request.patient))];
+
+        // Query the database to find all patients associated with the unique patient IDs
+        const patients = await patientModel.find({ hospitalId, _id: { $in: uniquePatientIds } });
+
+        // If no patients are found, return a not found error message
+        if (!patients || patients.length === 0) {
+            return res.status(404).json({ message: "No patients found for the specified hospital" });
+        }
+
+        // If patients are found, return the list of patients
+        return res.status(200).json({ patients });
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        })
+        // Handle unexpected errors and return an internal server error message
+        return res.status(500).json({ message: "Internal server error: " + error.message });
     }
-}
+};
+
+
+
 
 const getOnePatient = async (req, res) => {
     try {
@@ -591,24 +628,24 @@ const getOnePatient = async (req, res) => {
     }
 
 }
-const deleteOnePatient = async (req, res) => {
-    try {
-        const id = req.params.id
-        const findPatient = await patientModel.findByIdAndDelete(id)
-        if (!findPatient) {
-            return res.status(404).json({
-                message: "Unable to find patient to be deleted"
-            })
-        }
-        return res.status(200).json({
-            message: `The patient with: ${findPatient.firstName} has been found`
-        })
-    } catch (error) {
-        res.status(500).json({
-            message: error.message
-        })
-    }
-}
+// const deleteOnePatient = async (req, res) => {
+//     try {
+//         const id = req.params.id
+//         const findPatient = await patientModel.findByIdAndDelete(id)
+//         if (!findPatient) {
+//             return res.status(404).json({
+//                 message: "Unable to find patient to be deleted"
+//             })
+//         }
+//         return res.status(200).json({
+//             message: `The patient with: ${findPatient.firstName} has been found`
+//         })
+//     } catch (error) {
+//         res.status(500).json({
+//             message: error.message
+//         })
+//     }
+// }
 
 
   const updateAdminProfile = async (req, res) => {
@@ -721,4 +758,4 @@ const checkPaymentStatus = async (req, res) => {
 
 
 module.exports = {
-    register, verifyAdmin, loginAdmin, getOneAdmin, forgotpassWordAdmin, getAllPatient, getOnePatient, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest}
+    register, verifyAdmin, loginAdmin, getOneAdmin, forgotpassWordAdmin, getOnePatient, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest, updateAdminProfile, checkPaymentStatus, getAllPatientsInHospital}

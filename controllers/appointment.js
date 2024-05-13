@@ -28,14 +28,6 @@ const viewApp = require('../createAppMail')
 const handleAppointmentRequest = async (req, res) => {
   try {
     const userId = req.user.userId;
-    
-    // Check if the user has updated their profile
-    // const isProfileUpdated = await checkProfile(userId);
-    // if (!isProfileUpdated) {
-    //   return res.status(400).json({ message: 'Please update your profile before scheduling an appointment' });
-    // }
-
-    // Continue with appointment scheduling logic...
     const { error } = validateAppointmentRequest(req.body);
     if (error) {
       return res.status(400).json({ message: error.details[0].message });
@@ -115,12 +107,18 @@ const handleAppointmentRequest = async (req, res) => {
     });
 
     if (!adminNotification) {
-      return res.status(404).json({ message: 'Notification not sent' });
+      return res.status(404).json({ 
+        message: 'Notification not sent'
+      });
     }
+    return res.status(201).json({ 
+      message: 'Appointment request sent successfully', appointment: appointmentRequest
+     });
 
-    return res.status(201).json({ message: 'Appointment request sent successfully', appointment: appointmentRequest });
   } catch (error) {
-    return res.status(500).json({ error: 'Internal server error: ' + error.message });
+    return res.status(500).json({
+      error: 'Internal server error: ' + error.message
+    });
   }
 };
 
