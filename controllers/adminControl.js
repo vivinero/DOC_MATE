@@ -219,6 +219,7 @@ const loginAdmin = async (req, res) => {
         const user = {
             hospitalName: admin.hospitalName,
             email: admin.email,
+            id: admin._id,
             isVerified: admin.isVerified,
             profilePicture: admin.profilePicture,
         };
