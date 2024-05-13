@@ -141,6 +141,8 @@ const createAppointment = async (req, res) => {
             status: app.status
         });
 
+        await createApp.save()
+
         // Send email to the patient with appointment details and link to the app
         const subject = "Your Appointment Details";
         const param = 12

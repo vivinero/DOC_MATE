@@ -9,6 +9,9 @@ const notificationModel = require("../models/notificateModel")
 
 const { validateAdmin } = require("../middleware/validator.js");
 const patientModel = require("../models/userModel.js");
+const paymentModel = require("../models/paymentModel.js")
+const appointmentModel = require("../models/appModel.js")
+
 
 const register = async (req, res) => {
     try {
@@ -540,58 +543,66 @@ const deleteRequest = async (req, res) => {
 
 
 
-const getAllPatient = async (req, res) => {
-    try {
-        const patient = await patientModel.find()
-        //console.log(patient)
-            .sort({ createdAt: -1 })
-            .populate('profilePicture', 'url') //if picture is an object with a url field
-        if (patient.length === 0) {
-            return res.status(200).json({
-                message: "There are currently no Patients in the database."
-            })
-        } else {
-            return res.status(200).json({
-                message: "List of available patients",
-                totalNumberOfPatients: patient.length,
-                data: patient
-               
-            })
-            // .map(patient => ({
-            //     ...patient,
-            //     profilePicture: patient.profilePicture ? patient.profilePicture.url : null // added check here
-            // }))
-             
-        }
-    } catch (error) {
-        res.status(500).json({ message: error.message })
-    }
-}
-
-
 // const getAllPatient = async (req, res) => {
 //     try {
-//         const patient = await patientModel.find()
-//             .sort({ createdAt: -1 })
-//             .populate('profilePicture', 'url') 
+//         const patient = await patientModel.find().sort({createdAt: -1}).populate();
 //         if (patient.length === 0) {
-//             return res.status(200).json({
+//            return res.status(200).json({
 //                 message: "There are currently no Patients in the database."
 //             })
-//         } else {
+//         }else {
 //             return res.status(200).json({
 //                 message: "List of available patients",
 //                 totalNumberOfPatients: patient.length,
-//                 data: patient.map(patient => ({ // modify the data to include the picture
-//                     ...patient,
-//                     picture: patient.picture.url // or patient.picture if it's already a URL
-//                 }))
+//                 data: patient
 //             })
+//             // .map(patient => ({
+//             //     ...patient,
+//             //     profilePicture: patient.profilePicture ? patient.profilePicture.url : null // added check here
+//             // }))
+             
 //         }
+
 //     } catch (error) {
-//         res.status(500).json({ message: error.message })
+//         res.status(500).json({
+//             message: error.message
+//         })
 //     }
 // }
+
+
+const getAllPatientsInHospital = async (req, res) => {
+    try {
+        // Get the hospital ID from the authenticated admin user
+        const hospitalId = req.user.hospitalId;
+
+        // Query the database to find all appointment requests associated with the hospital
+        const appointmentRequests = await appointmentModel.find({ hospitalId });
+
+        // If no appointment requests are found, return a not found error message
+        if (!appointmentRequests || appointmentRequests.length === 0) {
+            return res.status(404).json({ message: "No appointment requests found for the specified hospital" });
+        }
+
+        // Extract unique patient IDs from the appointment requests
+        const uniquePatientIds = [...new Set(appointmentRequests.map(request => request.patient))];
+
+        // Query the database to find all patients associated with the unique patient IDs
+        const patients = await patientModel.find({ hospitalId, _id: { $in: uniquePatientIds } });
+
+        // If no patients are found, return a not found error message
+        if (!patients || patients.length === 0) {
+            return res.status(404).json({ message: "No patients found for the specified hospital" });
+        }
+
+        // If patients are found, return the list of patients
+        return res.status(200).json({ patients });
+    } catch (error) {
+        // Handle unexpected errors and return an internal server error message
+        return res.status(500).json({ message: "Internal server error: " + error.message });
+    }
+};
+
 
 
 
@@ -618,24 +629,129 @@ const getOnePatient = async (req, res) => {
     }
 
 }
-const deleteOnePatient = async (req, res) => {
+// const deleteOnePatient = async (req, res) => {
+//     try {
+//         const id = req.params.id
+//         const findPatient = await patientModel.findByIdAndDelete(id)
+//         if (!findPatient) {
+//             return res.status(404).json({
+//                 message: "Unable to find patient to be deleted"
+//             })
+//         }
+//         return res.status(200).json({
+//             message: `The patient with: ${findPatient.firstName} has been found`
+//         })
+//     } catch (error) {
+//         res.status(500).json({
+//             message: error.message
+//         })
+//     }
+// }
+
+
+  const updateAdminProfile = async (req, res) => {
     try {
-        const id = req.params.id
-        const findPatient = await patientModel.findByIdAndDelete(id)
-        if (!findPatient) {
-            return res.status(404).json({
-                message: "Unable to find patient to be deleted"
-            })
+        // const userId = req.user.userId;
+        const {id} = req.params
+        const { email, address, phoneNumber } = req.body;
+
+        // check for errors
+        if (!email || !address || !phoneNumber) {
+            return res.status(400).json({
+                message: "Missing required fields"
+            });
         }
-        return res.status(200).json({
-            message: `The patient with: ${findPatient.firstName} has been found`
-        })
+        //update user's info
+        const updatedInfo = await adminModel.findByIdAndUpdate( id, { email, address, phoneNumber },{ new: true });
+
+        //check if the user exist
+        if (!updatedInfo) {
+            return res.status(400).json({
+                message: "Unable to update user"
+            })   
+        }
+        // throw a success response
+        res.status(200).json({
+            message: "Admin information updated successfully",
+            updatedInfo
+        });
     } catch (error) {
-        res.status(500).json({
-            message: error.message
-        })
+        return res.status(500).json({
+            message: "Internal server error: " + error.message
+        });
     }
-}
+};
+
+
+// const checkPaymentStatus = async (req, res) => {
+//     try {
+//         const paymentId = req.params.paymentId;
+//         //Payment model defined
+//         const payment = await paymentModel.findById(paymentId);
+        
+//         if (!payment) {
+//             // If payment is not found
+//             return "Payment not found";
+//         }
+
+//         if (payment.status === "paid") {
+//             // If payment status is already "paid"
+//             return res.status(200).json({
+//                 error: "Payment has already been made"
+//             });
+//         }
+
+//         // Update users payment status to be paid
+//         payment.status = "paid";
+//         await payment.save();
+
+//         // Return success confirmation message
+//         res.status(200).json({
+//             message: "Payment confirmed"
+//         });
+//     } catch (error) {
+//         return res.status(500).json({
+//             message: "Internal server error: " + error.message
+//         });
+//     }
+// };
+
+const checkPaymentStatus = async (req, res) => {
+    try {
+        const hospitalId = req.user.hospitalId; 
+        const paymentId = req.params.paymentId;
+
+        // Check if payment belongs to the specified hospital
+        const payment = await paymentModel.findOne({ _id: paymentId, hospitalId });
+        
+        if (!payment) {
+            // If payment is not found or doesn't belong to the hospital
+            return res.status(404).json({
+                message: "Payment not found" 
+            });
+        }
+
+        if (payment.status === "paid") {
+            // If payment status is already "paid"
+            return res.status(200).json({ 
+                message: "Payment has already been made" 
+            });
+        }
+
+        // Update payment status to "paid"
+        payment.status = "paid";
+        await payment.save();
+
+        // Return success confirmation message
+        return res.status(200).json({ 
+            message: "Payment confirmed" 
+        });
+    } catch (error) {
+        return res.status(500).json({ 
+            message: "Internal server error: " + error.message 
+        });
+    }
+};
 
 
 
@@ -643,5 +759,4 @@ const deleteOnePatient = async (req, res) => {
 
 
 module.exports = {
-    register, verifyAdmin, loginAdmin, getOneAdmin, forgotpassWordAdmin, getAllPatient, getOnePatient, deleteOnePatient, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest
-}
+    register, verifyAdmin, loginAdmin, getOneAdmin, forgotpassWordAdmin, getOnePatient, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest, updateAdminProfile, checkPaymentStatus, getAllPatientsInHospital}
