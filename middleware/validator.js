@@ -321,6 +321,106 @@ const validateAdmin = (data) => {
     return schema.validate(data);
 };
 
+const validateProductInput = (data) => {
+    try {
+        const validateSchema = joi.object({
+            productName: joi.string().min(3).max(30).regex(/^[a-zA-Z0-9\s_-]*$/).trim().required().messages({
+                'string.empty': "Product Name field can't be left empty",
+                'string.min': "Minimum of 3 characters for the Product Name field",
+                'any.required': "Please Product Name is required"
+            }),
+            category: joi.string().min(3).max(30).regex(/^[a-zA-Z0-9\s_-]*$/).trim().required().messages({
+                'string.empty': "category field can't be left empty",
+                'string.min': "Minimum of 3 characters for the category field",
+                'any.required': "Please category is required"
+            }),
+            brand: joi.string().min(3).max(30).regex(/^[a-zA-Z0-9\s_-]*$/).trim().required().messages({
+                'string.empty': "Brand field can't be left empty",
+                'string.min': "Minimum of 3 characters for the brand field",
+                'any.required': "Please brand is required"
+            }),
+            productDescription: joi.string().min(3).max(30).regex(/^[a-zA-Z0-9\s_-]*$/).trim().required().messages({
+                'string.empty': "Product description field can't be left empty",
+                'string.min': "Minimum of 3 characters for the Product description field",
+                'any.required': "Please Product description is required"
+            }),
+            costPrice: joi.number().min(1).required().messages({
+                'number.empty': "Cost Price field can't be left empty",
+                'number.min': "Minimum of 3 characters for the Cost Price field",
+                'any.required': "Please Cost Price is required"
+            }),
+            sellingPrice: joi.number().min(1).required().messages({
+                'number.empty': "Selling Price field can't be left empty",
+                'number.min': "Minimum of 3 characters for the Selling Price field",
+                'any.required': "Please Selling Price is required"
+            }),
+            stockQty: joi.number().min(1).required().messages({
+                'number.empty': "Stock quantity field can't be left empty",
+                'number.min': "Minimum of 3 characters for the Stock quantity field",
+                'any.required': "Please Stock quantity is required"
+            }),
+            VAT: joi.number().min(0).messages({
+                'number.empty': "VAT field can't be left empty",
+                'number.min': "Minimum of 3 characters for the VAT field",
+                'any.required': "Please VAT is required"
+            }),
+            reorderLevel: joi.number().min(1).required().messages({
+                'number.empty': "Reorder level field can't be left empty",
+                'number.min': "Minimum of 3 characters for the Reorder level field",
+                'any.required': "Please Reorder level is required"
+            }),
+
+        })
+        return validateSchema.validate(data);
+    } catch (error) {
+        throw error
+    }
+}
+
+
+
+const validateProductUpdate = (data) => {
+    try {
+        const validateSchema = joi.object({
+            productName: joi.string().min(3).max(30).regex(/^[a-zA-Z0-9\s_-]*$/).trim().messages({
+                'string.min': "Minimum of 3 characters for the Product Name field",
+            }),
+            category: joi.string().min(3).max(30).regex(/^[a-zA-Z0-9\s_-]*$/).trim().messages({
+                'string.min': "Minimum of 3 characters for the category field",
+            }),
+            brand: joi.string().min(3).max(30).regex(/^[a-zA-Z0-9\s_-]*$/).trim().messages({
+                'string.min': "Minimum of 3 characters for the brand field",
+            }),
+            productDescription: joi.string().min(3).max(30).regex(/^[a-zA-Z0-9\s_-]*$/).trim().messages({
+                'string.min': "Minimum of 3 characters for the Product description field",
+                'any.required': "Please Product description is required"
+            }),
+            costPrice: joi.number().min(1).messages({
+                'number.min': "Minimum of 3 characters for the Cost Price field",
+            }),
+            sellingPrice: joi.number().min(1).messages({
+                'number.min': "Minimum of 3 characters for the Selling Price field",
+            }),
+            stockQty: joi.number().min(1).messages({
+                'number.min': "Minimum of 3 characters for the Stock quantity field",
+            }),
+            VAT: joi.number().min(0).messages({
+                'number.min': "Minimum of 3 characters for the VAT field",
+                'any.required': "Please VAT is required"
+            }),
+            reorderLevel: joi.number().min(1).messages({
+                'number.min': "Minimum of 3 characters for the Reorder level field",
+            }),
+
+        })
+        return validateSchema.validate(data);
+    } catch (error) {
+        throw error
+    }
+}
+
+
+
 
 
 
@@ -333,6 +433,8 @@ module.exports = {
   validateMessage,
   validateUserProfile,
   validateUserProfileUpdate,
-    validateAdmin
+    validateAdmin,
+    validateProductInput,
+    validateProductUpdate,
 }
 
