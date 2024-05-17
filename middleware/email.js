@@ -8,7 +8,9 @@ async function sendMail(options) {
             auth: {
                 user: process.env.user, 
                 pass: process.env.emailPassword,
-            }
+                secure: true
+            },
+            tls: {rejectUnauthorized: false}
         })
         const mailOption = ({
             from: process.env.user,
