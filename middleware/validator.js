@@ -364,7 +364,7 @@ const validateProductInput = (data) => {
                 'number.min': "Minimum of 3 characters for the VAT field",
                 'any.required': "Please VAT is required"
             }),
-            reorderLevel: joi.number().min(1).required().messages({
+            reorderLevel: joi.number().min(1).optional().messages({
                 'number.empty': "Reorder level field can't be left empty",
                 'number.min': "Minimum of 3 characters for the Reorder level field",
                 'any.required': "Please Reorder level is required"

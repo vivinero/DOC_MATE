@@ -17,7 +17,7 @@ router.get("/all-hospitals", authenticate, getAllHospitals)
 router.get("/one-hospital/:Id", authenticate, getOneHospital)
 router.put("/update-profile/:userId", authenticate, updateProfile)
 router.get("/get-one-user", authenticate, getOnePatient)
-router.get('/hospitals-search',authenticate, searchHospital)
+router.get('/hospitals-search', searchHospital)
 
 router.get("/verify/:id/:token",verify);
 router.post("/login", login);

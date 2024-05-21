@@ -5,21 +5,23 @@ const router = express.Router();
 const { AddProduct, viewOneProduct, viewAllProduct, updateProduct,  deleteProduct, } = require('../controllers/productControl');
 const { authenticate, authenticateAdmin } = require('../middleware/authentication');
 
+const upload = require('../middleware/multer')
+
 
 //endpoint to Add a new stock product
-router.post('/addstock/:userId', authenticate, authenticateAdmin, AddProduct);
+router.post('/addproduct/:userId', authenticate, authenticateAdmin, AddProduct);
 
 //endpoint to view a stock product
-router.get('/viewstock/:productId', authenticate, viewOneProduct);
+router.get('/view-product/:productId', viewOneProduct);
 
 //endpoint to view all stock products
-router.get('/viewAllstock/:userId', authenticate, viewAllProduct);
+router.get('/view-all-product',  viewAllProduct);
 
 //endpoint to update a stock product
-router.put('/updatestock/:productId', authenticate, authenticateAdmin, updateProduct);
+router.put('/update-product/:productId', authenticate, authenticateAdmin, updateProduct);
 
 //endpoint to delete a stock product
-router.delete('/deletestock/:productId/:userId', authenticate, authenticateAdmin, deleteProduct);
+router.delete('/delete-product/:productId/:userId', authenticate, authenticateAdmin, deleteProduct);
 
 
 module.exports = router;

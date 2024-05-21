@@ -1,6 +1,7 @@
 const productModel = require('../models/productModel');
 const userModel = require('../models/userModel');
 const { validateProductInput, validateProductUpdate,  } = require('../middleware/validator');
+const cloudinary = require('../middleware/cloudinary')
 
 
 
@@ -29,22 +30,37 @@ const AddProduct = async (req, res) => {
             costPrice: req.body.costPrice,
             sellingPrice: req.body.sellingPrice,  
             stockQty: req.body.stockQty,
-           // VAT: req.body.VAT,
-           // reorderLevel: req.body.reorderLevel,
+           
         }
 
         if (!product) {
             return res.status(400).json({
-                message: 'Please enter the product name, category, brand, product description, cost price, selling price, stock Qty, VAT, and reorder level',
+                message: 'Please enter the product name, category, brand, product description, cost price, and selling price',
             })
         }
 
-        if(product.costPrice > product.sellingPrice) {
-            return res.status(400).json({
-                message: "Cost price can't be higher than selling price"
-            })
-        }
+                const images = req.files.images.tempFilePath
+        const fileUploader = await cloudinary.uploader.upload(images, { folder: "Product-Media" }, (err, images) => {
+            try {
+      
+              // Delete the temporary file
+              fs.unlinkSync(req.files.images.tempFilePath);
+      
+              return images
+            } catch (err) {
+              return err
+            }
+          })
 
+        // let images = [];
+
+        // // Upload images to Cloudinary
+        // for (const file of req.files) {
+        //     const result = await cloudinary.uploader.upload(file.path);
+        //     images.push(result.secure_url);
+        // }
+
+        
         //Check if product already exist within the business
         const checkProduct = await productModel.findOne({ userId: userId, productName: product.productName.toLowerCase() });
             if (checkProduct) {
@@ -61,8 +77,10 @@ const AddProduct = async (req, res) => {
             costPrice: product.costPrice,
             sellingPrice: product.sellingPrice,
             stockQty: product.stockQty,
-           // VAT: product.VAT,
-            //reorderLevel: product.reorderLevel,
+            images:{
+                url: fileUploader.url,
+                public_id: fileUploader.public_id
+            },
             lastUpdated: new Date().toLocaleDateString(),
             userId: userId,
         })
@@ -80,7 +98,15 @@ const AddProduct = async (req, res) => {
             message: 'Product added successfully',
             data: newProduct
         });
-      }    
+      }  
+    //   if (user) {
+    //     user.products.push(newProduct);
+    //     await user.save();
+    //   } else {
+    //     return res.status(500).json({ message: 'Error saving product' })
+    //   }
+    // }
+  
     } catch (error) {
         return res.status(500).json({
             message: 'Internal Server Error: ' + error.message,
@@ -116,84 +142,181 @@ const viewOneProduct = async (req, res) => {
 
 
 // Function to view all product information
+// const viewAllProduct = async (req, res) => {
+//     try {
+//         const userId = req.params.userId;
+//         const products = await productModel.find({userId: userId}).sort({updatedAt: -1});
+//         if (!products) {
+//             return res.status(404).json({ 
+//                 message: "Product not found"
+//             });
+//         }
+
+//         // Filter products by user ID and then retrieve distinct categories
+//         const distinctCategories = await productModel.distinct("category", { userId: userId });
+//         const totalCategories = distinctCategories.length;
+
+//         return res.status(200).json({
+//             message: "List of all products for ", 
+//             totalProducts: products.length, 
+//             totalCategory: totalCategories,
+//             data: products,
+//         });
+        
+//     } catch (error) {
+//         return res.status(500).json({
+//             message: 'Internal Server Error: ' + error.message,
+//           })
+//     }
+// }
 const viewAllProduct = async (req, res) => {
     try {
-        const userId = req.params.userId;
-        const products = await productModel.find({userId: userId}).sort({updatedAt: -1});
+       // const userId = req.params.userId;
+        const products = await productModel.find().sort({updatedAt: -1});
         if (!products) {
             return res.status(404).json({ 
                 message: "Product not found"
             });
+        } else {
+            res.status(201).json({
+                message: "All available products.",
+                data: products,
+                totalNumberOfProductsAvailable: products.length,
+            });
         }
-
-        // Filter products by user ID and then retrieve distinct categories
-        const distinctCategories = await productModel.distinct("category", { userId: userId });
-        const totalCategories = distinctCategories.length;
-
-        return res.status(200).json({
-            message: "List of all products for "+req.user.businessName, 
-            totalProducts: products.length, 
-            totalCategory: totalCategories,
-            data: products,
-        });
-        
     } catch (error) {
-        return res.status(500).json({
-            message: 'Internal Server Error: ' + error.message,
-          })
+        return res.status(500).json({ error: "Internal server error " + error.message });
     }
-}
+};
 
+const updateProduct = async (req, res) => {
+  try {
+    const { error } = validateProductUpdate(req.body);
+    if (error) {
+      return res.status(500).json({ message: error.details[0].message });
+    } else {
+      const productId = req.params.productId;
+      const product = await productModel.findById(productId);
+      if (!product) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+      const productData = {
+        productName: req.body.productName || product.productName,
+        category: req.body.category || product.category,
+        brand: req.body.brand || product.brand,
+        productDescription: req.body.productDescription || product.productDescription,
+        costPrice: req.body.costPrice || product.costPrice,
+        sellingPrice: req.body.sellingPrice || product.sellingPrice,
+        stockQty: req.body.stockQty || product.stockQty,
+        lastUpdated: new Date().toLocaleDateString(),
+      };
+      const updatedImages = req.files.updatedImages.tempFilePath;
+      const fileUploader = await cloudinary.uploader.upload(updatedImages, {
+        folder: "Product-Media",
+      }, (err, updatedImages) => {
+        try {
+          // Delete the temporary file
+          fs.unlinkSync(req.files.updatedImages.tempFilePath);
+          return updatedImages;
+        } catch (err) {
+          return err;
+        }
+      });
+      const updatedProduct = await productModel.findByIdAndUpdate(
+                    productId,
+                    {
+                      $set: productData,
+                      $push: { updatedImages: { $each: [updatedImages] }},
+                    },
+                    { new: true }
+                  );
+                  
+      if (!updatedProduct) {
+        return res.status(400).json({ message: "Unable to update product" });
+      }
+      const currentTimestamp = new Date().getTime();
+      res.status(200).json({
+        message: "Product updated successfully",
+        data: updatedProduct,
+        image: `<img src="${updatedImages[0].secure_url}?timestamp=${currentTimestamp}" />`,
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      message: "Internal Server Error: " + error.message,
+    });
+  }
+};
 
 
 // Function to update a product 
-const  updateProduct = async (req, res) => {
-    try {
-      const { error } = validateProductUpdate(req.body);
-      if (error) {
-        return res.status(500).json({
-          message: error.details[0].message
-        })
-      } else {
-        const productId = req.params.productId
-        const product = await productModel.findById(productId)
-        if  (!product) {
-            return res.status(404).json({ 
-                message: "Product not found"
-            });
-        }
+// const  updateProduct = async (req, res) => {
+//     try {
+//       const { error } = validateProductUpdate(req.body);
+//       if (error) {
+//         return res.status(500).json({
+//           message: error.details[0].message
+//         })
+//       } else {
+//         const productId = req.params.productId
+//         const product = await productModel.findById(productId)
+//         if  (!product) {
+//             return res.status(404).json({ 
+//                 message: "Product not found"
+//             });
+//         }
 
-        const productData = {
-            productName: req.body.productName  ||  product.productName,
-            category: req.body.category ||  product.category,
-            brand: req.body.brand  ||  product.brand,
-            productDescription: req.body.productDescription  || product.productDescription, 
-            costPrice: req.body.costPrice  ||  product.costPrice, 
-            sellingPrice: req.body.sellingPrice  ||  product.sellingPrice, 
-            stockQty: req.body.stockQty  ||  product.stockQty,
-            //VAT: req.body.VAT || product.VAT,
-            //reorderLevel: req.body.reorderLevel  ||  product.reorderLevel,
-            lastUpdated: new Date().toLocaleDateString(),
-        }
+//         const productData = {
+//             productName: req.body.productName  ||  product.productName,
+//             category: req.body.category ||  product.category,
+//             brand: req.body.brand  ||  product.brand,
+//             productDescription: req.body.productDescription  || product.productDescription, 
+//             costPrice: req.body.costPrice  ||  product.costPrice, 
+//             sellingPrice: req.body.sellingPrice  ||  product.sellingPrice, 
+//             stockQty: req.body.stockQty  ||  product.stockQty,
+//             lastUpdated: new Date().toLocaleDateString(),
+    
+//         }
+//         const updatedImages = req.files.updatedImages.tempFilePath
+//         const fileUploader = await cloudinary.uploader.upload(updatedImages, { folder: "Product-Media" }, (err, updatedImages) => {
+//             try {
+      
+//               // Delete the temporary file
+//               fs.unlinkSync(req.files.updatedImages.tempFilePath);
+      
+//               return updatedImages
+//             } catch (err) {
+//               return err
+//             }
+//           })
 
-        const updatedProduct = await productModel.findByIdAndUpdate(productId, productData, {new: true});
-        if (!updatedProduct) {
-            return res.status(400).json({ 
-                message: "Unable to update product"
-            });
-        }
+//         // const updatedProduct = await productModel.findByIdAndUpdate(productId, {productData, $push: { updatedImages: { $each: updatedImages }}}, {new: true});
+//         const updatedProduct = await productModel.findByIdAndUpdate(
+//             productId,
+//             {
+//               $set: productData,
+//               $push: { updatedImages: { $each: [updatedImages] }},
+//             },
+//             { new: true }
+//           );
+          
+//         if (!updatedProduct) {
+//             return res.status(400).json({ 
+//                 message: "Unable to update product"
+//             });
+//         }
         
-        return res.status(200).json({
-            message: "Product updated successfully",
-            data: updatedProduct
-        })
-    }
-    } catch (error) {
-        return res.status(500).json({
-            message: 'Internal Server Error: ' + error.message,
-          })
-    }
-}
+//         return res.status(200).json({
+//             message: "Product updated successfully",
+//             data: updatedProduct
+//         })
+//     }
+//     } catch (error) {
+//         return res.status(500).json({
+//             message: 'Internal Server Error: ' + error.message,
+//           })
+//     }
+// }
 
 
 

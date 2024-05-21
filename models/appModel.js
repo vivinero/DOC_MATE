@@ -24,7 +24,9 @@ const appointmentSchema = new mongoose.Schema({
   time: { 
     type: String
   },
-
+  totalNumbersOfEmployees:{
+    type : Number
+  },
   lastDiagnosis: { 
     type: String
     },
