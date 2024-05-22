@@ -31,12 +31,30 @@ const productSchema = new mongoose.Schema({
     lastUpdated: {
         type: String, 
     },
+    images: {
+        public_id: {
+            type: String,
+         
+        },
+        url:{
+            type: String,
+        },
+    },
+    updatedImages: {
+        public_id: {
+            type: String,
+         
+        },
+        url:{
+            type: String,
+        },
+    },
     userId: {
         type: String,
     }
 }, {timestamps: true})
 
-const productModel = mongoose.model('ProductMgt', productSchema);
+const productModel = mongoose.model('ProductHome', productSchema);
 
 module.exports = productModel;
 

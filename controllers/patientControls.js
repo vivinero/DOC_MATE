@@ -749,45 +749,205 @@ const logOut = async (req, res) => {
     }
 }
 
+// const searchHospital = async (req, res) => {
+//     try {
+//         // Get the user's search query
+//         const searchQuery = req.query.q;
+//         if (!searchQuery) {
+//             return res.status(400).json({
+//                 error: "Can't search an empty field"
+//             });
+//         }
+//         // Debug: Log the search query
+//         console.log(`Searching for hospitals with query: ${searchQuery}`);
+
+//         // Search hospitals by name
+//         let hospitals = await hospitalModel.find({ hospitalName: { $regex: `^${searchQuery}`, $options: 'i' } })
+//         console.log(`Found hospitals: ${hospitals}`); 
+//             // If no hospital found, return an error
+//             if (!hospitals || hospitals.length === 0) {
+//                 return res.status(404).json({
+//                     error: `No result found for ${searchQuery}`
+//                 });
+//             }
+//  else {
+//             // Extract hospital details from the hospital search
+//             hospitals = hospitals.map(hospital => ({
+//                 id: hospital._id,
+//                 name: hospital.hospitalName,
+//                 email: hospital.email,
+//                 address: hospital.hospitalAddress,
+//             }));
+//         }
+
+//         // Return the hospitals found
+//         return res.status(200).json({
+//             message: `${hospitals.length} hospital(s) found for ${searchQuery}`,
+//             data: hospitals
+//         });
+
+//     } catch (err) {
+//         return res.status(500).json({
+//             error: err.message
+//         });
+//     }
+// }
+
+
+
+
+
 const searchHospital = async (req, res) => {
-    try {
-        // Extract the search query from the request
-        const searchQuery = req.query.q;
-        //console.log(searchQuery)
-        let hospitals;
+  try {
+    // Extract the search query from the request
+    const searchQuery = req.query.q;
+    console.log(req.query);
+    let hospitals;
 
-        if (searchQuery) {
-            // If search query is provided, filter hospitals by name starting with the query
-            hospitals = await hospitalModel.find({ hospitalName: { $regex: `^${searchQuery}`, $options: 'i' } })
-                .select('hospitalName hospitalAddress email')
-                // Sort hospitals alphabetically by name
-                .sort({ hospitalName: 1 });
+    if (searchQuery) {
 
-        } else {
-            // If no search query is provided, fetch all hospitals
-            hospitals = await hospitalModel.find()
-                .select('hospitalName hospitalAddress email')
-                .sort({ createdAt: -1 }); // Sort hospitals by creation date
-        }
-
-        if (hospitals.length === 0) {
-            return res.status(200).json({
-                message: "No hospitals found."
-            });
-        } else {
-            return res.status(200).json({
-                message: "List of hospitals",
-                totalNumberOfHospitals: hospitals.length,
-                data: hospitals
-            });
-        }
-    } catch (err) {
-        return res.status(500).json({
-            message: err.message
-        });
+      // If search query is provided, filter hospitals by name starting with the query
+      hospitals = await hospitalModel.find({
+        hospitalName: { $regex: `^${searchQuery}`, $options: 'i' }
+      })
+        .sort({ hospitalName: 1 }); // Sort hospitals alphabetically by name
+    } else {
+      // If no search query is provided, return an empty array
+      hospitals = [];
     }
-}
+    console.log(`Search query: ${searchQuery}`);
+    console.log(`Hospitals: ${hospitals}`);
 
+
+    if (hospitals.length === 0) {
+      return res.status(200).json({ message: "No hospitals found." });
+    } else {
+      return res.status(200).json({
+        message: "List of hospitals",
+        totalNumberOfHospitals: hospitals.length,
+        data: hospitals
+        
+      });
+      
+    }
+
+  } catch (err) {
+    return res.status(500).json({ message: err.message });
+  }}
+
+
+
+// Route to search hospitals by name and sort alphabetically
+// const searchHospital = async (req, res) => {
+//   try {
+//     const { hospitalName } = req.query;
+
+//     // Log the query parameter to ensure it is being received
+//     console.log('Search query:', hospitalName);
+
+//     // Create a filter for the search query
+//     const filter = hospitalName ? { hospitalName: { $regex: new RegExp('^' + hospitalName, 'i') } } : {};
+
+//     // Log the filter object to ensure it is constructed correctly
+//     console.log('Filter object:', filter);
+
+//     const hospitals = await hospitalModel.find(filter).sort({ hospitalName: 1 }); // 1 for ascending order
+
+//     // Log the retrieved hospitals to ensure the query is working
+//     console.log('Retrieved hospitals:', hospitals);
+
+//     res.status(200).json({
+//       message: 'Hospitals retrieved successfully',
+//       data: hospitals
+//     });
+//   } catch (error) {
+//     console.error('Error retrieving hospitals:', error);
+//     res.status(500).json({
+//       message: 'Internal Server Error: ' + error.message,
+//     });
+//   }
+// };
+
+// const searchHospital = async(req,res)=>{
+//     try {
+  
+//         // get the user's search
+//         // const {search} = req.params
+//         // if(!search){
+//         //     return res.status(400).json({
+//         //         error:"can't search an empty field"
+//         //     })
+//         // }
+  
+//         const searchQuery = req.query.q  ;
+//         // console.log(searchQuery)
+//         // const convertedSearch = search.toLowerCase().charAt(0).toUpperCase() + search.slice(1)
+  
+//         // check if the search is a location
+//         // const loc = await locModel.findOne({loc:convertedSearch}).populate({path:"hotel", populate:{path:"hotelRooms"}})
+  
+        
+//             // if not location search in hotel
+//             const hospital = await hospitalModel.find({ hospitalName: { $regex: `^${searchQuery}`, $options: 'i' } }).populate("Hospital")
+  
+//         if(!hospital || hospital.length === 0){
+//             const loc = await hospitalModel.find({ loc: { $regex: `^${searchQuery}`, $options: 'i' } }).populate({path:"Hospital", populate:{path:"Hospital"}})
+//     // console.log(loc[0].hotel)
+    
+//             // extract details from the locstion returned
+//             const extractedData = loc[0].hospital.map(hospital => ({
+//                 id:hospital._id,
+//                 name: hospital.hospitalName,
+//                 //description: hospital.desc,
+//                 //profileImage: hospital.profileImage,
+//                 email: hospital.email,
+//                 address: hospital.hospitalAddress,
+//                // features: hospital.features,
+    
+                
+//             }));
+    
+//            return res.status(200).json({
+//                 message:`${extractedData.length} Hospitals with the name ${searchQuery}`,
+//                 data:extractedData
+//             })
+  
+//         }
+  
+//                 if(hospital.length === 0){
+//                 return res.status(404).json({
+//                     error:`No result found for ${searchQuery}`
+//                 })
+//             }
+  
+//             // extract hotel inputs
+//             const extractedHospital = hospital.map(hospital => ({
+//                 id:hospital._id,
+//                 name:hospital.hospitalName,
+//                 //description:hospital.desc,
+//                 //profileImage:hospital.profileImage,
+//                 email: hospital.email,
+//                 address:hospital.hospitalAddress,
+//                 //features:hospital.features,
+//                 //stars:hospital.stars,
+//                 //hotelImages:hospital.hotelImages,
+                
+//             }))
+        
+//             // retun the hotels
+//             res.status(200).json({
+//                 message:`${hotel.length} hotel found for ${searchQuery}`,
+//                 data:extractedHospital
+//             })
+        
+//     } catch (err) {
+//         res.status(500).json({
+//             error:err.message
+//         })
+//     }
+//   }
+  
+  
 
 
 

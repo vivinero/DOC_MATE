@@ -18,7 +18,6 @@ router.get("/one-hospital/:Id", authenticate, getOneHospital)
 router.put("/update-profile/:userId", authenticate, updateProfile)
 router.get("/get-one-user", authenticate, getOnePatient)
 router.get('/hospitals-search',authenticate, searchHospital)
-router.post('/patient-payment',authenticate, confirmPayment)
 
 router.get("/verify/:id/:token",verify);
 router.post("/login", login);

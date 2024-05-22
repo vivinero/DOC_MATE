@@ -26,15 +26,6 @@ const patientSchema = new mongoose.Schema({
     patientId:{
         type: String
     },
-    hospitalId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Hospital',
-        required: true
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now
-    },
     profilePicture: {
 
         public_id: {
@@ -85,7 +76,11 @@ const patientSchema = new mongoose.Schema({
     profileUpdated:{
         type: Boolean,
         default: false
-    }
+    },
+    products: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'ProductMgt',
+    }],
 }, {timestamps: true})
 
 
