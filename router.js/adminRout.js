@@ -20,7 +20,7 @@ adminRouter.delete("/deleteImg/:id",adminAuthenticate, deleteProfilePictureAdmin
 adminRouter.get("/all-requests",adminAuthenticate, getAllRequest)
 adminRouter.get("/one-request", adminAuthenticate,viewOneAppointRequest)
 // adminRouter.get("/all-patient", adminAuthenticate,getAllPatient)
-adminRouter.get("/all-patients", adminAuthenticate, getAllPatientsInHospital)
+adminRouter.get("/all-patients/:id", adminAuthenticate, getAllPatientsInHospital)
 adminRouter.get("/one-patient/:id", adminAuthenticate,getOnePatient)
 adminRouter.get("/one-admin", adminAuthenticate, getOneAdmin)
 // adminRouter.delete("/delete-patient", adminAuthenticate, deleteOnePatient)

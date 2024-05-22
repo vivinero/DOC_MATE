@@ -1,3 +1,4 @@
+const { required } = require("joi")
 const mongoose = require("mongoose")
 const cartItemSchema = new mongoose.Schema({
     userId: {
@@ -16,8 +17,15 @@ const cartItemSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     }
-})
+});
 const cartSchema = new mongoose.Schema({
-    
-})
-const cartSchema = mongoose.m
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "user",
+        required: true
+    },
+    items: [cartItemSchema]
+});
+const Cart = mongoose.model('Cart', cartSchema)
+
+module.exports = Cart
