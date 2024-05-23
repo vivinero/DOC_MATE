@@ -8,6 +8,12 @@ const notificationSchema = new mongoose.Schema({
     date: {
         type: String,
     },
+    time : {
+        type: String
+    },
+    reasonForReschedule:{
+        type: String
+    },
     lastDiagnosis: { type: String  },
   presentSymptoms: { type: String},
   lastVisitation:{type: Date},

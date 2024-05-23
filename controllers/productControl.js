@@ -2,6 +2,7 @@ const productModel = require('../models/productModel');
 const userModel = require('../models/userModel');
 const { validateProductInput, validateProductUpdate,  } = require('../middleware/validator');
 const cloudinary = require('../middleware/cloudinary')
+const fs = require("fs")
 
 
 
@@ -188,65 +189,191 @@ const viewAllProduct = async (req, res) => {
         return res.status(500).json({ error: "Internal server error " + error.message });
     }
 };
-
 const updateProduct = async (req, res) => {
   try {
     const { error } = validateProductUpdate(req.body);
     if (error) {
       return res.status(500).json({ message: error.details[0].message });
-    } else {
-      const productId = req.params.productId;
-      const product = await productModel.findById(productId);
-      if (!product) {
-        return res.status(404).json({ message: "Product not found" });
-      }
-      const productData = {
-        productName: req.body.productName || product.productName,
-        category: req.body.category || product.category,
-        brand: req.body.brand || product.brand,
-        productDescription: req.body.productDescription || product.productDescription,
-        costPrice: req.body.costPrice || product.costPrice,
-        sellingPrice: req.body.sellingPrice || product.sellingPrice,
-        stockQty: req.body.stockQty || product.stockQty,
-        lastUpdated: new Date().toLocaleDateString(),
-      };
+    }
+
+    const productId = req.params.productId;
+    const product = await productModel.findById(productId);
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    const productData = {
+      productName: req.body.productName || product.productName,
+      category: req.body.category || product.category,
+      brand: req.body.brand || product.brand,
+      productDescription: req.body.productDescription || product.productDescription,
+      costPrice: req.body.costPrice || product.costPrice,
+      sellingPrice: req.body.sellingPrice || product.sellingPrice,
+      stockQty: req.body.stockQty || product.stockQty,
+      lastUpdated: new Date().toLocaleDateString(),
+    };
+
+    // Check if a new image is provided
+    if (req.files && req.files.updatedImages) {
       const updatedImages = req.files.updatedImages.tempFilePath;
       const fileUploader = await cloudinary.uploader.upload(updatedImages, {
         folder: "Product-Media",
-      }, (err, updatedImages) => {
-        try {
-          // Delete the temporary file
-          fs.unlinkSync(req.files.updatedImages.tempFilePath);
-          return updatedImages;
-        } catch (err) {
-          return err;
-        }
       });
-      const updatedProduct = await productModel.findByIdAndUpdate(
-                    productId,
-                    {
-                      $set: productData,
-                      $push: { updatedImages: { $each: [updatedImages] }},
-                    },
-                    { new: true }
-                  );
-                  
-      if (!updatedProduct) {
-        return res.status(400).json({ message: "Unable to update product" });
+
+      // Optionally, delete the old image from Cloudinary
+      if (product.images && product.images.public_id) {
+        await cloudinary.uploader.destroy(product.images.public_id);
       }
-      const currentTimestamp = new Date().getTime();
-      res.status(200).json({
-        message: "Product updated successfully",
-        data: updatedProduct,
-        image: `<img src="${updatedImages[0].secure_url}?timestamp=${currentTimestamp}" />`,
-      });
+
+      // Set the new image URL and public ID
+      productData.images = {
+        url: fileUploader.secure_url,
+        public_id: fileUploader.public_id
+      };
+
+      // Delete the temporary file
+      fs.unlinkSync(req.files.updatedImages.tempFilePath);
     }
+
+    const updatedProduct = await productModel.findByIdAndUpdate(
+      productId,
+      { $set: productData },
+      { new: true }
+    );
+
+    if (!updatedProduct) {
+      return res.status(400).json({ message: "Unable to update product" });
+    }
+
+    res.status(200).json({
+      message: "Product updated successfully",
+      data: updatedProduct,
+    });
   } catch (error) {
     return res.status(500).json({
       message: "Internal Server Error: " + error.message,
     });
   }
 };
+
+// const updateProduct = async (req, res) => {
+//   try {
+//     const { error } = validateProductUpdate(req.body);
+//     if (error) {
+//       return res.status(400).json({ message: error.details[0].message });
+//     }
+
+//     const productId = req.params.productId;
+//     const product = await productModel.findById(productId);
+
+//     if (!product) {
+//       return res.status(404).json({ message: "Product not found" });
+//     }
+
+//     // Prepare the updated product data
+//     const productData = {
+//       productName: req.body.productName || product.productName,
+//       category: req.body.category || product.category,
+//       brand: req.body.brand || product.brand,
+//       productDescription: req.body.productDescription || product.productDescription,
+//       costPrice: req.body.costPrice || product.costPrice,
+//       sellingPrice: req.body.sellingPrice || product.sellingPrice,
+//       stockQty: req.body.stockQty || product.stockQty,
+//       lastUpdated: new Date().toLocaleDateString(),
+//     };
+
+//     // Handle image upload if a new image is provided
+//     if (req.files && req.files.updatedImages) {
+//       const updatedImages = req.files.updatedImages.tempFilePath;
+//       const fileUploader = await cloudinary.uploader.upload(updatedImages, { folder: "Product-Media" });
+
+//       // Delete the temporary file
+//       fs.unlinkSync(req.files.updatedImages.tempFilePath);
+
+//       // Update the product's image field
+//       productData.images = {
+//         url: fileUploader.secure_url,
+//         public_id: fileUploader.public_id
+//       };
+//     }
+
+//     // Update the product in the database
+//     const updatedProduct = await productModel.findByIdAndUpdate(productId, { $set: productData }, { new: true });
+
+//     if (!updatedProduct) {
+//       return res.status(400).json({ message: "Unable to update product" });
+//     }
+
+//     res.status(200).json({
+//       message: "Product updated successfully",
+//       data: updatedProduct,
+//     });
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: "Internal Server Error: " + error.message,
+//     });
+//   }
+// };
+
+
+// const updateProduct = async (req, res) => {
+//   try {
+//     const { error } = validateProductUpdate(req.body);
+//     if (error) {
+//       return res.status(500).json({ message: error.details[0].message });
+//     } else {
+//       const productId = req.params.productId;
+//       const product = await productModel.findById(productId);
+//       if (!product) {
+//         return res.status(404).json({ message: "Product not found" });
+//       }
+//       const productData = {
+//         productName: req.body.productName || product.productName,
+//         category: req.body.category || product.category,
+//         brand: req.body.brand || product.brand,
+//         productDescription: req.body.productDescription || product.productDescription,
+//         costPrice: req.body.costPrice || product.costPrice,
+//         sellingPrice: req.body.sellingPrice || product.sellingPrice,
+//         stockQty: req.body.stockQty || product.stockQty,
+//         lastUpdated: new Date().toLocaleDateString(),
+//       };
+//       const updatedImages = req.files.updatedImages.tempFilePath;
+//       const fileUploader = await cloudinary.uploader.upload(updatedImages, {
+//         folder: "Product-Media",
+//       }, (err, updatedImages) => {
+//         try {
+//           // Delete the temporary file
+//           fs.unlinkSync(req.files.updatedImages.tempFilePath);
+//           return updatedImages;
+//         } catch (err) {
+//           return err;
+//         }
+//       });
+//       const updatedProduct = await productModel.findByIdAndUpdate(
+//                     productId,
+//                     {
+//                       $set: productData,
+//                       $push: { updatedImages: { $each: [updatedImages] }},
+//                     },
+//                     { new: true }
+//                   );
+                  
+//       if (!updatedProduct) {
+//         return res.status(400).json({ message: "Unable to update product" });
+//       }
+//       const currentTimestamp = new Date().getTime();
+//       res.status(200).json({
+//         message: "Product updated successfully",
+//         data: updatedProduct,
+//         //image: `<img src="${updatedImages[0].secure_url}?timestamp=${currentTimestamp}" />`,
+//       });
+//     }
+//   } catch (error) {
+//     return res.status(500).json({
+//       message: "Internal Server Error: " + error.message,
+//     });
+//   }
+// };
 
 
 // Function to update a product 

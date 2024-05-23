@@ -5,6 +5,7 @@ const router = express.Router();
 const {signUp, verify, login, forgotpassWord, resetpassword,updateProfile, uploadProfilePicture, deleteProfilePicture, getAllHospitals, logOut, getOneHospital, searchHospital, getOnePatient
 }= require ("../controllers/patientControls");
 const {authenticate, admin} = require ("../middleware/authentication");
+const { rescheduleAppointment } = require('../controllers/appointment');
 
 router.post("/register", signUp);
 //router.post("/verify/:id/:token", verify);

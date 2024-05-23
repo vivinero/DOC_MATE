@@ -24,6 +24,9 @@ const appointmentSchema = new mongoose.Schema({
   time: { 
     type: String
   },
+  reasonForReschedule:{
+    type: String
+  },
   totalNumbersOfEmployees:{
     type : Number
   },
@@ -46,6 +49,9 @@ patient: [{
   type: mongoose.SchemaTypes.ObjectId,
   ref: "Patient"
 }],
+patientId : {
+  type : String
+},
 hospital: [{
   type: mongoose.SchemaTypes.ObjectId,
   ref: "Hospital"
@@ -67,7 +73,7 @@ hospital: [{
   // },
   status: { 
     type: String, 
-    enum: ["Pending", "Confirmed", "Reschedule"] 
+    enum: ["Pending", "Confirmed", "Pending Reschedule"] 
   },
 
 

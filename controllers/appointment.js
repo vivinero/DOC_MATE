@@ -214,9 +214,42 @@ const deleteRequest = async (req, res) => {
     })
   }
 }
+const viewPatientAppointments = async (req, res) => {
+  try {
+    // Extract patient ID from request parameters or authenticated user data
+    const patientId = req.params.patientId;
 
+    // Validate patient ID (you can also add more validation logic if needed)
+    if (!patientId) {
+      return res.status(400).json({
+        message: "Patient ID is required"
+      });
+    }
 
+    // Find all appointments for the patient
+    const appointments = await appointmentModel.find({ patientId: patientId }).sort({ date: -1 });
 
+    // Check if appointments are found
+    if (!appointments || appointments.length === 0) {
+      return res.status(404).json({
+        message: "No appointments found for this patient"
+      });
+    }
+
+    // Return the appointments
+    return res.status(200).json({
+      message: "Appointments retrieved successfully",
+      totalNumberOfAppointments: appointments.length,
+      data: appointments
+    });
+
+  } catch (error) {
+    // Handle any errors that occur
+    return res.status(500).json({
+      message: "Internal server error: " + error.message
+    });
+  }
+};
 
 
 
@@ -231,8 +264,19 @@ const rescheduleAppointment = async (req, res) => {
       });
     }
 
-    // Set the appointment status to 'Pending Reschedule'
-    appointment.status = 'Reschedule';
+    const { date, time, reasonForReschedule } = req.body;
+
+    if (!date || !time || !reasonForReschedule) {
+      return res.status(400).json({
+        message: 'Please enter date, time, and reason for reschedule'
+      });
+    }
+
+    // Set the appointment status to 'Pending Reschedule' and update date, time, and reason
+    appointment.status = 'Pending Reschedule';
+    appointment.date = date;
+    appointment.time = time;
+    appointment.reasonForReschedule = reasonForReschedule;
 
     // Save the updated appointment
     await appointment.save();
@@ -240,22 +284,70 @@ const rescheduleAppointment = async (req, res) => {
     // Create a notification for the admin with relevant information from the appointment
     const notifyAdmin = await notificationModel.create({
       fullName: appointment.fullName,
-      patientEmail: appointment.patientEmail, 
-      date: appointment.date, 
-      lastDiagnosis: appointment.lastDiagnosis, 
-      presentSymptoms: appointment.presentSymptoms, 
-      lastVisitation: appointment.lastVisitation 
+      patientEmail: appointment.patientEmail,
+      date: appointment.date,
+      time: appointment.time,
+      reasonForReschedule: appointment.reasonForReschedule,
     });
 
-    // Save the notification
-    await notifyAdmin.save();
+    // Save the notification (this line is not needed because .create() already saves it)
+    // await notifyAdmin.save();
 
     return res.status(200).json({ message: 'Reschedule request sent successfully' });
   } catch (error) {
     console.error('Error sending request:', error);
-    return res.status(500).json({ error: 'Internal server error' + error.message });
+    return res.status(500).json({ error: 'Internal server error: ' + error.message });
   }
 };
+
+
+
+
+// const rescheduleAppointment = async (req, res) => {
+//   try {
+    
+//     const appointmentId = req.params.appointmentId;
+   
+
+//     const appointment = await appointmentModel.findById(appointmentId);
+//     if (!appointment) {
+//       return res.status(404).json({
+//         message: "Appointment with the ID not found"
+//       });
+//     }
+
+//     const reschedule ={date, time, reasonForReschedule} 
+
+//     if (!reschedule) {
+//       return res.status(400).json({
+//           message: 'Please enter date, time and reason for Reschedule'
+//       })
+//   }
+
+//     // Set the appointment status to 'Pending Reschedule'
+//     appointment.status = 'Reschedule';
+
+//     // Save the updated appointment
+//     await appointment.save();
+
+//     // Create a notification for the admin with relevant information from the appointment
+//     const notifyAdmin = await notificationModel.create({
+//       fullName: appointment.fullName,
+//       patientEmail: appointment.patientEmail, 
+//       date: appointment.date, 
+//       time: appointment.time, 
+//       reasonForReschedule: appointment.reasonForReschedule, 
+//     });
+
+//     // Save the notification
+//     await notifyAdmin.save();
+
+//     return res.status(200).json({ message: 'Reschedule request sent successfully' });
+//   } catch (error) {
+//     console.error('Error sending request:', error);
+//     return res.status(500).json({ error: 'Internal server error' + error.message });
+//   }
+// };
 
 
 
@@ -305,7 +397,8 @@ module.exports = {
   viewOneAppointRequest,
   deleteRequest,
   confirmedPayment,
-  rescheduleAppointment
+  rescheduleAppointment,
+  viewPatientAppointments
   
 
 }
