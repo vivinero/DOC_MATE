@@ -666,9 +666,6 @@ const getOneHospital = async (req, res) => {
   
   }
 
-  const express = require('express');
-const router = express.Router();
-
 const confirmPayment = async (req, res) => {
     try {
         const { firstName, lastName, email, phoneNumber, hospitalId, appointmentDate } = req.body;
