@@ -26,24 +26,6 @@ const patientSchema = new mongoose.Schema({
     patientId:{
         type: String
     },
-    images: {
-        public_id: {
-            type: String,
-         
-        },
-        url:{
-            type: String,
-        },
-    },
-    updatedImages: {
-        public_id: {
-            type: String,
-         
-        },
-        url:{
-            type: String,
-        },
-    },
     profilePicture: {
 
         public_id: {
@@ -54,8 +36,6 @@ const patientSchema = new mongoose.Schema({
             type: String,
             default: "https://cdn3.iconfinder.com/data/icons/leto-user-group/64/__user_person_profile-1024.png"
         },
-        
-        
     },
     appointment:[{
         type: mongoose.Schema.Types.ObjectId,
@@ -65,7 +45,7 @@ const patientSchema = new mongoose.Schema({
         type: Array,
         default:[]
       },
-      hospitals:[{
+    hospitals:[{
         type: mongoose.Schema.Types.ObjectId,
         ref:"Hospital"
     }],
