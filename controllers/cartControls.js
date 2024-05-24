@@ -409,8 +409,8 @@ const viewCartContents = async (req, res) => {
                 data: cartItems
             });
         } else {
-            // If user is not authenticated, fetch cart contents from session cart
-            if (req.session.cart && req.session.cart.length > 0) {
+            // If user is not authenticated, fetch cart contents from session cart if it exists
+            if (req.session && req.session.cart && req.session.cart.length > 0) {
                 res.status(200).json({
                     message: 'Cart contents retrieved successfully',
                     data: req.session.cart
@@ -422,9 +422,37 @@ const viewCartContents = async (req, res) => {
 
     } catch (error) {
         console.error('Error retrieving cart contents:', error);
-        res.status(500).json({ message: 'Internal server error' + error.message });
+        res.status(500).json({ message: 'Internal server error: ' + error.message });
     }
 };
+
+// const viewCartContents = async (req, res) => {
+//     try {
+//         if (req.user) {
+//             // If user is authenticated, fetch cart contents from the database
+//             const userId = req.user.id;
+//             const cartItems = await Cart.find({ userId }).populate('product');
+//             res.status(200).json({
+//                 message: 'Cart contents retrieved successfully',
+//                 data: cartItems
+//             });
+//         } else {
+//             // If user is not authenticated, fetch cart contents from session cart
+//             if (req.session.cart && req.session.cart.length > 0) {
+//                 res.status(200).json({
+//                     message: 'Cart contents retrieved successfully',
+//                     data: req.session.cart
+//                 });
+//             } else {
+//                 res.status(404).json({ message: 'Cart is empty or not found' });
+//             }
+//         }
+
+//     } catch (error) {
+//         console.error('Error retrieving cart contents:', error);
+//         res.status(500).json({ message: 'Internal server error' + error.message });
+//     }
+// };
 
 
 
