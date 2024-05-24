@@ -214,6 +214,47 @@ const deleteRequest = async (req, res) => {
     })
   }
 }
+
+const viewAppointmentDetails = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const appointmentId = req.params.appointmentId;
+
+    if (!userId) {
+      return res.status(403).json({
+        message: "User not authorized"
+      });
+    }
+
+    // Find the appointment by ID and check if the appointment belongs to the user
+    const appointment = await appointmentModel.findById(appointmentId);
+
+    if (!appointment) {
+      return res.status(404).json({
+        message: "Appointment not found"
+      });
+    }
+
+    if (appointment.patient.toString() !== userId) {
+      return res.status(403).json({
+        message: "You do not have permission to view this appointment"
+      });
+    }
+
+    // Return appointment details
+    return res.status(200).json({
+      message: "Appointment details retrieved successfully",
+      appointment
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Internal Server Error: ' + error.message
+    });
+  }
+};
+
+
 const viewPatientAppointments = async (req, res) => {
   try {
     // Extract patient ID from request parameters or authenticated user data
@@ -398,7 +439,8 @@ module.exports = {
   deleteRequest,
   confirmedPayment,
   rescheduleAppointment,
-  viewPatientAppointments
+  viewPatientAppointments,
+  viewAppointmentDetails
   
 
 }
