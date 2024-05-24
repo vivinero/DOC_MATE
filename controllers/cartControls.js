@@ -4,7 +4,7 @@ const Product = require("../models/productModel")
 
 const User = require("../models/userModel")
 
-exports.addToCart = async (req, res) => {
+const addToCart = async (req, res) => {
     try {
         if (req.user) {
             //if user is authenticated, add item to cart
@@ -125,69 +125,179 @@ exports.addToCart = async (req, res) => {
 //     }
 // }
 
-exports.removeFromCart = async (req, res) => {
+
+const removeFromCart = async (req, res) => {
     try {
-        // const {userId} = req.user;
-        const { productId } = req.params;
-
-        // Find and remove the item from the cart
-        const result = await Cart.findOneAndDelete(productId);
-
-        // Check if the item was found and deleted
-        if (!result) {
-            return res.status(404).json({
-                message: "Item not found in cart"
-            });
+        if (req.user) {
+            // If user is authenticated, remove item from user's cart in the database
+            const userId = req.user.id;
+            const productId = req.params.productId;
+            // Remove the item from the user's cart in the database
+            await Cart.findOneAndDelete({ userId, productId });
+            res.status(200).json({ message: 'Item removed from cart successfully' });
+        } else {
+            // If user is not authenticated, remove item from session cart
+            const productId = req.params.productId;
+            // Remove the item from the session cart
+            req.session.cart = req.session.cart.filter(item => item.productId !== productId);
+            res.status(200).json({ message: 'Item removed from cart successfully' });
         }
-
-        res.status(200).json({
-            message: "Item has been removed from cart successfully"
-        });
     } catch (error) {
-        res.status(500).json({
-            error: "Internal Server Error: " + error.message
-        });
+        console.error('Error removing item from cart:', error);
+        res.status(500).json({ message: 'Internal server error' + error.message });
     }
 };
 
-exports.updateQuantity = async (req, res)=> {
-    try {
-        // const userId = req.user.id
-        const {productId} = req.params
-        const {quantity} = req.body
-//update quantity of the item
-        await Cart.findOneAndUpdate({productId}, {quantity})
-        res.status(200).json({
-            message: "Items has been updated successfully"
-        })
-    } catch (error) {
-        res.status(500).json({
-            error: "Internal Server Error" + error.message
-        })
-    }
-}
+// exports.removeFromCart = async (req, res) => {
+//     try {
+//         // const {userId} = req.user;
+//         const { productId } = req.params;
 
-exports.viewCartContent = async(req, res)=> {
+//         // Find and remove the item from the cart
+//         const result = await Cart.findOneAndDelete(productId);
+
+//         // Check if the item was found and deleted
+//         if (!result) {
+//             return res.status(404).json({
+//                 message: "Item not found in cart"
+//             });
+//         }
+
+//         res.status(200).json({
+//             message: "Item has been removed from cart successfully"
+//         });
+//     } catch (error) {
+//         res.status(500).json({
+//             error: "Internal Server Error: " + error.message
+//         });
+//     }
+// };
+
+const updateQuantity = async (req, res) => {
     try {
-        // const userId = req.user.id
-        const { cartId } = req.params
-        //get all item in the user's cart
-        const  cartItems = await Cart.findOne({cartId}).populate('productId')
-        if (!cartItems) {
-            return res.status(404).json({
-                error: "Unable to retrive cart item, because it is empty or does not exist"
-            })
+        if (req.user) {
+            // If user is authenticated, remove item from user's cart in the database
+            const userId = req.user.id;
+            const productId = req.params.productId;
+
+            const { quantity } = req.body;
+
+            if (userId) {
+                // If user is authenticated, update quantity in the database
+                await Cart.findOneAndUpdate({ userId, productId }, { quantity });
+                res.status(200).json({ message: 'Quantity updated successfully' });
+            } else {
+                // If user is not authenticated, update quantity in session cart
+                if (req.session.cart) {
+                    const itemIndex = req.session.cart.findIndex(item => item.productId === productId);
+                    if (itemIndex !== -1) {
+                        req.session.cart[itemIndex].quantity = quantity;
+                        res.status(200).json({ message: 'Quantity updated successfully' });
+                    } else {
+                        res.status(404).json({ message: 'Item not found in cart' });
+                    }
+                } else {
+                    res.status(404).json({ message: 'Cart not found' });
+                }
+            }
         }
-        res.status(200).json({
-            message: 'Cart contents successfully retrieved',
-            data: cartItems
+    } catch (error) {
+        console.error('Error updating quantity:', error);
+        res.status(500).json({ message: 'Internal server error' + error.message });
+    }
+};
+
+const viewCartContents = async (req, res) => {
+    try {
+        if (req.user) {
+            // If user is authenticated, fetch cart contents from the database
+            const userId = req.user.id;
+            const cartItems = await Cart.find({ userId }).populate('product');
+            res.status(200).json({
+                message: 'Cart contents retrieved successfully',
+                data: cartItems
+            });
+        } else {
+            // If user is not authenticated, fetch cart contents from session cart
+            if (req.session.cart && req.session.cart.length > 0) {
+                res.status(200).json({
+                    message: 'Cart contents retrieved successfully',
+                    data: req.session.cart
+                });
+            } else {
+                res.status(404).json({ message: 'Cart is empty or not found' });
+            }
+        }
+
+    } catch (error) {
+        console.error('Error retrieving cart contents:', error);
+        res.status(500).json({ message: 'Internal server error' + error.message });
+    }
+};
+
+
+
+const clearCart = async (req, res) => {
+    try {
+        if (req.user) {
+            // If user is authenticated, remove all items from the user's cart in the database
+            const userId = req.user.id;
+
+            await Cart.deleteMany({ userId });
+        } else {
+            // If user is not authenticated, clear session cart
+            req.session.cart = [];
+        }
+
+        return res.status(200).json({
+            message: 'Cart cleared successfully'
         });
     } catch (error) {
-        res.status(500).json({
-            error: "Internal Server Error" + error.message
-        })
+        console.error('Error clearing cart:', error);
+        return res.status(500).json({ message: 'Internal server error' + error.message });
     }
-}
+};
+
+
+
+// exports.updateQuantity = async (req, res)=> {
+//     try {
+//         // const userId = req.user.id
+//         const {productId} = req.params
+//         const {quantity} = req.body
+// //update quantity of the item
+//         await Cart.findOneAndUpdate({productId}, {quantity})
+//         res.status(200).json({
+//             message: "Items has been updated successfully"
+//         })
+//     } catch (error) {
+//         res.status(500).json({
+//             error: "Internal Server Error" + error.message
+//         })
+//     }
+// }
+
+// exports.viewCartContent = async(req, res)=> {
+//     try {
+//         // const userId = req.user.id
+//         const { cartId } = req.params
+//         //get all item in the user's cart
+//         const  cartItems = await Cart.findOne({cartId}).populate('productId')
+//         if (!cartItems) {
+//             return res.status(404).json({
+//                 error: "Unable to retrive cart item, because it is empty or does not exist"
+//             })
+//         }
+//         res.status(200).json({
+//             message: 'Cart contents successfully retrieved',
+//             data: cartItems
+//         });
+//     } catch (error) {
+//         res.status(500).json({
+//             error: "Internal Server Error" + error.message
+//         })
+//     }
+// }
 
 // exports.clearCart = async (req, res)=>{
 //     try {
@@ -208,44 +318,44 @@ exports.viewCartContent = async(req, res)=> {
 //     }
 // }
 
-exports.clearCart = async (req, res) => {
-    try {
-        // Retrieve sessionId from cookies or query parameters
-        const sessionId = req.cookies.sessionId || req.query.sessionId;
+// exports.clearCart = async (req, res) => {
+//     try {
+//         // Retrieve sessionId from cookies or query parameters
+//         const sessionId = req.cookies.sessionId || req.query.sessionId;
 
-        if (!sessionId) {
-            return res.status(400).json({
-                message: 'Session ID is required'
-            });
-        }
+//         if (!sessionId) {
+//             return res.status(400).json({
+//                 message: 'Session ID is required'
+//             });
+//         }
 
-        // Find the cart by session ID and clear its items
-        const cart = await Cart.findOneAndUpdate(
-            { sessionId },
-            { $set: { items: [] } },
-            { new: true }
-        );
+//         // Find the cart by session ID and clear its items
+//         const cart = await Cart.findOneAndUpdate(
+//             { sessionId },
+//             { $set: { items: [] } },
+//             { new: true }
+//         );
 
-        if (!cart) {
-            return res.status(404).json({
-                message: 'Cart not found'
-            });
-        }
+//         if (!cart) {
+//             return res.status(404).json({
+//                 message: 'Cart not found'
+//             });
+//         }
 
-        res.status(200).json({
-            message: 'Cart successfully cleared',
-            data: cart.items
-        });
-    } catch (error) {
-        console.error('Error clearing cart:', error);
-        res.status(500).json({
-            error: 'Internal Server Error: ' + error.message
-        });
-    }
-};
+//         res.status(200).json({
+//             message: 'Cart successfully cleared',
+//             data: cart.items
+//         });
+//     } catch (error) {
+//         console.error('Error clearing cart:', error);
+//         res.status(500).json({
+//             error: 'Internal Server Error: ' + error.message
+//         });
+//     }
+// };
 
 
-exports.movedToSave = async (req, res)=> {
+const movedToSave = async (req, res)=> {
     try {
         const userId = req.user.id
         const productId = req.params.productId
@@ -264,7 +374,7 @@ exports.movedToSave = async (req, res)=> {
     }
 }
 
-exports.moveItemsBackToCart = async (req, res)=> {
+const moveItemsBackToCart = async (req, res)=> {
     try {
         const userId = req.user.id
         const productId = req.parama.productId;
@@ -279,3 +389,4 @@ exports.moveItemsBackToCart = async (req, res)=> {
         })
     }
 }
+module.exports = {addToCart, removeFromCart, updateQuantity, moveItemsBackToCart, movedToSave, clearCart, viewCartContents}
