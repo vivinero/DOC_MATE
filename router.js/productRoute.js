@@ -18,7 +18,7 @@ router.get('/view-product/:productId', viewOneProduct);
 router.get('/view-all-product',  viewAllProduct);
 
 //endpoint to update a stock product
-router.put('/update-product/:productId', authenticate, authenticateAdmin, updateProduct);
+router.put('/update-product/:productId', updateProduct);
 
 //endpoint to delete a stock product
 router.delete('/delete-product/:productId/:userId', authenticate, authenticateAdmin, deleteProduct);

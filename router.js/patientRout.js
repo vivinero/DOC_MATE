@@ -6,6 +6,7 @@ const {signUp, verify, login, forgotpassWord, resetpassword,updateProfile, uploa
      getAllHospitals, logOut, getOneHospital, searchHospital, getOnePatient, confirmPayment
 }= require ("../controllers/patientControls");
 const {authenticate, admin} = require ("../middleware/authentication");
+const { rescheduleAppointment } = require('../controllers/appointment');
 
 router.post("/register", signUp);
 //router.post("/verify/:id/:token", verify);
