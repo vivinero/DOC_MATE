@@ -5,14 +5,19 @@ const {
     handleAppointmentRequest,
     confirmedPayment,
     viewPatientAppointments,
-    rescheduleAppointment}= require("../controllers/appointment")
+    rescheduleAppointment,
+    viewOneAppointRequest,
+    getAllRequest
+}= require("../controllers/appointment")
 const {authenticate} = require('../middleware/authentication')
 
 ;
 patientAppointmentRouter.post("/request/:adminId", authenticate,handleAppointmentRequest );
 patientAppointmentRouter.post("/reschedule-app/:appointmentId", authenticate, rescheduleAppointment)
 patientAppointmentRouter.post('/confirm-payment', authenticate, confirmedPayment) 
-patientAppointmentRouter.get('/appointment-history/:patientId', viewPatientAppointments)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
+patientAppointmentRouter.get('/appointment-history/:patientId', viewPatientAppointments)    
+patientAppointmentRouter.get('/one-app-req/:appointmentId', viewOneAppointRequest)     
+patientAppointmentRouter.get('/all-app-req', getAllRequest)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
 //patientAppointmentRouter.post('/updates-profile', updatesProfile)
 
 
