@@ -138,7 +138,8 @@ const createAppointment = async (req, res) => {
             time: time,
             speciality: speciality,
             patient: app.patient,
-            status: app.status
+            status: app.status,
+            id : app._id
         });
 
         await createApp.save()

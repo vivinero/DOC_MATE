@@ -22,12 +22,7 @@ const productSchema = new mongoose.Schema({
     stockQty: {
         type: Number,
     },
-    VAT: {
-        type: Number,
-    },
-    reorderLevel: {
-        type: Number,
-    }, 
+    
     lastUpdated: {
         type: String, 
     },
@@ -50,6 +45,9 @@ const productSchema = new mongoose.Schema({
         },
     },
     userId: {
+        type: String,
+    },
+    productId: {
         type: String,
     }
 }, {timestamps: true})
