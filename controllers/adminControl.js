@@ -566,10 +566,10 @@ const deleteRequest = async (req, res) => {
 
 const getAllPatientsInHospital = async (req, res) => {
     try {
-        const { hospitalId } = req.params;
-
+        console.log(req.user)
+        const id = req.user.userId;
         // Query the database to find all patients in the specified hospital
-        const patients = await patientModel.find({ hospitalId });
+        const patients = await patientModel.find({hospitals: id });
 
         if (!patients || patients.length === 0) {
             return res.status(404).json({
