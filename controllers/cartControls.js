@@ -4,79 +4,163 @@ const Product = require("../models/productModel")
 
 const User = require("../models/userModel")
 
+const app = require("../middleware/session")
+
 const addToCart = async (req, res) => {
     try {
-        if (req.user) {
-            //if user is authenticated, add item to cart
-            const userId = req.user.userId;
-            const productId = req.params.productId;
-
-            // Extract quantity from request body
-            const { quantity } = req.body;
-
-            // Check if product exists
-            const product = await Product.findById(productId);
-            if (!product) {
-                return res.status(404).json({
-                    message: 'Product not found'
-                });
-            }
-
-            // Check if user exists
-            const user = await User.findById({ user: userId });
-            if (!user) {
-                return res.status(404).json({
-                    message: 'User not found'
-                });
-            }
-
-            // Create or update cart
-            let cart = await Cart.findOne({ user: userId });
-            if (!cart) {
-                // Create new cart if it doesn't exist
-                cart = new Cart({
-                    userId,
-                    items: [{ product: productId, quantity: parseInt(quantity) }], // Parse quantity to integer
-                });
-            } else {
-                // Update existing cart
-                const index = cart.items.findIndex(item => item.product.equals(productId));
-                if (index !== -1) {
-                    // If product already exists in cart, update quantity
-                    cart.items[index].quantity += parseInt(quantity); // Parse quantity to integer
-                } else {
-                    // If product doesn't exist in cart, add it
-                    cart.items.push({ product: productId, quantity: parseInt(quantity) }); // Parse quantity to integer
-                }
-            }
-
-            // Save cart
-            await cart.save();
-
-            return res.status(200).json({
-                message: 'Product added to cart successfully',
-                data: cart
-            });
-        } else {
-            // If user is not authenticated, add item to session cart
-            const productId = req.params.productId;
-            const { quantity } = req.body;
-            req.session.cart = req.session.cart || [];
-            req.session.cart.push({ productId, quantity });
-            return res.status(200).json({
-                message: 'Item added to visitor cart successfully',
-                data: req.session.cart
-            });
+      if (req.user) {
+        // If user is authenticated, add item to cart
+        const userId = req.user.userId;
+        const productId = req.params.productId;
+  
+        // Extract quantity from request body
+        const { quantity } = req.body;
+  
+        // Check if product exists
+        const product = await Product.findById(productId);
+        if (!product) {
+          return res.status(404).json({
+            message: 'Product not found'
+          });
         }
-
-
-
-    } catch (err) {
-        return res.status(500).json({
-            Error: 'Internal Server Error' + err.message,
+  
+        // Check if user exists
+        const user = await User.findById(userId); // Corrected query to use userId
+        if (!user) {
+          return res.status(404).json({
+            message: 'User not found'
+          });
+        }
+  
+        // Create or update cart
+        let cart = await Cart.findOne({ user: userId });
+        if (!cart) {
+          // Create new cart if it doesn't exist
+          cart = new Cart({
+            user: userId,
+            items: [{ product: productId, quantity: parseInt(quantity) }], // Parse quantity to integer
+          });
+        } else {
+          // Update existing cart
+          const index = cart.items.findIndex(item => item.product.equals(productId));
+          if (index !== -1) {
+            // If product already exists in cart, update quantity
+            cart.items[index].quantity += parseInt(quantity); // Parse quantity to integer
+          } else {
+            // If product doesn't exist in cart, add it
+            cart.items.push({ product: productId, quantity: parseInt(quantity) }); // Parse quantity to integer
+          }
+        }
+  
+        // Save cart
+        await cart.save();
+  
+        return res.status(200).json({
+          message: 'Product added to cart successfully',
+          data: cart
         });
+      } else {
+        // If user is not authenticated, add item to session cart
+        const productId = req.params.productId;
+        const { quantity } = req.body;
+  
+        // Ensure req.session is initialized
+        if (!req.session) {
+          req.session = {};
+        }
+  
+        // Ensure req.session.cart is initialized
+        req.session.cart = req.session.cart || [];
+  
+        // Add item to session cart
+        req.session.cart.push({ product: productId, quantity: parseInt(quantity) }); // Parse quantity to integer
+  
+        return res.status(200).json({
+          message: 'Item added to visitor cart successfully',
+          data: req.session.cart
+        });
+      }
+    } catch (err) {
+      return res.status(500).json({
+        Error: 'Internal Server Error: ' + err.message,
+      });
     }
-};
+  };
+  
+
+// const addToCart = async (req, res) => {
+//     try {
+//         if (req.user) {
+//             //if user is authenticated, add item to cart
+//             const userId = req.user.userId;
+//             const productId = req.params.productId;
+
+//             // Extract quantity from request body
+//             const { quantity } = req.body;
+
+//             // Check if product exists
+//             const product = await Product.findById(productId);
+//             if (!product) {
+//                 return res.status(404).json({
+//                     message: 'Product not found'
+//                 });
+//             }
+
+//             // Check if user exists
+//             const user = await User.findById({ user: userId });
+//             if (!user) {
+//                 return res.status(404).json({
+//                     message: 'User not found'
+//                 });
+//             }
+
+//             // Create or update cart
+//             let cart = await Cart.findOne({ user: userId });
+//             if (!cart) {
+//                 // Create new cart if it doesn't exist
+//                 cart = new Cart({
+//                     userId,
+//                     items: [{ product: productId, quantity: parseInt(quantity) }], // Parse quantity to integer
+//                 });
+//             } else {
+//                 // Update existing cart
+//                 const index = cart.items.findIndex(item => item.product.equals(productId));
+//                 if (index !== -1) {
+//                     // If product already exists in cart, update quantity
+//                     cart.items[index].quantity += parseInt(quantity); // Parse quantity to integer
+//                 } else {
+//                     // If product doesn't exist in cart, add it
+//                     cart.items.push({ product: productId, quantity: parseInt(quantity) }); // Parse quantity to integer
+//                 }
+//             }
+
+//             // Save cart
+//             await cart.save();
+
+//             return res.status(200).json({
+//                 message: 'Product added to cart successfully',
+//                 data: cart
+//             });
+//         } else {
+//             // If user is not authenticated, add item to session cart
+//             const productId = req.params.productId;
+//             const { quantity } = req.body;
+//             req.session.cart = req.session.cart || [];
+//             req.session.cart.push({ productId, quantity });
+//             return res.status(200).json({
+//                 message: 'Item added to visitor cart successfully',
+//                 data: req.session.cart
+//             });
+//         }
+
+
+
+//     } catch (err) {
+//         return res.status(500).json({
+//             Error: 'Internal Server Error' + err.message,
+//         });
+//     }
+// };
 
 
 // exports.addToCart = async(req, res)=> {

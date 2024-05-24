@@ -3,7 +3,7 @@ const cartRouter = express.Router()
 const { addToCart, removeFromCart, updateQuantity, moveItemsBackToCart, movedToSave, clearCart, viewCartContents } = require("../controllers/cartControls")
 // const {authenticate} = require("../middleware/authentication")
 
-cartRouter.post("/add-to-cart", addToCart)
+cartRouter.post("/add-to-cart/:productId", addToCart)
 cartRouter.delete("/remove-from-cart/:productId", removeFromCart)
 cartRouter.put("/update-quantity/:productId", updateQuantity)
 cartRouter.get("/view-cart-content/:cartId", viewCartContents)
