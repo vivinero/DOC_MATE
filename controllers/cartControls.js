@@ -240,7 +240,7 @@ const updateQuantity = async (req, res) => {
 
 
 
-// const removeFromCart = async (req, res) => {
+
 //     try {
 //         if (req.user) {
 //             // If user is authenticated, remove item from user's cart in the database
@@ -287,45 +287,6 @@ const updateQuantity = async (req, res) => {
 //     }
 // };
 
-// const updateQuantity = async (req, res) => {
-//     try {
-//         // Check if user is authenticated
-//         if (req.user) {
-//             console.log('Session:', req.app); // Debugging line
-//             const userId = req.user.id;
-//             const productId = req.params.productId;
-//             const { quantity } = req.body;
-
-//             // If user is authenticated, update quantity in the database
-//             await Cart.findOneAndUpdate({ userId, productId }, { quantity });
-//             return res.status(200).json({ message: 'Quantity updated successfully' });
-//         } else {
-//             // If user is not authenticated, check if session cart exists
-//             if (!req.app || !req.app.cart) {
-//                 return res.status(404).json({ message: 'Cart not found' });
-//             }
-
-//             const productId = req.params.productId;
-//             const { quantity } = req.body;
-
-//             // Find the index of the item in the session cart
-//             const itemIndex = req.app.cart.findIndex(item => item.productId === productId);
-
-//             // If item is not found in the session cart, return error
-//             if (itemIndex === -1) {
-//                 return res.status(404).json({ message: 'Item not found in cart' });
-//             }
-
-//             // Update quantity of the item in the session cart
-//             req.app.cart[itemIndex].quantity = quantity;
-
-//             return res.status(200).json({ message: 'Quantity updated successfully' });
-//         }
-//     } catch (error) {
-//         console.error('Error updating quantity:', error);
-//         return res.status(500).json({ message: 'Internal server error: ' + error.message });
-//     }
-// };
 
 // const updateQuantity = async (req, res) => {
 //     try {

@@ -296,7 +296,13 @@ const viewPatientAppointments = async (req, res) => {
 
 const rescheduleAppointment = async (req, res) => {
   try {
+    const userId = req.user.userId
     const appointmentId = req.params.appointmentId;
+    if (!userId) {
+      return res.status(403).json({
+        message: "User not authorized"
+      });
+    }
 
     const appointment = await appointmentModel.findById(appointmentId);
     if (!appointment) {
