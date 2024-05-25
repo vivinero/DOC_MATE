@@ -225,6 +225,7 @@ const viewAppointmentDetails = async (req, res) => {
         message: "User not authorized"
       });
     }
+    console.log(userId)
 
     // Find the appointment by ID and check if the appointment belongs to the user
     const appointment = await appointmentModel.findById(appointmentId);
