@@ -1,4 +1,4 @@
-const generateDynamicEmail=( link,firstName)=> {
+const generateDynamicEmail=( link,fullName)=> {
   
     return `
   
@@ -44,7 +44,7 @@ const generateDynamicEmail=( link,firstName)=> {
                         <td>
                             <div style="padding: 0 2.5em; text-align: center;">
                                 <h2 style="font-family: 'Lato', sans-serif; color: rgba(0,0,0,.3); font-size: 40px; margin-bottom: 0; font-weight: 400;">BOOK APPOINTMENT</h2>
-                                <h3 style="font-family: 'Lato', sans-serif; font-size: 24px; font-weight: 300;">Dear , ${firstName},<br/>You have successfully booked an Appointment.</h3>
+                                <h3 style="font-family: 'Lato', sans-serif; font-size: 24px; font-weight: 300;">Dear , ${fullName},<br/>You have successfully booked an Appointment.</h3>
                                 <p><a href=${link} class="btn btn-primary" style="padding: 15px 35px; display: inline-block; border-radius: 3px; background: #2C7DA0; color: #ffffff; text-decoration: none;">View Appointment</a></p>
                                 <h6 style="font-family: 'Lato', sans-serif; font-size: 18px; font-weight: 300;">This email expires in 2minutes</h6>
                             </div>
