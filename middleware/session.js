@@ -1,6 +1,6 @@
 // const express = require('express');
 // const session = require('express-session');
-// const MongoStore = require('connect-mongo');
+ const MongoStore = require('connect-mongo');
 
 // // Create an instance of Express
 // const app = express();
@@ -34,7 +34,11 @@ app.use(session({
     secret: 'your_secret_key', // Replace with your own secret
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false } // Set to true if using HTTPS
+    cookie: { secure: false } ,// Set to true if using HTTPS
+    store: MongoStore.create({
+        mongoUrl: 'mongodb://localhost:27017/safeAjo',
+        ttl: 7 * 24 * 60 * 60 // Session will expire in 7 days
+    })
 }));
 
 // Mock authentication middleware
