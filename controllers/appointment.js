@@ -11,7 +11,7 @@ const notificationModel = require("../models/notificateModel")
 const { validateAppointmentRequest } = require("../middleware/validator");
 const sendMail = require('../middleware/email');
 const viewApp = require('../createAppMail')
-
+const mongoose = require('mongoose');
 
 
 // const checkProfile = async (userId) => {
@@ -227,7 +227,7 @@ const viewAppointmentDetails = async (req, res) => {
     }
     
     // Convert userId to ObjectId
-    const objectIdUserId = mongoose.Types.ObjectId(userId);
+    const objectIdUserId = new mongoose.Types.ObjectId(userId);
 
     // Find the appointment by ID and check if the appointment belongs to the user
     const appointment = await appointmentModel.findById(appointmentId);
