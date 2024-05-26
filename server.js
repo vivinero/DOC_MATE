@@ -30,7 +30,7 @@ const app = express();
 // const server = http.createServer(app);
 app.use(cors("*"))
 // Set up Socket.IO
-const apps = require("./middleware/session")
+//const apps = require("./middleware/session")
 
 const db = require("./config/config");
 
