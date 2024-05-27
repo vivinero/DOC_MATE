@@ -6,6 +6,7 @@ const jwt = require("jsonwebtoken");
 const multer = require("multer")
 const cloudinary = require("../middleware/cloudinary.js")
 const fs = require("fs")
+const Payment = require('../models/paymentModel'); // Import the Payment model
 const hospitalModel = require("../models/adminModel.js")
 require('dotenv').config()
 
@@ -666,6 +667,8 @@ const getOneHospital = async (req, res) => {
   
   }
 
+ 
+
 const confirmPayment = async (req, res) => {
     try {
         const { firstName, lastName, email, phoneNumber, hospitalId, appointmentDate } = req.body;
@@ -678,13 +681,25 @@ const confirmPayment = async (req, res) => {
             });
         }
 
-         // Validate the date (optional, for example, check if it's a valid date)
-         if (isNaN(Date.parse(appointmentDate))) {
+        // Validate the date (optional, for example, check if it's a valid date)
+        if (isNaN(Date.parse(appointmentDate))) {
             return res.status(400).json({
                 error: 'Invalid date format'
             });
         }
 
+        // Save payment details to the database
+        const payment = new Payment({
+            firstName,
+            lastName,
+            email,
+            phoneNumber,
+            hospitalId,
+            appointmentDate,
+            userId
+        });
+
+        await payment.save();
 
         // Return the patient details as confirmation
         res.status(200).json({
@@ -705,6 +720,46 @@ const confirmPayment = async (req, res) => {
         });
     }
 };
+
+// const confirmPayment = async (req, res) => {
+//     try {
+//         const { firstName, lastName, email, phoneNumber, hospitalId, appointmentDate } = req.body;
+//         const userId = req.user.userId;
+
+//         // Validate the request body
+//         if (!firstName || !lastName || !email || !phoneNumber || !hospitalId || !appointmentDate) {
+//             return res.status(400).json({
+//                 error: 'All fields are required'
+//             });
+//         }
+
+//          // Validate the date (optional, for example, check if it's a valid date)
+//          if (isNaN(Date.parse(appointmentDate))) {
+//             return res.status(400).json({
+//                 error: 'Invalid date format'
+//             });
+//         }
+
+
+//         // Return the patient details as confirmation
+//         res.status(200).json({
+//             message: 'Payment confirmed and details received',
+//             patientDetails: {
+//                 firstName,
+//                 lastName,
+//                 email,
+//                 phoneNumber,
+//                 hospitalId,
+//                 appointmentDate,
+//                 userId
+//             },
+//         });
+//     } catch (error) {
+//         res.status(500).json({
+//             error: 'Internal server error: ' + error.message
+//         });
+//     }
+// };
 
 // module.exports = router;
 

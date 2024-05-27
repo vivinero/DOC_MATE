@@ -41,6 +41,7 @@ app.use(session({
     })
 }));
 
+
 // Mock authentication middleware
 app.use((req, res, next) => {
     // Mock user authentication

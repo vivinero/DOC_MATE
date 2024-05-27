@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 // const {validateUser} = require("../middleware/validator.js")
 const cloudinary = require("../middleware/cloudinary")
 const notificationModel = require("../models/notificateModel")
-
+const Payment = require('../models/paymentModel');
 const { validateAdmin } = require("../middleware/validator.js");
 const patientModel = require("../models/userModel.js");
 const paymentModel = require("../models/paymentModel.js")
@@ -666,6 +666,80 @@ const getOnePatient = async (req, res) => {
         });
     }
 };
+const getPayments = async (req, res) => {
+    try {
+        const userId = req.user.userId
+        if(!userId){
+            res.status(404).json({
+                message: "You are not authenticated"
+            })
+        }
+        const payments = await Payment.find();
+
+        res.status(200).json({
+            message: 'Payments retrieved successfully',
+            payments
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: 'Internal server error: ' + error.message
+        });
+    }
+};
+
+const deletePayment = async (req, res) => {
+    try {
+        const user = req.user.userId
+        const paymentId = req.params.paymentId;
+
+        // Check if paymentId is provided
+        if (!paymentId) {
+            return res.status(400).json({
+                error: 'Payment ID is required'
+            });
+        }
+
+        // Find and delete the payment record by ID
+        const deletedPayment = await Payment.findByIdAndDelete(paymentId);
+
+        if (!deletedPayment) {
+            return res.status(404).json({
+                message: 'Payment not found'
+            });
+        }
+
+        res.status(200).json({
+            message: 'Payment deleted successfully',
+            payment: deletedPayment
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: 'Internal server error: ' + error.message
+        });
+    }
+};
+
+const deleteAllPayments = async (req, res) => {
+    try {
+        const userId = req.user.userId
+        // Delete all payment records
+        await Payment.deleteMany({});
+
+        res.status(200).json({
+            message: 'All payments deleted successfully'
+        });
+    } catch (error) {
+        res.status(500).json({
+            error: 'Internal server error: ' + error.message
+        });
+    }
+};
+
+
+
+
+
+
 
 
 // const checkPaymentStatus = async (req, res) => {
@@ -744,4 +818,4 @@ const getOnePatient = async (req, res) => {
 
 
 module.exports = {
-    register, verifyAdmin, loginAdmin, getOneAdmin, forgotpassWordAdmin, getOnePatient, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest, updateAdminProfile, getAllPatientsInHospital}
+    register, verifyAdmin, loginAdmin, getOneAdmin, forgotpassWordAdmin, getOnePatient, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest,getPayments,  deletePayment, deleteAllPayments, updateAdminProfile, getAllPatientsInHospital}

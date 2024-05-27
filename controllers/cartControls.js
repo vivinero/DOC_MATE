@@ -4,7 +4,7 @@ const Product = require("../models/productModel")
 
 const User = require("../models/userModel")
 
-const app = require("../middleware/session")
+const app = require("../middleware/sessions")
 
 const mongoose = require('mongoose');
 
@@ -70,7 +70,7 @@ const addToCart = async (req, res) => {
         } else {
             // If user is not authenticated, add item to session cart
 
-            // Ensure req.session is initialized
+           // Ensure req.session is initialized
             if (!req.app) {
                 req.app = {};
             }
@@ -238,6 +238,54 @@ const updateQuantity = async (req, res) => {
     }
 };
 
+const viewCartContents = async (req, res) => {
+    try {
+        if (req.user) {
+            // If user is authenticated, fetch cart contents from the database
+            const userId = req.user.id;
+            const cart = await Cart.findOne({ user: userId }).populate({
+                path: 'items.product',
+                model: 'Product',
+                select: '-__v -userId -stockQty -lastUpdated' // Example: exclude the version field
+            });
+            if (cart) {
+                res.status(200).json({
+                    message: 'Cart contents retrieved successfully',
+                    data: cart.items
+                });
+            } else {
+                res.status(404).json({ message: 'Cart is empty or not found' });
+            }
+        } else {
+            // If user is not authenticated, fetch cart contents from session cart
+            if (req.app.cart && req.app.cart.length > 0) {
+                // Fetch product details for each product in the session cart
+                const productIds = req.app.cart.map(item => item.product);
+                const products = await Product.find({ _id: { $in: productIds } });
+
+                // Map session cart items to include full product details
+                const sessionCart = req.app.cart.map(item => {
+                    const product = products.find(p => p._id.equals(item.product));
+                    return {
+                        ...item,
+                        product
+                    };
+                });
+
+                res.status(200).json({
+                    message: 'Cart contents retrieved successfully',
+                    data: sessionCart
+                });
+            } else {
+                res.status(404).json({ message: 'Cart is empty or not found' });
+            }
+        }
+    } catch (error) {
+        console.error('Error retrieving cart contents:', error);
+        res.status(500).json({ message: 'Internal server error: ' + error.message });
+    }
+};
+
 
 
 
@@ -334,33 +382,33 @@ const updateQuantity = async (req, res) => {
 //         return res.status(500).json({ message: 'Internal server error: ' + error.message });
 //     }
 // };
-const viewCartContents = async (req, res) => {
-    try {
-        if (req.user) {
-            // If user is authenticated, fetch cart contents from the database
-            const userId = req.user.id;
-            const cartItems = await Cart.find({ userId }).populate('product');
-            res.status(200).json({
-                message: 'Cart contents retrieved successfully',
-                data: cartItems
-            });
-        } else {
-            // If user is not authenticated, fetch cart contents from session cart
-            if (req.app.cart && req.app.cart.length > 0) {
-                res.status(200).json({
-                    message: 'Cart contents retrieved successfully',
-                    data: req.app.cart
-                });
-            } else {
-                res.status(404).json({ message: 'Cart is empty or not found' });
-            }
-        }
-
-    } catch (error) {
-        console.error('Error retrieving cart contents:', error);
-        res.status(500).json({ message: 'Internal server error' + error.message });
-    }
-};
+// const viewCartContents = async (req, res) => {
+//     try {
+//         if (req.user) {
+//             // If user is authenticated, fetch cart contents from the database
+//             const userId = req.user.id;
+//             const cartItems = await Cart.find({ userId }).populate('product');
+//             res.status(200).json({
+//                 message: 'Cart contents retrieved successfully',
+//                 data: cartItems
+//             });
+//         } else {
+//             // If user is not authenticated, fetch cart contents from session cart
+//             if (req.app.cart && req.app.cart.length > 0) {
+//                 res.status(200).json({
+//                     message: 'Cart contents retrieved successfully',
+//                     data: req.app.cart
+//                 });
+//             } else {
+//                 res.status(404).json({ message: 'Cart is empty or not found' });
+//             }
+//         }
+//         //console.log('Updated session cart:', req.app.cart); // Debugging line
+//     } catch (error) {
+//         console.error('Error retrieving cart contents:', error);
+//         res.status(500).json({ message: 'Internal server error' + error.message });
+//     }
+// };
 
 
 
