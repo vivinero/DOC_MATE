@@ -93,10 +93,11 @@ const { id } = require("@hapi/joi/lib/base");
 
 const createAppointment = async (req, res) => {
     try {
-        const userId = req.user.userId;
+        const hospitalId = req.user.userId;
         const id = req.params.id;
+        
 
-        if (!userId) {
+        if (!hospitalId) {
             return res.status(403).json({
                 message: "No Hospital not found"
             });
@@ -139,9 +140,9 @@ const createAppointment = async (req, res) => {
             speciality: speciality,
             patient: app.patient,
             status: app.status,
-            id : app._id
+            appointmentId : app._id
         });
-
+        createApp.hospital.push(hospitalId)
         await createApp.save()
 
         // Send email to the patient with appointment details and link to the app

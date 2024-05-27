@@ -8,6 +8,7 @@ const cloudinary = require("../middleware/cloudinary.js")
 const fs = require("fs")
 const Payment = require('../models/paymentModel'); // Import the Payment model
 const hospitalModel = require("../models/adminModel.js")
+const mongoose = require("mongoose");
 require('dotenv').config()
 
 
@@ -668,58 +669,127 @@ const getOneHospital = async (req, res) => {
   }
 
  
+  
+  const confirmPayment = async (req, res) => {
+      try {
+          const { firstName, lastName, email, phoneNumber, hospitalId, appointmentDate } = req.body;
+          const userId = req.user.userId;
+  
+          // Validate the request body
+          if (!firstName || !lastName || !email || !phoneNumber || !hospitalId || !appointmentDate) {
+              return res.status(400).json({
+                  error: 'All fields are required'
+              });
+          }
+  
+          // Validate the date (optional, for example, check if it's a valid date)
+          if (isNaN(Date.parse(appointmentDate))) {
+              return res.status(400).json({
+                  error: 'Invalid date format'
+              });
+          }
+  
+          // Check if the hospital exists
+          if (!mongoose.Types.ObjectId.isValid(hospitalId)) {
+              return res.status(400).json({
+                  error: 'Invalid hospital ID format'
+              });
+          }
+  
+          const hospital = await hospitalModel.findById(hospitalId);
+          if (!hospital) {
+              return res.status(404).json({
+                  error: 'Hospital not found'
+              });
+          }
+  
+          // Save payment details to the database
+          const payment = new Payment({
+              firstName,
+              lastName,
+              email,
+              phoneNumber,
+              hospitalId: hospitalId, // Store hospitalId in the payment
+              appointmentDate,
+              userId
+          });
+         // payment.hospitalId.push(hospitalId)
+          await payment.save();
+  
+          // Return the patient details as confirmation
+          res.status(200).json({
+              message: 'Payment confirmed and details received',
+              patientDetails: {
+                  firstName,
+                  lastName,
+                  email,
+                  phoneNumber,
+                  hospitalId,
+                  appointmentDate,
+                  userId
+              },
+          });
+      } catch (error) {
+          res.status(500).json({
+              error: 'Internal server error: ' + error.message
+          });
+      }
+  };
+  
+ 
+  
 
-const confirmPayment = async (req, res) => {
-    try {
-        const { firstName, lastName, email, phoneNumber, hospitalId, appointmentDate } = req.body;
-        const userId = req.user.userId;
+// const confirmPayment = async (req, res) => {
+//     try {
+//         const { firstName, lastName, email, phoneNumber, hospitalId, appointmentDate } = req.body;
+//         const userId = req.user.userId;
 
-        // Validate the request body
-        if (!firstName || !lastName || !email || !phoneNumber || !hospitalId || !appointmentDate) {
-            return res.status(400).json({
-                error: 'All fields are required'
-            });
-        }
+//         // Validate the request body
+//         if (!firstName || !lastName || !email || !phoneNumber || !hospitalId || !appointmentDate) {
+//             return res.status(400).json({
+//                 error: 'All fields are required'
+//             });
+//         }
 
-        // Validate the date (optional, for example, check if it's a valid date)
-        if (isNaN(Date.parse(appointmentDate))) {
-            return res.status(400).json({
-                error: 'Invalid date format'
-            });
-        }
+//         // Validate the date (optional, for example, check if it's a valid date)
+//         if (isNaN(Date.parse(appointmentDate))) {
+//             return res.status(400).json({
+//                 error: 'Invalid date format'
+//             });
+//         }
 
-        // Save payment details to the database
-        const payment = new Payment({
-            firstName,
-            lastName,
-            email,
-            phoneNumber,
-            hospitalId,
-            appointmentDate,
-            userId
-        });
+//         // Save payment details to the database
+//         const payment = new Payment({
+//             firstName,
+//             lastName,
+//             email,
+//             phoneNumber,
+//             hospitalId,
+//             appointmentDate,
+//             userId
+//         });
 
-        await payment.save();
+//         await payment.save();
 
-        // Return the patient details as confirmation
-        res.status(200).json({
-            message: 'Payment confirmed and details received',
-            patientDetails: {
-                firstName,
-                lastName,
-                email,
-                phoneNumber,
-                hospitalId,
-                appointmentDate,
-                userId
-            },
-        });
-    } catch (error) {
-        res.status(500).json({
-            error: 'Internal server error: ' + error.message
-        });
-    }
-};
+//         // Return the patient details as confirmation
+//         res.status(200).json({
+//             message: 'Payment confirmed and details received',
+//             patientDetails: {
+//                 firstName,
+//                 lastName,
+//                 email,
+//                 phoneNumber,
+//                 hospitalId,
+//                 appointmentDate,
+//                 userId
+//             },
+//         });
+//     } catch (error) {
+//         res.status(500).json({
+//             error: 'Internal server error: ' + error.message
+//         });
+//     }
+// };
 
 // const confirmPayment = async (req, res) => {
 //     try {
@@ -847,8 +917,6 @@ const logOut = async (req, res) => {
 
 
 
-
-
 const searchHospital = async (req, res) => {
   try {
     // Extract the search query from the request
@@ -889,117 +957,7 @@ const searchHospital = async (req, res) => {
 
 
 
-// Route to search hospitals by name and sort alphabetically
-// const searchHospital = async (req, res) => {
-//   try {
-//     const { hospitalName } = req.query;
 
-//     // Log the query parameter to ensure it is being received
-//     console.log('Search query:', hospitalName);
-
-//     // Create a filter for the search query
-//     const filter = hospitalName ? { hospitalName: { $regex: new RegExp('^' + hospitalName, 'i') } } : {};
-
-//     // Log the filter object to ensure it is constructed correctly
-//     console.log('Filter object:', filter);
-
-//     const hospitals = await hospitalModel.find(filter).sort({ hospitalName: 1 }); // 1 for ascending order
-
-//     // Log the retrieved hospitals to ensure the query is working
-//     console.log('Retrieved hospitals:', hospitals);
-
-//     res.status(200).json({
-//       message: 'Hospitals retrieved successfully',
-//       data: hospitals
-//     });
-//   } catch (error) {
-//     console.error('Error retrieving hospitals:', error);
-//     res.status(500).json({
-//       message: 'Internal Server Error: ' + error.message,
-//     });
-//   }
-// };
-
-// const searchHospital = async(req,res)=>{
-//     try {
-  
-//         // get the user's search
-//         // const {search} = req.params
-//         // if(!search){
-//         //     return res.status(400).json({
-//         //         error:"can't search an empty field"
-//         //     })
-//         // }
-  
-//         const searchQuery = req.query.q  ;
-//         // console.log(searchQuery)
-//         // const convertedSearch = search.toLowerCase().charAt(0).toUpperCase() + search.slice(1)
-  
-//         // check if the search is a location
-//         // const loc = await locModel.findOne({loc:convertedSearch}).populate({path:"hotel", populate:{path:"hotelRooms"}})
-  
-        
-//             // if not location search in hotel
-//             const hospital = await hospitalModel.find({ hospitalName: { $regex: `^${searchQuery}`, $options: 'i' } }).populate("Hospital")
-  
-//         if(!hospital || hospital.length === 0){
-//             const loc = await hospitalModel.find({ loc: { $regex: `^${searchQuery}`, $options: 'i' } }).populate({path:"Hospital", populate:{path:"Hospital"}})
-//     // console.log(loc[0].hotel)
-    
-//             // extract details from the locstion returned
-//             const extractedData = loc[0].hospital.map(hospital => ({
-//                 id:hospital._id,
-//                 name: hospital.hospitalName,
-//                 //description: hospital.desc,
-//                 //profileImage: hospital.profileImage,
-//                 email: hospital.email,
-//                 address: hospital.hospitalAddress,
-//                // features: hospital.features,
-    
-                
-//             }));
-    
-//            return res.status(200).json({
-//                 message:`${extractedData.length} Hospitals with the name ${searchQuery}`,
-//                 data:extractedData
-//             })
-  
-//         }
-  
-//                 if(hospital.length === 0){
-//                 return res.status(404).json({
-//                     error:`No result found for ${searchQuery}`
-//                 })
-//             }
-  
-//             // extract hotel inputs
-//             const extractedHospital = hospital.map(hospital => ({
-//                 id:hospital._id,
-//                 name:hospital.hospitalName,
-//                 //description:hospital.desc,
-//                 //profileImage:hospital.profileImage,
-//                 email: hospital.email,
-//                 address:hospital.hospitalAddress,
-//                 //features:hospital.features,
-//                 //stars:hospital.stars,
-//                 //hotelImages:hospital.hotelImages,
-                
-//             }))
-        
-//             // retun the hotels
-//             res.status(200).json({
-//                 message:`${hotel.length} hotel found for ${searchQuery}`,
-//                 data:extractedHospital
-//             })
-        
-//     } catch (err) {
-//         res.status(500).json({
-//             error:err.message
-//         })
-//     }
-//   }
-  
-  
 
 
 

@@ -22,7 +22,7 @@ const paymentSchema = new mongoose.Schema({
     hospitalId: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: 'Hospital'
+        //ref: 'Hospital'
     },
     appointmentDate: {
         type: Date,

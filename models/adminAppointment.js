@@ -21,6 +21,11 @@ const Appointments = new mongoose.Schema({
         type: mongoose.SchemaTypes.ObjectId,
         ref: "Patient"
     },
+    hospital: [{
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'Hospital'
+    }],
     
 
 })
