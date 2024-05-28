@@ -2,7 +2,7 @@ const adminRouter = require("express").Router()
 
 const {register, verifyAdmin, loginAdmin, forgotpassWordAdmin,getOneAdmin, resetpasswordAdmin, uploadProfilePictureAdmin,
      deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest, getAllPatient, getOnePatient, updateAdminProfile,
-     getAllPatientsInHospital, getPayments, deletePayment, deleteAllPayments
+     getAllPatientsInHospital, getPayments, deletePayment, deleteAllPayments, deleteOnePatient
     }
 
  = require("../controllers/adminControl")
@@ -30,9 +30,11 @@ adminRouter.delete("delete-app/:id", deleteRequest)
 adminRouter.get('/all-payment', adminAuthenticate, getPayments);
 // Define the route for deleting one payment
 adminRouter.delete('/delete-payment/:paymentId',adminAuthenticate, deletePayment);
+//endpoint to delete a patient
+adminRouter.delete('/delete-payment/:paymentId',adminAuthenticate, deletePayment);
 
 // Define the route for deleting all payments
-adminRouter.delete('/delete-all-payment', adminAuthenticate, deleteAllPayments);
+adminRouter.delete('/delete-patient/:patientId', adminAuthenticate, deleteOnePatient);
 
 
 

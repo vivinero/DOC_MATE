@@ -614,24 +614,25 @@ const getOnePatient = async (req, res) => {
     }
 
 }
-// const deleteOnePatient = async (req, res) => {
-//     try {
-//         const id = req.params.id
-//         const findPatient = await patientModel.findByIdAndDelete(id)
-//         if (!findPatient) {
-//             return res.status(404).json({
-//                 message: "Unable to find patient to be deleted"
-//             })
-//         }
-//         return res.status(200).json({
-//             message: `The patient with: ${findPatient.firstName} has been found`
-//         })
-//     } catch (error) {
-//         res.status(500).json({
-//             message: error.message
-//         })
-//     }
-// }
+const deleteOnePatient = async (req, res) => {
+    try {
+        const hospitalId = req.user.userId
+        const patientId = req.params.patientId
+        const findPatient = await patientModel.findByIdAndDelete(patientId)
+        if (!findPatient) {
+            return res.status(404).json({
+                message: "Unable to find patient to be deleted"
+            })
+        }
+        return res.status(200).json({
+            message: `The patient with: ${findPatient.firstName} has been deleted`
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        })
+    }
+}
 
 
 const updateAdminProfile = async (req, res) => {
@@ -856,5 +857,5 @@ const deleteAllPayments = async (req, res) => {
 
 
 module.exports = {
-    register, verifyAdmin, loginAdmin, getOneAdmin, forgotpassWordAdmin, getOnePatient, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest, getPayments, deletePayment, deleteAllPayments, updateAdminProfile, getAllPatientsInHospital
+    register, verifyAdmin, loginAdmin, getOneAdmin, forgotpassWordAdmin, getOnePatient, deleteOnePatient,resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest, getPayments, deletePayment, deleteAllPayments, updateAdminProfile, getAllPatientsInHospital
 }
