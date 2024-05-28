@@ -8,7 +8,7 @@ adminAppointmentRouter.post("/createAppointment/:id", adminAuthenticate, createA
 adminAppointmentRouter.post("/reschedule/:id", adminAuthenticate, rescheduleAppointment)
 adminAppointmentRouter.get("/all-appointments", getAllApp)
 adminAppointmentRouter.get("/oneappointment/:id", getOneApp)
-adminAppointmentRouter.get("/deleteappointment/:id", deleteAppointment)
+adminAppointmentRouter.delete("/delete-appointment/:appointmentId",adminAuthenticate, deleteAppointment)
 adminAppointmentRouter.get("/pendingappointment/", getAllPendingAppointments)
 adminAppointmentRouter.get("/allpending/", getAllPending)
 adminAppointmentRouter.get("/all-pending-reschedule/", getAllPendingReschedule)

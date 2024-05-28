@@ -357,8 +357,9 @@ const getOneApp = async (req, res) => {
 
 const deleteAppointment = async (req, res) => {
     try {
-        const id = req.body.id
-        const findApp = await appointmentsModel.findByIdAndDelete(id)
+        const userId = req.user.userId
+        const appointmentId = req.params.appointmentId
+        const findApp = await appointmentsModel.findByIdAndDelete(appointmentId)
         if (!findApp) {
             return res.status(404).json({
                 message: "Unable to find appointment to be deleted"

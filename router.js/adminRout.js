@@ -25,7 +25,7 @@ adminRouter.get("/one-patient/:id", adminAuthenticate,getOnePatient)
 adminRouter.get("/one-admin", adminAuthenticate, getOneAdmin)
 // adminRouter.delete("/delete-patient", adminAuthenticate, deleteOnePatient)
 adminRouter.put("/admin-profile-update/:id", adminAuthenticate, updateAdminProfile)
-adminRouter.delete("delete-app/:id", deleteRequest)
+adminRouter.delete("delete-app/:appointmentId", deleteRequest)
 // Define the route for the new endpoint
 adminRouter.get('/all-payment', adminAuthenticate, getPayments);
 // Define the route for deleting one payment
