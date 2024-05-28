@@ -152,7 +152,10 @@ const addToCart = async (req, res) => {
 // }
 const removeFromCart = async (req, res) => {
     try {
+        console.log('Session:',req.app)
         const productId = req.params.productId;
+        console.log('Product ID to remove:', productId);
+
 
         if (req.user) {
             // If user is authenticated, remove item from user's cart in the database
@@ -174,12 +177,20 @@ const removeFromCart = async (req, res) => {
         } else {
             // If user is not authenticated, remove item from session cart
             // Ensure req.session is initialized
+
+            // if (!req.app) {
+            //     return res.status(500).json({ message: 'Session not initialized' });
+            // }
             if (!req.app) {
                 req.app = {};
             }
 
             // Ensure req.session.cart is initialized
             req.app.cart = req.app.cart || [];
+            console.log('Session cart before removal:', req.app.cart);
+
+             // Remove the item from the session cart
+             //req.app.cart = req.session.cart.filter(item => item.product.toString() !== productId);
 
             // Remove the item from the session cart
             req.app.cart = req.app.cart.filter(item => item.productId !== productId);
