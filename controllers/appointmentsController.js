@@ -377,7 +377,8 @@ const deleteAppointment = async (req, res) => {
 
 const getAllPendingAppointments = async (req, res) => {
     try {
-        const pendingAppointments = await appointmentsModel.find({ status: 'pending' });
+        const hospitalId = req.user.userId
+        const pendingAppointments = await appointmentsModel.find({ status: 'Pending' });
         if (!pendingAppointments) {
             return res.status(404).json({
                 message: "Unable to get all pending appointment"
