@@ -408,6 +408,7 @@ const logOutAdmin = async (req, res) => {
 
 const getAllRequest = async (req, res) => {
     try {
+        const hospitalId = req.user.userId
         const notification = await notificationModel.find().sort({ createdAt: -1 });
         if (!notification) {
             res.status(404).json({
@@ -566,8 +567,9 @@ const deleteRequest = async (req, res) => {
 
 const getAllPatientsInHospital = async (req, res) => {
     try {
-        console.log(req.user)
+        console.log('User:', req.user);
         const id = req.user.userId;
+        console.log('Hospital ID:', id);
         // Query the database to find all patients in the specified hospital
         const patients = await patientModel.find({ hospitals: id });
 
@@ -578,7 +580,7 @@ const getAllPatientsInHospital = async (req, res) => {
         }
 
         res.status(200).json({
-            message: `Patients in hospital ID ${hospitalId} have been found`,
+            message: `Patients in hospital ID ${id} have been found`,
             data: patients
         });
     } catch (error) {
