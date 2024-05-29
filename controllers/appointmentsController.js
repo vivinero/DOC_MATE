@@ -147,7 +147,7 @@ const createAppointment = async (req, res) => {
 
         // Send email to the patient with appointment details and link to the app
         const subject = "Your Appointment Details";
-        const link = `https://docmate-tau.vercel.app/#/patient/patientAppointmentReview/{createApp._id}`; // Modify this URL according to your requirement
+        const link = `https://docmate-tau.vercel.app/#/patient/patientAppointmentReview/${createApp._id}`; // Modify this URL according to your requirement
         const html = viewApp(link, app.firstName); // Assuming you have access to patient's first name
         await sendMail({
             email: app.patientEmail,
