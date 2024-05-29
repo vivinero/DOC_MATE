@@ -378,20 +378,20 @@ const deleteAppointment = async (req, res) => {
 const getAllPendingAppointments = async (req, res) => {
     try {
         const hospitalId = req.user.userId
-        const pendingAppointments = await appointmentsModel.find({ status: 'Pending' });
-        if (!pendingAppointments) {
+        const Appointments = await appointmentsModel.find({ status: 'Pending' });
+        if (!Appointments) {
             return res.status(404).json({
                 message: "Unable to get all pending appointment"
             })
         }
-        if (pendingAppointments.length === 0) {
+        if (Appointments.length === 0) {
             return res.status(200).json({
                 message: "There are no available pending appointments"
             })
         }
         res.status(200).json({
-            message: `There are ${pendingAppointments.length} pending appointments`,
-            pendingAppointments
+            message: `There are ${Appointments.length} pending appointments`,
+            Appointments
         });
     } catch (error) {
         res.status(500).json({
