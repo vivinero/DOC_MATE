@@ -580,7 +580,7 @@ const getAllPatientsInHospital = async (req, res) => {
         }
 
         res.status(200).json({
-            message: `Patients in hospital ID ${id} have been found`,
+            message: `Patients in hospital ID ${id} have ben found`,
             data: patients
         });
     } catch (error) {
@@ -669,6 +669,41 @@ const updateAdminProfile = async (req, res) => {
         });
     }
 };
+
+// const getPayments = async (req, res) => {
+//     try {
+//         // Extract hospital ID from authenticated user
+//         const hospitalId = req.user.userId;
+
+//         // Debug: Check if hospitalId is available
+//         if (!hospitalId) {
+//             console.log('No hospital ID found in user authentication');
+//             return res.status(404).json({ message: "You are not authenticated" });
+//         }
+
+//         // Debug: Log the hospital ID
+//         console.log('Fetching payments for hospital ID:', hospitalId);
+
+//         // Fetch payments associated with the hospital ID
+//         const payments = await Payment.find({ hospital: hospitalId });
+
+//         // Debug: Log the fetched payments
+//         console.log('Fetched payments:', payments);
+
+//         // Check if payments were found
+//         if (payments.length === 0) {
+//             console.log('No payments found for the hospital ID');
+//             return res.status(404).json({ message: 'No payments found for this hospital' });
+//         }
+
+//         // Return the payments
+//         return res.status(200).json({ message: 'Payments retrieved successfully', payments });
+//     } catch (error) {
+//         console.error('Error retrieving payments:', error.message);
+//         res.status(500).json({ error: 'Internal server error: ' + error.message });
+//     }
+// };
+
 const getPayments = async (req, res) => {
     try {
         //const userId = req.user.userId;
@@ -676,7 +711,7 @@ const getPayments = async (req, res) => {
         if (!hospitalId) {
             return res.status(404).json({ message: "You are not authenticated" }); // Note the added return statement
         }
-        const payments = await Payment.find({ hospital: hospitalId });
+        const payments = await Payment.find({ hospitalId: hospitalId });
         return res.status(200).json({ message: 'Payments retrieved successfully', payments, }); // Only one response is sent
     } catch (error) {
         res.status(500).json({ error: 'Internal server error: ' + error.message });
@@ -859,5 +894,5 @@ const deleteAllPayments = async (req, res) => {
 
 
 module.exports = {
-    register, verifyAdmin, loginAdmin, getOneAdmin, forgotpassWordAdmin, getOnePatient, deleteOnePatient,resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest, getPayments, deletePayment, deleteAllPayments, updateAdminProfile, getAllPatientsInHospital
+    register, verifyAdmin, loginAdmin, getOneAdmin, forgotpassWordAdmin, getOnePatient, deleteOnePatient, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest, getPayments, deletePayment, deleteAllPayments, updateAdminProfile, getAllPatientsInHospital
 }
