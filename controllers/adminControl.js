@@ -703,44 +703,55 @@ const updateAdminProfile = async (req, res) => {
 //         res.status(500).json({ error: 'Internal server error: ' + error.message });
 //     }
 // };
-
 const getPayments = async (req, res) => {
     try {
-        //const userId = req.user.userId;
+        // Get the hospital ID from the authenticated user
         const hospitalId = req.user.userId;
+
+        // Check if hospitalId is present
         if (!hospitalId) {
-            return res.status(404).json({ message: "You are not authenticated" }); // Note the added return statement
+            return res.status(404).json({ message: "You are not authenticated" });
         }
-        const payments = await Payment.find({ hospitalId: hospitalId });
-        return res.status(200).json({ message: 'Payments retrieved successfully', payments, }); // Only one response is sent
+
+        // Find payments associated with the hospital ID
+        const payments = await Payment.find({ hospitalId });
+
+        // Check if no payments were found
+        if (payments.length === 0) {
+            return res.status(404).json({ message: "No payments found for this hospital" });
+        }
+
+        // Return the payments if found
+        return res.status(200).json({ message: 'Payments retrieved successfully', payments });
     } catch (error) {
+        // Handle any errors that occur during the process
         res.status(500).json({ error: 'Internal server error: ' + error.message });
     }
 };
 
-
-
-
-
 // const getPayments = async (req, res) => {
 //     try {
-//         const userId = req.user.userId;
-//         const hospitalId = req.user.hospitalId; // Assuming you have a hospitalId in the user object
-
-//         if (!userId || !hospitalId) {
-//             res.status(404).json({ message: "You are not authenticated" });
+//         //const userId = req.user.userId;
+//         const hospitalId = req.user.userId;
+//         if (!hospitalId) {
+//             return res.status(404).json({ message: "You are not authenticated" }); // Note the added return statement
 //         }
-
-//         const payments = await Payment.find({ hospital: hospitalId }); // Filter payments by hospitalId
-
-//         return res.status(200).json({
-//             message: 'Payments retrieved successfully',
-//             payments,
-//         });
+//         const payments = await Payment.find({ hospitalId: hospitalId });
+//         if(!payments){
+//             return res.status(404).json({
+//                 message: "No payments found"
+//             })
+//         }
+//         return res.status(200).json({ message: 'Payments retrieved successfully', payments, }); // Only one response is sent
 //     } catch (error) {
 //         res.status(500).json({ error: 'Internal server error: ' + error.message });
 //     }
 // };
+
+
+
+
+
 
 
 //     try {
