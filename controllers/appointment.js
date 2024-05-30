@@ -271,7 +271,7 @@ const viewPatientAppointments = async (req, res) => {
     }
 
     // Find all appointments for the patient
-    const appointments = await appointmentModel.find({ patientId: patientId }).sort({ date: -1 });
+    const appointments = await appointmentModel.find({ patient: patientId }).sort({ date: -1 });
 
     // Check if appointments are found
     if (!appointments || appointments.length === 0) {
