@@ -147,8 +147,8 @@ const createAppointment = async (req, res) => {
 
         // Send email to the patient with appointment details and link to the app
         const subject = "Your Appointment Details";
-        const link = `https://docmate-tau.vercel.app/#/patient/patientAppointmentReview/{createApp._id}`; // Modify this URL according to your requirement
-        const html = viewApp(link, app.firstName); // Assuming you have access to patient's first name
+        const link = `https://docmate-tau.vercel.app/#/appointmentLogin/${createApp._id}`; // Modify this URL according to your requirement
+        const html = viewApp(link, app.fullName); // Assuming you have access to patient's first name
         await sendMail({
             email: app.patientEmail,
             subject: subject,
@@ -308,9 +308,6 @@ const rescheduleAppointment = async (req, res) => {
 } 
 
 
-
-
-
 const getAllApp = async (req, res) => {
     try {
         const appointments = await appointmentsModel.find()
@@ -357,8 +354,9 @@ const getOneApp = async (req, res) => {
 
 const deleteAppointment = async (req, res) => {
     try {
-        const id = req.body.id
-        const findApp = await appointmentsModel.findByIdAndDelete(id)
+        const userId = req.user.userId
+        const appointmentId = req.params.appointmentId
+        const findApp = await appointmentsModel.findByIdAndDelete(appointmentId)
         if (!findApp) {
             return res.status(404).json({
                 message: "Unable to find appointment to be deleted"
@@ -376,20 +374,21 @@ const deleteAppointment = async (req, res) => {
 
 const getAllPendingAppointments = async (req, res) => {
     try {
-        const pendingAppointments = await appointmentsModel.find({ status: 'pending' });
-        if (!pendingAppointments) {
+        const hospitalId = req.user.userId
+        const appointments = await appointmentsModel.find({ status: 'Pending' });
+        if (!appointments) {
             return res.status(404).json({
                 message: "Unable to get all pending appointment"
             })
         }
-        if (pendingAppointments.length === 0) {
+        if (appointments.length === 0) {
             return res.status(200).json({
                 message: "There are no available pending appointments"
             })
         }
         res.status(200).json({
-            message: `There are ${pendingAppointments.length} pending appointments`,
-            pendingAppointments
+            message: `There are ${appointments.length} pending appointments`,
+            appointments
         });
     } catch (error) {
         res.status(500).json({
@@ -513,6 +512,5 @@ module.exports={
      getAllPending,
      getAllPendingReschedule,
      getAllConfirmedAppointment
-    
 
 }

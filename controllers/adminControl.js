@@ -408,6 +408,7 @@ const logOutAdmin = async (req, res) => {
 
 const getAllRequest = async (req, res) => {
     try {
+        const hospitalId = req.user.userId
         const notification = await notificationModel.find().sort({ createdAt: -1 });
         if (!notification) {
             res.status(404).json({
@@ -566,10 +567,11 @@ const deleteRequest = async (req, res) => {
 
 const getAllPatientsInHospital = async (req, res) => {
     try {
-        console.log(req.user)
+        console.log('User:', req.user);
         const id = req.user.userId;
+        console.log('Hospital ID:', id);
         // Query the database to find all patients in the specified hospital
-        const patients = await patientModel.find({hospitals: id });
+        const patients = await patientModel.find({ hospitals: id });
 
         if (!patients || patients.length === 0) {
             return res.status(404).json({
@@ -578,7 +580,7 @@ const getAllPatientsInHospital = async (req, res) => {
         }
 
         res.status(200).json({
-            message: `Patients in hospital ID ${hospitalId} have been found`,
+            message: `Patients in hospital ID ${id} have ben found`,
             data: patients
         });
     } catch (error) {
@@ -614,30 +616,31 @@ const getOnePatient = async (req, res) => {
     }
 
 }
-// const deleteOnePatient = async (req, res) => {
-//     try {
-//         const id = req.params.id
-//         const findPatient = await patientModel.findByIdAndDelete(id)
-//         if (!findPatient) {
-//             return res.status(404).json({
-//                 message: "Unable to find patient to be deleted"
-//             })
-//         }
-//         return res.status(200).json({
-//             message: `The patient with: ${findPatient.firstName} has been found`
-//         })
-//     } catch (error) {
-//         res.status(500).json({
-//             message: error.message
-//         })
-//     }
-// }
+const deleteOnePatient = async (req, res) => {
+    try {
+        const hospitalId = req.user.userId
+        const patientId = req.params.patientId
+        const findPatient = await patientModel.findByIdAndDelete(patientId)
+        if (!findPatient) {
+            return res.status(404).json({
+                message: "Unable to find patient to be deleted"
+            })
+        }
+        return res.status(200).json({
+            message: `The patient with: ${findPatient.firstName} has been deleted`
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: error.message
+        })
+    }
+}
 
 
-  const updateAdminProfile = async (req, res) => {
+const updateAdminProfile = async (req, res) => {
     try {
         // const userId = req.user.userId;
-        const {id} = req.params
+        const { id } = req.params
         const { email, address, phoneNumber } = req.body;
 
         // check for errors
@@ -647,13 +650,13 @@ const getOnePatient = async (req, res) => {
             });
         }
         //update user's info
-        const updatedInfo = await adminModel.findByIdAndUpdate( id, { email, address, phoneNumber },{ new: true });
+        const updatedInfo = await adminModel.findByIdAndUpdate(id, { email, address, phoneNumber }, { new: true });
 
         //check if the user exist
         if (!updatedInfo) {
             return res.status(400).json({
                 message: "Unable to update user"
-            })   
+            })
         }
         // throw a success response
         res.status(200).json({
@@ -666,26 +669,110 @@ const getOnePatient = async (req, res) => {
         });
     }
 };
+
+// const getPayments = async (req, res) => {
+//     try {
+//         // Extract hospital ID from authenticated user
+//         const hospitalId = req.user.userId;
+
+//         // Debug: Check if hospitalId is available
+//         if (!hospitalId) {
+//             console.log('No hospital ID found in user authentication');
+//             return res.status(404).json({ message: "You are not authenticated" });
+//         }
+
+//         // Debug: Log the hospital ID
+//         console.log('Fetching payments for hospital ID:', hospitalId);
+
+//         // Fetch payments associated with the hospital ID
+//         const payments = await Payment.find({ hospital: hospitalId });
+
+//         // Debug: Log the fetched payments
+//         console.log('Fetched payments:', payments);
+
+//         // Check if payments were found
+//         if (payments.length === 0) {
+//             console.log('No payments found for the hospital ID');
+//             return res.status(404).json({ message: 'No payments found for this hospital' });
+//         }
+
+//         // Return the payments
+//         return res.status(200).json({ message: 'Payments retrieved successfully', payments });
+//     } catch (error) {
+//         console.error('Error retrieving payments:', error.message);
+//         res.status(500).json({ error: 'Internal server error: ' + error.message });
+//     }
+// };
 const getPayments = async (req, res) => {
     try {
-        const userId = req.user.userId
-        if(!userId){
-            res.status(404).json({
-                message: "You are not authenticated"
-            })
-        }
-        const payments = await Payment.find();
+        // Get the hospital ID from the authenticated user
+        const hospitalId = req.user.userId;
 
-        res.status(200).json({
-            message: 'Payments retrieved successfully',
-            payments
-        });
+        // Check if hospitalId is present
+        if (!hospitalId) {
+            return res.status(404).json({ message: "You are not authenticated" });
+        }
+
+        // Find payments associated with the hospital ID
+        const payments = await Payment.find({ hospitalId });
+
+        // Check if no payments were found
+        if (payments.length === 0) {
+            return res.status(404).json({ message: "No payments found for this hospital" });
+        }
+
+        // Return the payments if found
+        return res.status(200).json({ message: 'Payments retrieved successfully', payments });
     } catch (error) {
-        res.status(500).json({
-            error: 'Internal server error: ' + error.message
-        });
+        // Handle any errors that occur during the process
+        res.status(500).json({ error: 'Internal server error: ' + error.message });
     }
 };
+
+// const getPayments = async (req, res) => {
+//     try {
+//         //const userId = req.user.userId;
+//         const hospitalId = req.user.userId;
+//         if (!hospitalId) {
+//             return res.status(404).json({ message: "You are not authenticated" }); // Note the added return statement
+//         }
+//         const payments = await Payment.find({ hospitalId: hospitalId });
+//         if(!payments){
+//             return res.status(404).json({
+//                 message: "No payments found"
+//             })
+//         }
+//         return res.status(200).json({ message: 'Payments retrieved successfully', payments, }); // Only one response is sent
+//     } catch (error) {
+//         res.status(500).json({ error: 'Internal server error: ' + error.message });
+//     }
+// };
+
+
+
+
+
+
+
+//     try {
+//         const userId = req.user.userId
+//         if(!userId){
+//             res.status(404).json({
+//                 message: "You are not authenticated"
+//             })
+//         }
+//         const payments = await Payment.find();
+
+//         res.status(200).json({
+//             message: 'Payments retrieved successfully',
+//             payments
+//         });
+//     } catch (error) {
+//         res.status(500).json({
+//             error: 'Internal server error: ' + error.message
+//         });
+//     }
+// };
 
 const deletePayment = async (req, res) => {
     try {
@@ -747,7 +834,7 @@ const deleteAllPayments = async (req, res) => {
 //         const paymentId = req.params.paymentId;
 //         //Payment model defined
 //         const payment = await paymentModel.findById(paymentId);
-        
+
 //         if (!payment) {
 //             // If payment is not found
 //             return "Payment not found";
@@ -782,7 +869,7 @@ const deleteAllPayments = async (req, res) => {
 
 //         // Check if payment belongs to the specified hospital
 //         const payment = await paymentModel.findOne({ _id: paymentId, hospitalId });
-        
+
 //         if (!payment) {
 //             // If payment is not found or doesn't belong to the hospital
 //             return res.status(404).json({
@@ -818,4 +905,5 @@ const deleteAllPayments = async (req, res) => {
 
 
 module.exports = {
-    register, verifyAdmin, loginAdmin, getOneAdmin, forgotpassWordAdmin, getOnePatient, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest,getPayments,  deletePayment, deleteAllPayments, updateAdminProfile, getAllPatientsInHospital}
+    register, verifyAdmin, loginAdmin, getOneAdmin, forgotpassWordAdmin, getOnePatient, deleteOnePatient, resetpasswordAdmin, uploadProfilePictureAdmin, deleteProfilePictureAdmin, logOutAdmin, getAllRequest, deleteRequest, viewOneAppointRequest, getPayments, deletePayment, deleteAllPayments, updateAdminProfile, getAllPatientsInHospital
+}

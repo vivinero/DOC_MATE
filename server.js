@@ -1,5 +1,5 @@
 // const { sendAppointmentReminders } = require('./controllers/appointment');
-const appointmentModel = require("./models/appModel")
+const appointmentModel = require("./models/appModel.js")
 
 const express = require('express');
 // const http = require('http');
@@ -13,15 +13,15 @@ const messageRouter = require('./routers/messageRouter.js');
 const Message = require('./models/messagesModel.js');
 const { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold  } = require('@google/generative-ai');
 
-const patientRouter = require('./router.js/patientRout');
-const patientAppointmentRouter = require("./router.js/patientAppRoute")
-const appointmentRouter = require('./router.js/adminAppRoute');
+const patientRouter = require('./router.js/patientRout.js');
+const patientAppointmentRouter = require("./router.js/patientAppRoute.js")
+const appointmentRouter = require('./router.js/adminAppRoute.js');
 //const notificationRouter = require('./router.js/notificationRout');
-const adminRouter = require('./router.js/adminRout');
-const contactUs = require("./router.js/messageRoute")
+const adminRouter = require('./router.js/adminRout.js');
+const contactUs = require("./router.js/messageRoute.js")
 const productRouter = require('./router.js/productRoute.js')
 const categoryRouter = require('./router.js/categoryRoute.js')
-// const cartRouter = require("./router.js/cartRouter.js")
+const cartRouter = require("./router.js/cartRouter.js")
 const searchRouter = require("./router.js/searchRoute.js");
 const fileUpload = require ("express-fileupload")
 
@@ -32,7 +32,7 @@ app.use(cors("*"))
 // Set up Socket.IO
 //const apps = require("./middleware/session")
 
-const db = require("./config/config");
+const db = require("./config/config.js");
 
 app.use(bodyParser.json());
 // Add error handling middleware for JSON parsing errors
@@ -154,7 +154,7 @@ app.use(patientAppointmentRouter)
 app.use(contactUs)
 app.use(messageRouter);
 app.use(productRouter)
-// app.use(cartRouter)
+app.use(cartRouter)
 app.use(categoryRouter)
 app.use(searchRouter);
 
