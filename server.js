@@ -21,7 +21,7 @@ const adminRouter = require('./router.js/adminRout');
 const contactUs = require("./router.js/messageRoute")
 const productRouter = require('./router.js/productRoute.js')
 const categoryRouter = require('./router.js/categoryRoute.js')
-const cartRouter = require("./router.js/cartRouter.js")
+// const cartRouter = require("./router.js/cartRouter.js")
 const searchRouter = require("./router.js/searchRoute.js");
 const fileUpload = require ("express-fileupload")
 
@@ -154,7 +154,7 @@ app.use(patientAppointmentRouter)
 app.use(contactUs)
 app.use(messageRouter);
 app.use(productRouter)
-app.use(cartRouter)
+// app.use(cartRouter)
 app.use(categoryRouter)
 app.use(searchRouter);
 
