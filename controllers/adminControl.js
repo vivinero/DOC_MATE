@@ -472,10 +472,6 @@ const getOneAdmin = async (req, res) => {
     }
 }
 
-
-
-
-
 const deleteRequest = async (req, res) => {
     try {
         const appointmentId = req.params.appointmentId;
@@ -500,24 +496,6 @@ const deleteRequest = async (req, res) => {
     }
 }
 
-//   exports.getAllHospitals = async (req, res) => {
-//     try {
-//         const comment = await commentModel.find()
-//         if (comment.length === 0) {
-//             return res.status(200).json({
-//                 message: "No Comment found"
-//             })
-//         }
-//         return res.status(200).json({
-//             message: "These are the comments in the blog",
-//             comment
-//         })
-//     } catch (error) {
-//         res.status(500).json({
-//             message: error.message
-//         })
-//     }
-// }
 
 
 // const getAllPatient = async (req, res) => {
@@ -544,32 +522,13 @@ const deleteRequest = async (req, res) => {
 
 
 
-// const getAllPatientsInHospital = async (req, res) => {
-//     try {
-//         const id = req.user.userId
-//         const {HospitalId} = req.params
-//         const Patient = await patientModel.findById(id, {HospitalId})
-//         if (!Patient || Patient.length === 0) {
-//             return res.status(404).json({
-//                 error: "No patient found in this hospital"
-//             })
-//         }
-//         res.status(200).json({
-//             message: `Patients in hospital ID ${HospitalId} have been found`
-//         })
-//     } catch (error) {
-//         res.status(500).json({
-//             error: error.message
-//         })
-//     }
-// };
 
 
 const getAllPatientsInHospital = async (req, res) => {
     try {
-        console.log('User:', req.user);
+       
         const id = req.user.userId;
-        console.log('Hospital ID:', id);
+       
         // Query the database to find all patients in the specified hospital
         const patients = await patientModel.find({ hospitals: id });
 
